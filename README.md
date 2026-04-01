@@ -105,6 +105,50 @@ orbis/
 
 ---
 
+## Routes de l'Application
+
+### Public
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page avec compteur realtime |
+
+### Authentification
+| Route | Description |
+|-------|-------------|
+| `/auth/login` | Connexion email/password |
+| `/auth/register` | Inscription en 3 étapes (identifiants → profil → résidence) |
+
+### Application (authentification requise)
+| Route | Description |
+|-------|-------------|
+| `/dashboard` | Vue d'ensemble (solde, entreprises, transactions, suggestions) |
+| `/bank` | Gestion des comptes et virements |
+| `/map` | Carte interactive des villes et entreprises |
+| `/company/new` | Création d'une entreprise |
+| `/company/[id]` | Détail d'une entreprise |
+| `/profile` | Profil utilisateur et paramètres |
+| `/suggestions` | Liste des suggestions avec filtres et tri |
+| `/suggestions/new` | Créer une nouvelle suggestion |
+
+### Administration (admin requis)
+| Route | Description |
+|-------|-------------|
+| `/admin/suggestions` | Gestion des suggestions (accept/reject/implement) |
+
+---
+
+## Server Actions
+
+Toutes les mutations serveur sont dans `app/actions/` :
+
+- `auth.ts` — login, register, updateProfile, selectResidence
+- `bank.ts` — getUserAccounts, getTransactionHistory, transferFunds
+- `company.ts` — createCompany, getCompanyById, updateCompany
+- `suggestions.ts` — createSuggestion, voteSuggestion, getSuggestions
+- `profile.ts` — updateDisplayName, getUserStats
+
+---
+
 ## Modèle de données
 
 ### Utilisateur

@@ -14,6 +14,8 @@ export interface SuggestionCardProps {
   suggestion: SuggestionWithAuthor
   onVote?: () => void
   hasVoted: boolean
+  showDetailButton?: boolean
+  onClick?: () => void
   className?: string
 }
 
@@ -39,16 +41,22 @@ export function SuggestionCard({
   suggestion, 
   onVote, 
   hasVoted,
+  showDetailButton,
+  onClick,
   className 
 }: SuggestionCardProps) {
   const voteCount = suggestion._count?.votes ?? suggestion.votes?.length ?? 0
   
   return (
-    <div className={cn(
-      'backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-5',
-      'hover:bg-white/[0.08] transition-all duration-200',
-      className
-    )}>
+    <div 
+      onClick={onClick}
+      className={cn(
+        'backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-5',
+        'hover:bg-white/[0.08] transition-all duration-200',
+        onClick && 'cursor-pointer',
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <h3 className="font-semibold text-white leading-tight">{suggestion.title}</h3>
@@ -88,11 +96,16 @@ export function SuggestionCard({
           </button>
         )}
         
-        {/* Vote count (read-only) */}
+        {/* Vote count (read-only) or detail button */}
         {(!onVote || suggestion.status !== 'PENDING') && (
-          <div className="flex items-center gap-1.5 text-sm text-white/40">
-            <ThumbsUp className="w-4 h-4" />
-            <span>{voteCount}</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-sm text-white/40">
+              <ThumbsUp className="w-4 h-4" />
+              <span>{voteCount}</span>
+            </div>
+            {showDetailButton && (
+              <span className="text-xs text-violet-400">Voir détails →</span>
+            )}
           </div>
         )}
       </div>
