@@ -4,6 +4,8 @@ import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { createOAuthUser } from '@/app/actions/auth'
+import { checkOnboardingStatus } from '@/app/actions/auth'
 
 function CallbackHandler() {
   const router = useRouter()
@@ -41,7 +43,7 @@ function CallbackHandler() {
     }
 
     // Exchange the code for a session
-    supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
+    supabase.auth.exchangeCodeForSession(code).then(async ({ error: exchangeError }) => {
       if (exchangeError) {
         console.error('Exchange error:', exchangeError)
         setError(exchangeError.message)
@@ -50,19 +52,42 @@ function CallbackHandler() {
       }
 
       // Check if user is authenticated
-      supabase.auth.getUser().then(({ data: { user }, error: userError }) => {
-        if (userError || !user) {
-          console.error('User error:', userError)
-          setError('Failed to get user')
-          setTimeout(() => router.push('/auth/login?error=auth_failed'), 3000)
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      
+      if (userError || !user) {
+        console.error('User error:', userError)
+        setError('Failed to get user')
+        setTimeout(() => router.push('/auth/login?error=auth_failed'), 3000)
+        return
+      }
+
+      console.log('User authenticated:', user.id, user.email)
+      
+      // Create or get user in our database
+      if (user.email) {
+        const result = await createOAuthUser(user.id, user.email)
+        
+        if (result.error) {
+          console.error('Database user creation error:', result.error)
+          setError(result.error)
+          setTimeout(() => router.push(`/auth/login?error=${encodeURIComponent(result.error || 'Database error')}`), 3000)
           return
         }
-
-        console.log('User authenticated:', user.id, user.email)
         
-        // Check if user exists in our database - will redirect to onboarding if needed
-        router.push('/auth/oauth-complete')
-      })
+        // Check onboarding status
+        const onboardingStatus = await checkOnboardingStatus(user.id)
+        
+        if (onboardingStatus.complete) {
+          // User has completed onboarding, go to dashboard
+          router.push('/dashboard')
+        } else {
+          // User needs to complete onboarding
+          router.push('/auth/oauth-complete')
+        }
+      } else {
+        setError('No email provided from OAuth provider')
+        setTimeout(() => router.push('/auth/login?error=no_email'), 3000)
+      }
     })
   }, [router, searchParams])
 

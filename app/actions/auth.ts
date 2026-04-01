@@ -21,6 +21,70 @@ function generateAccountNumber(): string {
   return result
 }
 
+function generateUsernameFromEmail(email: string): string {
+  // Extract local part of email and clean it
+  const localPart = email.split('@')[0]
+  // Remove special characters, keep only alphanumeric, hyphens, underscores
+  let username = localPart.toLowerCase().replace(/[^a-z0-9_-]/g, '')
+  // Add random suffix to avoid conflicts
+  const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
+  username = `${username}_${randomSuffix}`
+  // Ensure max 50 chars
+  if (username.length > 50) {
+    username = username.substring(0, 46) + randomSuffix
+  }
+  return username
+}
+
+export async function createOAuthUser(supabaseUserId: string, email: string) {
+  try {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: supabaseUserId }
+    })
+    
+    if (existingUser) {
+      return { success: true, user: existingUser, isNewUser: false }
+    }
+
+    // Generate unique username from email
+    let username = generateUsernameFromEmail(email)
+    let attempts = 0
+    const maxAttempts = 10
+
+    // Ensure username is unique
+    while (attempts < maxAttempts) {
+      const existingUsername = await prisma.user.findFirst({
+        where: { username }
+      })
+      if (!existingUsername) break
+      
+      // Generate new username with different random suffix
+      const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
+      username = generateUsernameFromEmail(email).replace(/_\d{4}$/, `_${randomSuffix}`)
+      attempts++
+    }
+
+    if (attempts >= maxAttempts) {
+      return { error: 'Could not generate unique username' }
+    }
+
+    // Create user in Prisma
+    const user = await prisma.user.create({
+      data: {
+        id: supabaseUserId,
+        email,
+        username,
+      },
+    })
+
+    return { success: true, user, isNewUser: true }
+  } catch (error) {
+    console.error('OAuth user creation error:', error)
+    return { error: 'Failed to create user in database' }
+  }
+}
+
 export async function registerUser(email: string, password: string, username: string) {
   const supabase = await createClient()
 
