@@ -12,11 +12,11 @@ interface TransactionRowProps {
     toAccountId: string
     fromAccount: {
       accountNumber: string
-      company?: { name: string } | null
+      capitalCompany?: { name: string } | null
     }
     toAccount: {
       accountNumber: string
-      company?: { name: string } | null
+      capitalCompany?: { name: string } | null
     }
   }
   accountId: string
@@ -44,7 +44,7 @@ export function TransactionRow({ transaction, accountId, showAccountInfo = false
           </p>
           {showAccountInfo && (
             <p className="text-xs text-white/50">
-              {isOutgoing ? 'Vers' : 'De'}: {otherAccount.company?.name || otherAccount.accountNumber}
+              {isOutgoing ? 'Vers' : 'De'}: {otherAccount.capitalCompany?.name || otherAccount.accountNumber}
             </p>
           )}
           <p className="text-xs text-white/40">

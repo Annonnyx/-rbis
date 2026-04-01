@@ -37,7 +37,7 @@ export async function getSuggestions(
       where.status = status
     }
 
-    const orderBy = sortBy === 'votes' 
+    const orderBy: any = sortBy === 'votes' 
       ? { upvotes: 'desc' }
       : { createdAt: 'desc' }
 
@@ -81,7 +81,7 @@ export async function getSuggestionsWithVotes(userId: string, status?: string, s
       where.status = status
     }
 
-    const orderBy = sortBy === 'votes' 
+    const orderBy: any = sortBy === 'votes' 
       ? { upvotes: 'desc' }
       : { createdAt: 'desc' }
 

@@ -17,8 +17,6 @@ export function useRealtimeNotifications(userId: string | null) {
   useEffect(() => {
     if (!userId) return
 
-    const supabase = createClient()
-
     // Subscribe to location changes
     const locationChannel = supabase
       .channel('location-unlocks')

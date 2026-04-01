@@ -8,14 +8,19 @@ export async function getUserAccounts(userId: string) {
     const accounts = await prisma.bankAccount.findMany({
       where: { ownerId: userId },
       include: {
-        company: true,
+        capitalCompany: true,
         sentTransactions: {
           orderBy: { createdAt: 'desc' },
           take: 5,
           include: {
+            fromAccount: {
+              include: {
+                capitalCompany: true,
+              },
+            },
             toAccount: {
               include: {
-                company: true,
+                capitalCompany: true,
               },
             },
           },
@@ -26,7 +31,7 @@ export async function getUserAccounts(userId: string) {
           include: {
             fromAccount: {
               include: {
-                company: true,
+                capitalCompany: true,
               },
             },
           },
@@ -57,12 +62,12 @@ export async function getAccountTransactions(accountId: string, page: number = 1
         include: {
           fromAccount: {
             include: {
-              company: true,
+              capitalCompany: true,
             },
           },
           toAccount: {
             include: {
-              company: true,
+              capitalCompany: true,
             },
           },
         },

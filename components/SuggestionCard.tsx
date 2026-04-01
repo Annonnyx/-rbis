@@ -23,29 +23,6 @@ interface SuggestionCardProps {
   onVote?: (suggestionId: string) => void
 }
 
-interface TransactionRowProps {
-  transaction: {
-    id: string
-    amount: bigint
-    label?: string | null
-    createdAt: Date
-    fromAccountId: string
-    toAccountId: string
-    fromAccount: {
-      accountNumber: string
-      company?: { name: string } | null
-    }
-    toAccount: {
-      accountNumber: string
-      company?: { name: string } | null
-    }
-  }
-  accountId: string
-  showAccountInfo?: boolean
-}
-
-import { SuggestionStatus } from '@prisma/client'
-
 const statusConfig: Record<SuggestionStatus, { label: string; icon: typeof Clock; color: string }> = {
   PENDING: {
     label: 'En attente',
