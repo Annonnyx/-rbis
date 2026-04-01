@@ -26,11 +26,14 @@ import {
   Lock,
   Wallet,
   Briefcase,
-  TrendingUp
+  TrendingUp,
+  Award,
+  Crown
 } from 'lucide-react'
 import { getUserSkills } from '@/lib/skills'
 import { getUserEmployment } from '@/app/actions/employment'
 import { SkillBar } from '@/components/SkillBar'
+import { getAllAchievementsWithProgress, getAchievementStats } from '@/app/actions/achievements'
 import Link from 'next/link'
 
 // ============================================
@@ -118,8 +121,32 @@ export default async function ProfilePage() {
   const employmentResult = await getUserEmployment(user.id)
   const employment = employmentResult.success ? employmentResult.data : null
   
+  // Récupérer les réalisations
+  const [achievementsResult, achievementStatsResult] = await Promise.all([
+    getAllAchievementsWithProgress(user.id),
+    getAchievementStats(user.id),
+  ])
+  
+  const achievements = achievementsResult.success ? achievementsResult.data : []
+  const achievementStats = achievementStatsResult.success ? achievementStatsResult.data : { total: 0, unlocked: 0, byRarity: {} }
+  const hasLegendary = achievementStats.byRarity.LEGENDARY > 0
+  
   const avatarColor = getColorFromUsername(user.username)
   const initial = (user.displayName || user.username).charAt(0).toUpperCase()
+  
+  const rarityColors: Record<string, string> = {
+    COMMON: 'text-gray-400',
+    RARE: 'text-blue-400',
+    EPIC: 'text-purple-400',
+    LEGENDARY: 'text-amber-400',
+  }
+  
+  const rarityBg: Record<string, string> = {
+    COMMON: 'bg-gray-500/10',
+    RARE: 'bg-blue-500/10',
+    EPIC: 'bg-purple-500/10',
+    LEGENDARY: 'bg-amber-500/10',
+  }
   
   return (
     <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-8">
@@ -148,6 +175,7 @@ export default async function ProfilePage() {
                   Modifié
                 </Badge>
               )}
+              {hasLegendary && <Crown className="w-6 h-6 text-amber-400" />}
             </div>
             <p className="text-white/50">@{user.username}</p>
             
@@ -229,6 +257,50 @@ export default async function ProfilePage() {
             ))}
           </div>
         </div>
+      </section>
+      
+      {/* Section Réalisations */}
+      <section>
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Award className="w-5 h-5 text-violet-400" />
+          Réalisations
+          <span className="text-sm font-normal text-white/50">
+            ({achievementStats.unlocked}/{achievementStats.total})
+          </span>
+        </h3>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {achievements.slice(0, 12).map(({ achievement, unlocked, unlockedAt }) => (
+            <div
+              key={achievement.id}
+              className={`p-3 rounded-xl border transition-all ${
+                unlocked 
+                  ? `${rarityBg[achievement.rarity]} border-white/20` 
+                  : 'bg-white/5 border-white/10 opacity-40'
+              }`}
+              title={achievement.description}
+            >
+              <div className="text-2xl mb-1">{achievement.icon}</div>
+              <p className={`font-medium text-xs ${unlocked ? 'text-white' : 'text-white/40'} line-clamp-1`}>
+                {achievement.title}
+              </p>
+              <Badge 
+                variant={unlocked ? 'success' : 'neutral'}
+                className={`text-xs mt-1 ${unlocked ? rarityColors[achievement.rarity] : ''}`}
+              >
+                {achievement.rarity}
+              </Badge>
+            </div>
+          ))}
+        </div>
+        
+        {achievements.length > 12 && (
+          <div className="text-center mt-4">
+            <p className="text-sm text-white/50">
+              +{achievements.length - 12} réalisations supplémentaires
+            </p>
+          </div>
+        )}
       </section>
       
       {/* Section Paramètres */}

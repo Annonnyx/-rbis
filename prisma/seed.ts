@@ -70,6 +70,59 @@ const RESOURCE_TYPES = [
 ]
 
 /**
+ * Quêtes du jeu
+ */
+const QUEST_TEMPLATES = [
+  // PERMANENTES
+  { title: 'Premier virement', description: 'Effectuer votre première transaction bancaire', type: 'PERMANENT', category: 'ECONOMY', requirement: { type: 'transaction_count', target: 1 }, rewardOrbes: 50, repeatable: false },
+  { title: 'Entrepreneur', description: 'Créer votre première entreprise', type: 'PERMANENT', category: 'ECONOMY', requirement: { type: 'company_created', target: 1 }, rewardOrbes: 200, repeatable: false },
+  { title: 'Actionnaire', description: 'Acheter des actions pour la première fois', type: 'PERMANENT', category: 'ECONOMY', requirement: { type: 'shares_bought', target: 1 }, rewardOrbes: 100, repeatable: false },
+  { title: 'Citoyen engagé', description: 'Voter pour une suggestion', type: 'PERMANENT', category: 'SOCIAL', requirement: { type: 'suggestion_voted', target: 1 }, rewardOrbes: 30, repeatable: false },
+  { title: 'Messager', description: 'Envoyer votre premier message privé', type: 'PERMANENT', category: 'SOCIAL', requirement: { type: 'message_sent', target: 1 }, rewardOrbes: 25, repeatable: false },
+  
+  // QUOTIDIENNES
+  { title: 'Journée active', description: 'Effectuer 3 transactions', type: 'DAILY', category: 'ECONOMY', requirement: { type: 'transaction_count', target: 3 }, rewardOrbes: 30, repeatable: true },
+  { title: 'Communicateur', description: 'Envoyer 5 messages', type: 'DAILY', category: 'SOCIAL', requirement: { type: 'message_sent', target: 5 }, rewardOrbes: 20, repeatable: true },
+  { title: 'Voyageur', description: 'Explorer une ville différente', type: 'DAILY', category: 'EXPLORATION', requirement: { type: 'city_visited', target: 1 }, rewardOrbes: 15, repeatable: true },
+  
+  // HEBDOMADAIRES
+  { title: 'Semaine productive', description: 'Compléter 5 cycles de production', type: 'WEEKLY', category: 'PRODUCTION', requirement: { type: 'production_cycles', target: 5 }, rewardOrbes: 150, repeatable: true },
+  { title: 'Investisseur actif', description: 'Acheter 10 actions', type: 'WEEKLY', category: 'ECONOMY', requirement: { type: 'shares_bought', target: 10 }, rewardOrbes: 100, repeatable: true },
+  { title: 'Gros virement', description: 'Transférer plus de 1000 Orbes', type: 'WEEKLY', category: 'ECONOMY', requirement: { type: 'orbes_transferred', target: 100000 }, rewardOrbes: 80, repeatable: true },
+  { title: 'Ambassadeur', description: 'Envoyer 20 messages', type: 'WEEKLY', category: 'SOCIAL', requirement: { type: 'message_sent', target: 20 }, rewardOrbes: 75, repeatable: true },
+  { title: 'Entrepreneur en série', description: 'Créer 2 entreprises', type: 'WEEKLY', category: 'ECONOMY', requirement: { type: 'company_created', target: 2 }, rewardOrbes: 120, repeatable: true },
+]
+
+/**
+ * Réalisations / Badges
+ */
+const ACHIEVEMENTS = [
+  // COMMON
+  { title: 'Fondateur', description: 'Créer votre première entreprise', icon: '🏦', category: 'ECONOMY', rarity: 'COMMON', condition: { type: 'company_created', target: 1 } },
+  { title: 'Votant', description: 'Voter 10 fois pour des suggestions', icon: '🗳️', category: 'SOCIAL', rarity: 'COMMON', condition: { type: 'suggestion_voted', target: 10 } },
+  { title: 'Messager', description: 'Envoyer 50 messages', icon: '💬', category: 'SOCIAL', rarity: 'COMMON', condition: { type: 'message_sent', target: 50 } },
+  { title: 'Commerçant', description: 'Effectuer 20 transactions', icon: '💸', category: 'ECONOMY', rarity: 'COMMON', condition: { type: 'transaction_count', target: 20 } },
+  
+  // RARE
+  { title: 'Bull Market', description: 'Avoir un portfolio d\'actions > ◎ 10 000', icon: '📈', category: 'ECONOMY', rarity: 'RARE', condition: { type: 'portfolio_value', target: 1000000 } },
+  { title: 'Producteur', description: 'Compléter 50 cycles de production', icon: '⚙️', category: 'ECONOMY', rarity: 'RARE', condition: { type: 'production_cycles', target: 50 } },
+  { title: 'Politicien', description: 'Proposer 5 lois communautaires', icon: '🏛️', category: 'SOCIAL', rarity: 'RARE', condition: { type: 'law_proposed', target: 5 } },
+  { title: 'Stratège', description: 'Gagner une élection', icon: '🗳️', category: 'SOCIAL', rarity: 'RARE', condition: { type: 'election_won', target: 1 } },
+  
+  // EPIC
+  { title: 'Globetrotteur', description: 'Avoir une entreprise dans 3 villes', icon: '🌍', category: 'EXPLORER', rarity: 'EPIC', condition: { type: 'companies_in_cities', target: 3 } },
+  { title: 'Magnat', description: 'Posséder 5 entreprises', icon: '🏭', category: 'ECONOMY', rarity: 'EPIC', condition: { type: 'company_created', target: 5 } },
+  { title: 'Philanthrope', description: 'Voter 100 fois', icon: '🎁', category: 'SOCIAL', rarity: 'EPIC', condition: { type: 'suggestion_voted', target: 100 } },
+  { title: 'Grand messager', description: 'Envoyer 500 messages', icon: '📨', category: 'SOCIAL', rarity: 'EPIC', condition: { type: 'message_sent', target: 500 } },
+  
+  // LEGENDARY
+  { title: 'Représentant', description: 'Être élu représentant d\'une ville', icon: '👑', category: 'LEGEND', rarity: 'LEGENDARY', condition: { type: 'election_won', target: 1 } },
+  { title: 'Milliardaire', description: 'Avoir un solde total > ◎ 1 000 000', icon: '⚡', category: 'ECONOMY', rarity: 'LEGENDARY', condition: { type: 'total_balance', target: 100000000 } },
+  { title: 'Légende vivante', description: 'Débloquer toutes les réalisations', icon: '🌟', category: 'LEGEND', rarity: 'LEGENDARY', condition: { type: 'all_achievements', target: 1 } },
+  { title: 'Maître du commerce', description: 'Effectuer 1000 transactions', icon: '💎', category: 'ECONOMY', rarity: 'LEGENDARY', condition: { type: 'transaction_count', target: 1000 } },
+]
+
+/**
  * Fonction principale de seed
  * Idempotent - peut être relancée sans erreur
  */
@@ -170,6 +223,56 @@ async function main() {
         console.log(`  ⚠️ TradeRoute skipped: ${route.from.name} ↔ ${route.to.name}`)
       }
     }
+  }
+
+  // Seed QuestTemplates
+  console.log('🌱 Seeding QuestTemplates...')
+  for (const quest of QUEST_TEMPLATES) {
+    await prisma.questTemplate.upsert({
+      where: { title: quest.title },
+      update: {
+        description: quest.description,
+        type: quest.type,
+        category: quest.category,
+        requirement: quest.requirement,
+        rewardOrbes: quest.rewardOrbes,
+        repeatable: quest.repeatable,
+      },
+      create: {
+        title: quest.title,
+        description: quest.description,
+        type: quest.type,
+        category: quest.category,
+        requirement: quest.requirement,
+        rewardOrbes: quest.rewardOrbes,
+        repeatable: quest.repeatable,
+      },
+    })
+    console.log(`  ✓ Quest: ${quest.title}`)
+  }
+
+  // Seed Achievements
+  console.log('🌱 Seeding Achievements...')
+  for (const achievement of ACHIEVEMENTS) {
+    await prisma.achievement.upsert({
+      where: { title: achievement.title },
+      update: {
+        description: achievement.description,
+        icon: achievement.icon,
+        category: achievement.category,
+        rarity: achievement.rarity,
+        condition: achievement.condition,
+      },
+      create: {
+        title: achievement.title,
+        description: achievement.description,
+        icon: achievement.icon,
+        category: achievement.category,
+        rarity: achievement.rarity,
+        condition: achievement.condition,
+      },
+    })
+    console.log(`  ✓ Achievement: ${achievement.title}`)
   }
 
   console.log('✅ Seed completed successfully')

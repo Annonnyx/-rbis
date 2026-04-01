@@ -83,6 +83,9 @@ model User {
   lawsProposed  CommunityLaw[] @relation("Proposer")
   // Trade Routes
   tradeRouteUsages TradeRouteUsage[] @relation("Route")
+  // Quests & Achievements
+  quests        UserQuest[]
+  achievements  UserAchievement[]
 
   @@map("users")
 }
@@ -898,4 +901,121 @@ model TradeRouteUsage {
   contract Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
 
   @@map("trade_route_usages")
+}
+
+// ============================================
+// MODÈLES QUÊTES & RÉALISATIONS
+// ============================================
+
+enum QuestType {
+  DAILY
+  WEEKLY
+  PERMANENT
+}
+
+enum QuestCategory {
+  ECONOMY
+  SOCIAL
+  PRODUCTION
+  EXPLORATION
+}
+
+enum UserQuestStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+}
+
+enum AchievementCategory {
+  ECONOMY
+  SOCIAL
+  EXPLORER
+  LEGEND
+}
+
+enum AchievementRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+/**
+ * Template de quête (défini en seed)
+ */
+model QuestTemplate {
+  id            String       @id @default(uuid())
+  title         String
+  description   String       @db.VarChar(500)
+  type          QuestType
+  category      QuestCategory
+  requirement   Json         // condition de complétion
+  rewardOrbes   BigInt       @default(0)
+  rewardXp      Json?        // { skillCategory: string, amount: int }[]
+  repeatable    Boolean      @default(false)
+  active        Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+
+  // Relations
+  userQuests UserQuest[]
+
+  @@map("quest_templates")
+}
+
+/**
+ * Quête assignée à un utilisateur
+ */
+model UserQuest {
+  id              String        @id @default(uuid())
+  userId          String
+  questTemplateId String
+  progress        Json          // état actuel de la progression
+  status          UserQuestStatus @default(ACTIVE)
+  startedAt       DateTime      @default(now())
+  completedAt     DateTime?
+  expiresAt       DateTime?
+
+  // Relations
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questTemplate QuestTemplate @relation(fields: [questTemplateId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questTemplateId])
+  @@index([userId, status])
+  @@map("user_quests")
+}
+
+/**
+ * Réalisation / Badge (défini en seed)
+ */
+model Achievement {
+  id          String              @id @default(uuid())
+  title       String
+  description String              @db.VarChar(500)
+  icon        String              @default("🏆")
+  category    AchievementCategory
+  rarity      AchievementRarity   @default(COMMON)
+  condition   Json                // condition de déblocage
+  createdAt   DateTime            @default(now())
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+/**
+ * Réalisation débloquée par un utilisateur
+ */
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
 }
