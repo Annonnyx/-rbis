@@ -37,9 +37,9 @@ export async function registerUser(email: string, password: string, username: st
     return { error: 'Le nom d\'utilisateur doit contenir entre 1 et 50 caractères' }
   }
 
-  // Vérifier si le username existe déjà
-  const existingUser = await prisma.user.findUnique({
-    where: { username: username.toLowerCase() },
+  // Vérifier si le username existe déjà (case-sensitive)
+  const existingUser = await prisma.user.findFirst({
+    where: { username },
   })
 
   if (existingUser) {
@@ -52,7 +52,7 @@ export async function registerUser(email: string, password: string, username: st
     password,
     options: {
       data: {
-        username: username.toLowerCase(),
+        username,
       },
     },
   })
@@ -71,7 +71,7 @@ export async function registerUser(email: string, password: string, username: st
       data: {
         id: authData.user.id,
         email,
-        username: username.toLowerCase(),
+        username,
       },
     })
 
