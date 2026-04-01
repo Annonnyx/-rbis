@@ -9,9 +9,18 @@ function CallbackHandler() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState<string | null>(null)
+  const [debug, setDebug] = useState<string>('')
 
   useEffect(() => {
     if (!searchParams) return
+
+    // Debug: log all params
+    const params: Record<string, string> = {}
+    searchParams.forEach((value, key) => {
+      params[key] = value
+    })
+    console.log('Callback params:', params)
+    setDebug(`Params: ${JSON.stringify(params)}`)
 
     const code = searchParams.get('code')
     const errorParam = searchParams.get('error')
@@ -64,6 +73,7 @@ function CallbackHandler() {
           <h1 className="text-2xl font-bold text-white mb-4">Erreur de connexion</h1>
           <p className="text-red-400">{error}</p>
           <p className="text-white/50 mt-4">Redirection vers la page de connexion...</p>
+          <p className="text-white/30 mt-2 text-xs font-mono">{debug}</p>
         </div>
       </div>
     )
@@ -75,6 +85,7 @@ function CallbackHandler() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500 mx-auto mb-4"></div>
         <h1 className="text-xl font-bold text-white">Connexion en cours...</h1>
         <p className="text-white/50 mt-2">Veuillez patienter</p>
+        <p className="text-white/30 mt-2 text-xs font-mono">{debug}</p>
       </div>
     </div>
   )
