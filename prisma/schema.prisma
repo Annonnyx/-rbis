@@ -68,9 +68,9 @@ model BankAccount {
 
   // Relations
   owner           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  company         Company?         @relation(fields: [companyId], references: [id])
   sentTransactions     Transaction[] @relation("FromAccount")
   receivedTransactions Transaction[] @relation("ToAccount")
+  capitalCompany  Company?         @relation("CompanyCapital")
 
   @@map("bank_accounts")
 }
@@ -103,7 +103,7 @@ model Company {
   // Relations
   owner             User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   location          MapLocation @relation(fields: [locationId], references: [id])
-  capitalAccount    BankAccount @relation(fields: [capitalAccountId], references: [id])
+  capitalAccount    BankAccount @relation("CompanyCapital", fields: [capitalAccountId], references: [id])
 
   @@map("companies")
 }
