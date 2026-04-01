@@ -74,6 +74,15 @@ model User {
   cityAnnouncements CityAnnouncement[]
   foundedAlliances Alliance[] @relation("AllianceFounder")
   allianceMemberships AllianceMember[]
+  // Governance
+  electionsWon  Election[] @relation("Winner")
+  electionCandidates ElectionCandidate[]
+  electionVotes ElectionVote[] @relation("Voter")
+  mandates      CityRepresentative[]
+  taxConfigsUpdated TaxConfig[] @relation("UpdatedBy")
+  lawsProposed  CommunityLaw[] @relation("Proposer")
+  // Trade Routes
+  tradeRouteUsages TradeRouteUsage[] @relation("Route")
 
   @@map("users")
 }
@@ -186,6 +195,14 @@ model MapLocation {
   companies Company[]
   cityChats CityChat[]
   cityAnnouncements CityAnnouncement[]
+  // Governance
+  elections   Election[]
+  representatives CityRepresentative[]
+  taxConfigs  TaxConfig[]
+  communityLaws CommunityLaw[]
+  // Trade Routes
+  tradeRoutesFrom TradeRoute[] @relation("FromLocation")
+  tradeRoutesTo TradeRoute[] @relation("ToLocation")
 
   @@map("map_locations")
 }
@@ -537,6 +554,7 @@ model Contract {
   client       Company           @relation("Client", fields: [clientId], references: [id], onDelete: Cascade)
   resourceType ResourceType      @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
   deliveries   ContractDelivery[]
+  tradeRouteUsages TradeRouteUsage[]
 
   @@map("contracts")
 }
@@ -704,4 +722,180 @@ model AllianceTreasury {
   alliance Alliance @relation(fields: [allianceId], references: [id], onDelete: Cascade)
 
   @@map("alliance_treasuries")
+}
+
+// ============================================
+// MODÈLES GOUVERNANCE
+// ============================================
+
+enum ElectionStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+enum LawStatus {
+  PROPOSED
+  VOTING
+  ACTIVE
+  REJECTED
+}
+
+/**
+ * Élection pour représentant de ville
+ */
+model Election {
+  id          String       @id @default(uuid())
+  locationId  String
+  status      ElectionStatus @default(OPEN)
+  startedAt   DateTime     @default(now())
+  endsAt      DateTime
+  winnerId    String?
+
+  // Relations
+  location   MapLocation         @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  winner     User?               @relation(fields: [winnerId], references: [id], onDelete: SetNull)
+  candidates ElectionCandidate[]
+  votes      ElectionVote[]
+
+  @@index([locationId, status])
+  @@map("elections")
+}
+
+/**
+ * Candidat à une élection
+ */
+model ElectionCandidate {
+  id          String   @id @default(uuid())
+  electionId  String
+  userId      String
+  manifesto   String   @db.VarChar(1000)
+  votes       Int      @default(0)
+
+  // Relations
+  election Election     @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  electionVotes ElectionVote[]
+
+  @@unique([electionId, userId])
+  @@map("election_candidates")
+}
+
+/**
+ * Vote dans une élection
+ */
+model ElectionVote {
+  id          String   @id @default(uuid())
+  electionId  String
+  voterId     String
+  candidateId String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  election  Election          @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  voter     User              @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  candidate ElectionCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([electionId, voterId])
+  @@map("election_votes")
+}
+
+/**
+ * Représentant actuel d'une ville
+ */
+model CityRepresentative {
+  id           String   @id @default(uuid())
+  locationId   String   @unique
+  userId       String
+  electedAt    DateTime @default(now())
+  mandateEndsAt DateTime
+
+  // Relations
+  location MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("city_representatives")
+}
+
+/**
+ * Configuration des taxes d'une ville
+ */
+model TaxConfig {
+  id                  String   @id @default(uuid())
+  locationId          String   @unique
+  transactionTaxRate  Float    @default(0.0) // 0.0 à 0.15 (0% à 15%)
+  productionTaxRate   Float    @default(0.0) // 0.0 à 0.15 (0% à 15%)
+  lastUpdatedBy       String
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  location    MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  updatedBy   User        @relation(fields: [lastUpdatedBy], references: [id], onDelete: Cascade)
+
+  @@map("tax_configs")
+}
+
+/**
+ * Loi communautaire proposée
+ */
+model CommunityLaw {
+  id            String    @id @default(uuid())
+  locationId    String
+  proposedBy    String
+  title         String    @db.VarChar(100)
+  description   String    @db.VarChar(2000)
+  status        LawStatus  @default(PROPOSED)
+  votesFor      Int       @default(0)
+  votesAgainst  Int       @default(0)
+  votingEndsAt  DateTime
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  location MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  proposer User       @relation(fields: [proposedBy], references: [id], onDelete: Cascade)
+
+  @@index([locationId, status])
+  @@map("community_laws")
+}
+
+// ============================================
+// MODÈLES EXPANSION (ROUTES COMMERCIALES)
+// ============================================
+
+/**
+ * Route commerciale entre deux villes
+ */
+model TradeRoute {
+  id              String   @id @default(uuid())
+  fromLocationId  String
+  toLocationId    String
+  distance        Int      @default(100) // unités fictives
+  transitTimeMins Int      @default(60)  // délai de livraison
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  // Relations
+  fromLocation MapLocation @relation("FromLocation", fields: [fromLocationId], references: [id], onDelete: Cascade)
+  toLocation   MapLocation @relation("ToLocation", fields: [toLocationId], references: [id], onDelete: Cascade)
+  usages       TradeRouteUsage[]
+
+  @@unique([fromLocationId, toLocationId])
+  @@map("trade_routes")
+}
+
+/**
+ * Usage d'une route commerciale (log des livraisons)
+ */
+model TradeRouteUsage {
+  id          String    @id @default(uuid())
+  routeId     String
+  contractId  String
+  departedAt  DateTime  @default(now())
+  arrivedAt   DateTime?
+
+  // Relations
+  route    TradeRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  contract Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@map("trade_route_usages")
 }

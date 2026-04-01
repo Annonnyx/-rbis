@@ -131,6 +131,47 @@ async function main() {
     console.log(`  ✓ Resource: ${resource.name}`)
   }
 
+  // Seed TradeRoutes between locations (when multiple locations are unlocked)
+  const locations = await prisma.mapLocation.findMany()
+  if (locations.length >= 2) {
+    console.log('🌱 Seeding TradeRoutes...')
+    
+    const tradeRoutes = [
+      { from: locations[0], to: locations[1], distance: 100, transitTimeMins: 120 },
+      ...(locations[2] ? [{ from: locations[0], to: locations[2], distance: 200, transitTimeMins: 240 }] : []),
+      ...(locations[3] ? [{ from: locations[1], to: locations[3], distance: 150, transitTimeMins: 180 }] : []),
+      ...(locations[2] && locations[3] ? [{ from: locations[2], to: locations[3], distance: 100, transitTimeMins: 120 }] : []),
+    ]
+    
+    for (const route of tradeRoutes) {
+      try {
+        await prisma.tradeRoute.upsert({
+          where: {
+            fromLocationId_toLocationId: {
+              fromLocationId: route.from.id,
+              toLocationId: route.to.id,
+            },
+          },
+          update: {
+            distance: route.distance,
+            transitTimeMins: route.transitTimeMins,
+            active: true,
+          },
+          create: {
+            fromLocationId: route.from.id,
+            toLocationId: route.to.id,
+            distance: route.distance,
+            transitTimeMins: route.transitTimeMins,
+            active: true,
+          },
+        })
+        console.log(`  ✓ TradeRoute: ${route.from.name} ↔ ${route.to.name}`)
+      } catch (error) {
+        console.log(`  ⚠️ TradeRoute skipped: ${route.from.name} ↔ ${route.to.name}`)
+      }
+    }
+  }
+
   console.log('✅ Seed completed successfully')
 }
 
