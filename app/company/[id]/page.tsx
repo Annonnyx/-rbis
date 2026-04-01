@@ -1,25 +1,35 @@
 // ============================================
 // app/company/[id]/page.tsx
-// Page détail d'une entreprise
+// Page détail d'une entreprise (avec section bourse)
 // ============================================
 
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCompanyById } from '@/app/actions/company'
+import { getCurrentUser } from '@/app/actions/auth'
+import { getCompanyTransactions, getPriceHistory } from '@/app/actions/market'
+import { prisma } from '@/lib/prisma'
 import { PageHeader } from '@/components/PageHeader'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { OrbeCurrency } from '@/components/OrbeCurrency'
 import { TransactionRow } from '@/components/TransactionRow'
+import { StockChart } from '@/components/StockChart'
 import { EmptyState } from '@/components/EmptyState'
-import { Building2, MapPin, User, Calendar, Sparkles } from 'lucide-react'
+import { IPOButton } from '@/components/IPOButton'
+import { BuySharesButton } from '@/components/BuySharesButton'
+import { 
+  Building2, MapPin, User, Calendar, Sparkles, TrendingUp, 
+  TrendingDown, Activity, Users, DollarSign 
+} from 'lucide-react'
 
 interface CompanyPageProps {
   params: { id: string }
 }
 
 export default async function CompanyPage({ params }: CompanyPageProps) {
+  const user = await getCurrentUser()
   const result = await getCompanyById(params.id)
   
   if (!result.success || !result.company) {
@@ -27,6 +37,23 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
   }
   
   const company = result.company
+  const isOwner = user?.id === company.ownerId
+  
+  // Récupérer les infos boursières si disponibles
+  const shareInfo = await prisma.companyShare.findUnique({
+    where: { companyId: params.id },
+  })
+  
+  // Récupérer l'historique des prix si cotée
+  const priceHistory = shareInfo?.isListed 
+    ? await getPriceHistory(params.id, '7d')
+    : null
+  
+  // Récupérer les transactions d'actions si cotée
+  const shareTransactions = shareInfo?.isListed
+    ? await getCompanyTransactions(params.id, 5)
+    : null
+  
   const transactions = [
     ...company.capitalAccount.sentTransactions.map(t => ({ ...t, direction: 'out' as const })),
     ...company.capitalAccount.receivedTransactions.map(t => ({ ...t, direction: 'in' as const })),
@@ -40,6 +67,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold text-white">{company.name}</h1>
             <Badge variant="violet">Entreprise</Badge>
+            {shareInfo?.isListed && <Badge variant="success">Cotée</Badge>}
           </div>
           <p className="text-lg text-white/60">{company.objective}</p>
           <div className="flex items-center gap-4 mt-3 text-sm text-white/40">
@@ -51,14 +79,118 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
               <Calendar className="w-4 h-4" />
               Créée le {new Date(company.createdAt).toLocaleDateString('fr-FR')}
             </span>
+            {shareInfo?.isListed && (
+              <span className="flex items-center gap-1">
+                <Activity className="w-4 h-4 text-green-400" />
+                En bourse
+              </span>
+            )}
           </div>
         </div>
         
-        {/* Edit button (si owner) - à implémenter */}
-        <Button variant="secondary" size="sm">
-          Modifier
-        </Button>
+        {/* Actions (si owner) */}
+        <div className="flex gap-2">
+          {!shareInfo?.isListed && isOwner && (
+            <IPOButton 
+              companyId={company.id}
+              companyName={company.name}
+              companyCapital={company.capitalAccount.balance}
+            />
+          )}
+          <Button variant="secondary" size="sm">
+            Modifier
+          </Button>
+        </div>
       </div>
+      
+      {/* Section Bourse (si cotée) */}
+      {shareInfo?.isListed && (
+        <GlassCard className="border-violet-500/20">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-violet-400" />
+              Bourse
+            </h2>
+            <Badge variant="success">Cotée en bourse</Badge>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="p-4 rounded-xl bg-white/5">
+              <p className="text-xs text-white/40 mb-1">Prix actuel</p>
+              <p className="text-xl font-bold text-white">
+                <OrbeCurrency amount={shareInfo.currentPrice} />
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5">
+              <p className="text-xs text-white/40 mb-1">Actions totales</p>
+              <p className="text-xl font-bold text-white">{shareInfo.totalShares.toLocaleString()}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5">
+              <p className="text-xs text-white/40 mb-1">Disponibles</p>
+              <p className="text-xl font-bold text-white">{shareInfo.availableShares.toLocaleString()}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5">
+              <p className="text-xs text-white/40 mb-1">Capitalisation</p>
+              <p className="text-lg font-bold text-white">
+                <OrbeCurrency amount={shareInfo.currentPrice * BigInt(shareInfo.totalShares)} />
+              </p>
+            </div>
+          </div>
+          
+          {/* Graphique */}
+          {priceHistory?.success && priceHistory.data && priceHistory.data.length > 0 && (
+            <div className="mb-6">
+              <p className="text-sm text-white/50 mb-3">Évolution du prix (7 jours)</p>
+              <StockChart prices={priceHistory.data} height={200} showArea />
+            </div>
+          )}
+          
+          {/* Dernières transactions d'actions */}
+          <div className="pt-4 border-t border-white/10">
+            <h3 className="text-sm font-medium text-white/50 mb-3">Dernières transactions d'actions</h3>
+            {shareTransactions?.success && shareTransactions.data && shareTransactions.data.length > 0 ? (
+              <div className="space-y-2">
+                {shareTransactions.data.map((tx: any) => (
+                  <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${tx.seller ? 'bg-violet-400' : 'bg-green-400'}`} />
+                      <div>
+                        <p className="text-sm text-white">{tx.quantity} actions</p>
+                        <p className="text-xs text-white/40">
+                          {tx.seller ? `De ${tx.seller} à ${tx.buyer}` : `IPO - ${tx.buyer}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-white"><OrbeCurrency amount={tx.pricePerShare} />/action</p>
+                      <p className="text-xs text-white/40">Total: <OrbeCurrency amount={tx.totalAmount} /></p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-white/40">Aucune transaction d'actions récente</p>
+            )}
+          </div>
+          
+          {/* Bouton acheter */}
+          {user && !isOwner && (
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <BuySharesButton 
+                company={{
+                  id: company.id,
+                  name: company.name,
+                  objective: company.objective,
+                  owner: company.owner,
+                  shareInfo,
+                  priceHistory: priceHistory?.data || [],
+                }}
+                userId={user.id}
+              />
+            </div>
+          )}
+        </GlassCard>
+      )}
       
       {/* Compte bancaire */}
       <GlassCard>

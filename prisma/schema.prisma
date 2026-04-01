@@ -29,6 +29,12 @@ enum SuggestionStatus {
   IMPLEMENTED
 }
 
+enum MarketListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -54,6 +60,10 @@ model User {
   companies     Company[]
   suggestions   Suggestion[]
   votes         SuggestionVote[]
+  shareBuys     ShareTransaction[] @relation("Buyer")
+  shareSells    ShareTransaction[] @relation("Seller")
+  portfolio     SharePortfolio[]
+  marketListings MarketListing[] @relation("Seller")
 
   @@map("users")
 }
@@ -134,6 +144,11 @@ model Company {
   owner          User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   location       MapLocation @relation(fields: [locationId], references: [id])
   capitalAccount BankAccount @relation("CompanyCapital", fields: [capitalAccountId], references: [id])
+  shareInfo      CompanyShare?
+  transactions   ShareTransaction[]
+  portfolio      SharePortfolio[]
+  listings       MarketListing[]
+  priceHistory   PriceHistory[]
 
   @@map("companies")
 }
@@ -190,4 +205,109 @@ model SuggestionVote {
 
   @@unique([userId, suggestionId])
   @@map("suggestion_votes")
+}
+
+// ============================================
+// MODÈLES BOURSE & MARCHÉ FINANCIER
+// ============================================
+
+/**
+ * Informations boursières d'une entreprise
+ * Une seule entrée par entreprise cotée
+ */
+model CompanyShare {
+  id               String   @id @default(uuid())
+  companyId        String   @unique
+  totalShares      Int      @default(0)
+  availableShares  Int      @default(0)
+  currentPrice       BigInt   @default(1000) // centimes d'Orbe, min ◎ 0,01 (1 centime)
+  lastPriceUpdate  DateTime @default(now())
+  isListed         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("company_shares")
+}
+
+/**
+ * Transaction d'actions entre joueurs ou IPO
+ * Historique immuable de toutes les transactions
+ */
+model ShareTransaction {
+  id            String   @id @default(uuid())
+  buyerId       String
+  sellerId      String?  // null si achat initial à l'entreprise (IPO)
+  companyId     String
+  quantity      Int
+  pricePerShare BigInt   // prix au moment de la transaction
+  totalAmount   BigInt
+  createdAt     DateTime @default(now())
+
+  // Relations
+  buyer   User    @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller  User?   @relation("Seller", fields: [sellerId], references: [id], onDelete: SetNull)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("share_transactions")
+}
+
+/**
+ * Portfolio d'actions d'un utilisateur
+ * Table pivot avec quantité et prix moyen d'achat
+ */
+model SharePortfolio {
+  id              String @id @default(uuid())
+  userId          String
+  companyId       String
+  quantity        Int    @default(0)
+  averageBuyPrice BigInt @default(0) // prix moyen pondéré d'achat
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@map("share_portfolios")
+}
+
+/**
+ * Annonce de vente sur le marché secondaire
+ * Permet aux joueurs de vendre leurs actions à d'autres joueurs
+ */
+model MarketListing {
+  id          String              @id @default(uuid())
+  sellerId    String
+  companyId   String
+  quantity    Int
+  askingPrice BigInt              // prix demandé par action
+  status      MarketListingStatus @default(ACTIVE)
+  createdAt   DateTime            @default(now())
+  expiresAt   DateTime?           // expiration optionnelle
+  soldAt      DateTime?           // date de vente
+
+  // Relations
+  seller  User    @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("market_listings")
+}
+
+/**
+ * Historique des prix d'une entreprise
+ * Une entrée à chaque changement de prix ou toutes les heures
+ */
+model PriceHistory {
+  id         String   @id @default(uuid())
+  companyId  String
+  price      BigInt
+  recordedAt DateTime @default(now())
+  volume     Int      @default(0) // volume de transactions à ce prix
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, recordedAt])
+  @@map("price_history")
 }

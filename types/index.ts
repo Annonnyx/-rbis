@@ -12,16 +12,35 @@ import type {
   MapLocation, 
   Suggestion, 
   SuggestionVote,
+  CompanyShare,
+  ShareTransaction,
+  SharePortfolio,
+  MarketListing,
+  PriceHistory,
   AccountOwnerType,
-  SuggestionStatus
+  SuggestionStatus,
+  MarketListingStatus
 } from '@prisma/client'
 
 // ============================================
 // EXPORTS PRISMA
 // ============================================
 
-export type { User, BankAccount, Transaction, Company, MapLocation, Suggestion, SuggestionVote }
-export { AccountOwnerType, SuggestionStatus }
+export type { 
+  User, 
+  BankAccount, 
+  Transaction, 
+  Company, 
+  MapLocation, 
+  Suggestion, 
+  SuggestionVote,
+  CompanyShare,
+  ShareTransaction,
+  SharePortfolio,
+  MarketListing,
+  PriceHistory
+}
+export { AccountOwnerType, SuggestionStatus, MarketListingStatus }
 
 // ============================================
 // TYPES ÉTENDUS POUR L'UI
