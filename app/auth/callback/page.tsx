@@ -3,9 +3,17 @@
 import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createBrowserClient } from '@supabase/ssr'
 import { createOAuthUser } from '@/app/actions/auth'
 import { checkOnboardingStatus } from '@/app/actions/auth'
+
+// Create browser client with proper cookie handling
+function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
 function CallbackHandler() {
   const router = useRouter()
@@ -15,6 +23,9 @@ function CallbackHandler() {
 
   useEffect(() => {
     if (!searchParams) return
+
+    // Create browser client inside useEffect to ensure it's created on client
+    const supabase = createClient()
 
     // Debug: log all params
     const params: Record<string, string> = {}
