@@ -206,7 +206,7 @@ export async function loginUser(login: string, password: string) {
     return { error: error.message }
   }
 
-  redirect('/dashboard')
+  return { success: true, redirectTo: '/dashboard' }
 }
 
 export async function logoutUser() {

@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { loginUser } from '@/app/actions/auth'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 import { GlassCard } from '@/components/GlassCard'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -22,6 +24,8 @@ export default function LoginPage() {
     if (result?.error) {
       setError(result.error)
       setLoading(false)
+    } else if (result?.redirectTo) {
+      router.push(result.redirectTo)
     }
   }
 
