@@ -3,29 +3,44 @@
 import { supabase } from '@/lib/supabase'
 import { useState } from 'react'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || window?.location?.origin || 'http://localhost:3000'
-
 export function GoogleSignInButton() {
   const [loading, setLoading] = useState(false)
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
     
-    // Use environment variable or fallback to window.location.origin
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
     const redirectUrl = siteUrl || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
+    const callbackUrl = `${redirectUrl}/auth/callback`
     
-    const { error } = await supabase.auth.signInWithOAuth({
+    console.log('Starting Google OAuth...')
+    console.log('Redirect URL:', callbackUrl)
+    console.log('Site URL from env:', siteUrl)
+    console.log('Window origin:', typeof window !== 'undefined' ? window.location.origin : 'N/A')
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${redirectUrl}/auth/callback`,
+        redirectTo: callbackUrl,
+        skipBrowserRedirect: false,
       },
     })
 
+    console.log('OAuth response data:', data)
+    
     if (error) {
       console.error('Google sign in error:', error)
-      alert('Erreur lors de la connexion avec Google')
+      alert('Erreur lors de la connexion avec Google: ' + error.message)
+    } else if (data?.url) {
+      console.log('Redirecting to OAuth URL:', data.url)
+      // La redirection devrait être automatique avec skipBrowserRedirect: false
+      // mais on la force au cas où
+      window.location.href = data.url
+    } else {
+      console.error('No URL returned from signInWithOAuth')
+      alert('Erreur: pas de URL de redirection retournée')
     }
+    
     setLoading(false)
   }
 
