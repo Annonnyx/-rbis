@@ -153,6 +153,10 @@ model Company {
   priceHistory   PriceHistory[]
   jobPostings    JobPosting[]
   employments    Employment[]
+  inventory      CompanyInventory[]
+  productionLines ProductionLine[]
+  providerContracts Contract[] @relation("Provider")
+  clientContracts Contract[] @relation("Client")
 
   @@map("companies")
 }
@@ -425,4 +429,122 @@ model SalaryPayment {
   employment Employment @relation(fields: [employmentId], references: [id], onDelete: Cascade)
 
   @@map("salary_payments")
+}
+
+// ============================================
+// MODÈLES SYSTÈME DE PRODUCTION
+// ============================================
+
+enum ResourceCategory {
+  RAW
+  PROCESSED
+  ENERGY
+  SERVICE
+}
+
+enum ContractStatus {
+  ACTIVE
+  PAUSED
+  TERMINATED
+}
+
+/**
+ * Types de ressources (référence)
+ */
+model ResourceType {
+  id        String          @id @default(uuid())
+  name      String          @unique
+  category  ResourceCategory
+  basePrice BigInt          @default(1000) // prix de référence en centimes
+  unit      String          @default("unité")
+
+  // Relations
+  inventories  CompanyInventory[]
+  productionLines ProductionLine[]
+  contracts    Contract[]
+
+  @@map("resource_types")
+}
+
+/**
+ * Inventaire d'une entreprise
+ */
+model CompanyInventory {
+  id              String @id @default(uuid())
+  companyId       String
+  resourceTypeId  String
+  quantity        Int    @default(0)
+  averageCostPrice BigInt @default(0) // prix moyen d'acquisition
+
+  // Relations
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  resourceType ResourceType @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, resourceTypeId])
+  @@map("company_inventories")
+}
+
+/**
+ * Ligne de production
+ */
+model ProductionLine {
+  id                   String    @id @default(uuid())
+  companyId            String
+  outputResourceId     String
+  outputQuantityPerCycle Int     @default(1)
+  cycleHours           Int       @default(24) // durée d'un cycle en heures
+  costPerCycle         BigInt    @default(0) // coût fixe par cycle
+  active               Boolean   @default(false)
+  lastCycleAt          DateTime?
+  nextCycleAt          DateTime?
+  createdAt            DateTime  @default(now())
+
+  // Relations
+  company        Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  outputResource ResourceType @relation(fields: [outputResourceId], references: [id], onDelete: Cascade)
+
+  @@map("production_lines")
+}
+
+/**
+ * Contrat de fourniture entre entreprises
+ */
+model Contract {
+  id                   String         @id @default(uuid())
+  providerId           String
+  clientId             String
+  resourceTypeId       String
+  quantityPerDelivery  Int
+  pricePerUnit         BigInt
+  frequencyHours       Int            @default(24)
+  status               ContractStatus @default(ACTIVE)
+  startedAt            DateTime       @default(now())
+  nextDeliveryAt       DateTime?
+  terminatedAt         DateTime?
+
+  // Relations
+  provider     Company           @relation("Provider", fields: [providerId], references: [id], onDelete: Cascade)
+  client       Company           @relation("Client", fields: [clientId], references: [id], onDelete: Cascade)
+  resourceType ResourceType      @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
+  deliveries   ContractDelivery[]
+
+  @@map("contracts")
+}
+
+/**
+ * Livraison de contrat (log)
+ */
+model ContractDelivery {
+  id                String   @id @default(uuid())
+  contractId        String
+  quantityDelivered Int
+  totalPaid         BigInt
+  deliveredAt       DateTime @default(now())
+  success           Boolean  @default(true)
+  failureReason     String?
+
+  // Relations
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@map("contract_deliveries")
 }

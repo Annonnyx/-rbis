@@ -55,6 +55,21 @@ const SKILL_CATEGORIES = [
 ]
 
 /**
+ * Types de ressources pour le système de production
+ */
+const RESOURCE_TYPES = [
+  { name: 'Savon', category: 'PROCESSED', basePrice: 500, unit: 'unité' },
+  { name: 'Pain', category: 'PROCESSED', basePrice: 300, unit: 'unité' },
+  { name: 'Vêtements', category: 'PROCESSED', basePrice: 2000, unit: 'unité' },
+  { name: 'Électricité', category: 'ENERGY', basePrice: 100, unit: 'kWh' },
+  { name: 'Eau', category: 'RAW', basePrice: 50, unit: 'litre' },
+  { name: 'Métal', category: 'RAW', basePrice: 800, unit: 'kg' },
+  { name: 'Bois', category: 'RAW', basePrice: 400, unit: 'kg' },
+  { name: 'Pétrole', category: 'RAW', basePrice: 1500, unit: 'baril' },
+  { name: 'Données', category: 'SERVICE', basePrice: 1000, unit: 'GB' },
+]
+
+/**
  * Fonction principale de seed
  * Idempotent - peut être relancée sans erreur
  */
@@ -95,6 +110,25 @@ async function main() {
       },
     })
     console.log(`  ✓ Skill: ${skill.name}`)
+  }
+
+  // Seed ResourceTypes
+  for (const resource of RESOURCE_TYPES) {
+    await prisma.resourceType.upsert({
+      where: { name: resource.name },
+      update: {
+        category: resource.category,
+        basePrice: resource.basePrice,
+        unit: resource.unit,
+      },
+      create: {
+        name: resource.name,
+        category: resource.category,
+        basePrice: resource.basePrice,
+        unit: resource.unit,
+      },
+    })
+    console.log(`  ✓ Resource: ${resource.name}`)
   }
 
   console.log('✅ Seed completed successfully')

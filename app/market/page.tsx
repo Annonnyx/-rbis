@@ -32,8 +32,12 @@ import {
   ShoppingCart, 
   ArrowRight,
   TrendingDown,
-  Activity
+  Activity,
+  Package
 } from 'lucide-react'
+import { getResourceTypes } from '@/app/actions/production'
+import { prisma } from '@/lib/prisma'
+import { OrbeCurrency } from '@/components/OrbeCurrency'
 
 interface MarketPageProps {
   searchParams: { tab?: string }
@@ -235,6 +239,44 @@ async function ListingsTab({ userId }: { userId: string }) {
 }
 
 // ============================================
+// Onglet 4: Ressources
+// ============================================
+async function ResourcesTab() {
+  const result = await getResourceTypes()
+  
+  if (!result.success) {
+    return <div className="text-red-400">Erreur lors du chargement des ressources</div>
+  }
+  
+  const resources = result.data || []
+  
+  if (resources.length === 0) {
+    return (
+      <EmptyState
+        icon={Package}
+        title="Aucune ressource"
+        description="Le marché des ressources est vide."
+      />
+    )
+  }
+  
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {resources.map(resource => (
+        <GlassCard key={resource.id} className="text-center">
+          <p className="font-medium text-white">{resource.name}</p>
+          <p className="text-xs text-white/40 mb-2">{resource.category}</p>
+          <p className="text-lg font-bold text-violet-400">
+            <OrbeCurrency amount={resource.basePrice} />
+          </p>
+          <p className="text-xs text-white/40">/{resource.unit}</p>
+        </GlassCard>
+      ))}
+    </div>
+  )
+}
+
+// ============================================
 // Main Page
 // ============================================
 export default async function MarketPage({ searchParams }: MarketPageProps) {
@@ -255,6 +297,7 @@ export default async function MarketPage({ searchParams }: MarketPageProps) {
     { id: 'companies', label: 'Entreprises cotées', icon: TrendingUp },
     { id: 'portfolio', label: 'Mes actions', icon: PieChart },
     { id: 'listings', label: 'Annonces', icon: ShoppingCart },
+    { id: 'resources', label: 'Ressources', icon: Package },
   ]
   
   return (
@@ -294,6 +337,9 @@ export default async function MarketPage({ searchParams }: MarketPageProps) {
         )}
         {activeTab === 'listings' && (
           <ListingsTab userId={user.id} />
+        )}
+        {activeTab === 'resources' && (
+          <ResourcesTab />
         )}
       </Suspense>
     </div>

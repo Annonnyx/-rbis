@@ -21,11 +21,14 @@ import { IPOButton } from '@/components/IPOButton'
 import { BuySharesButton } from '@/components/BuySharesButton'
 import { 
   Building2, MapPin, User, Calendar, Sparkles, TrendingUp, 
-  TrendingDown, Activity, Users, DollarSign, Briefcase
+  TrendingDown, Activity, Users, DollarSign, Briefcase,
+  Package, Factory, FileText
 } from 'lucide-react'
 import { getCompanyEmployees, getCompanyJobPostings } from '@/app/actions/employment'
 import { EmployeeRow } from '@/components/EmployeeRow'
 import { JobCard } from '@/components/JobCard'
+import { getProductionLines, getCompanyInventory, getCompanyContracts } from '@/app/actions/production'
+import { ProgressBar } from '@/components/ProgressBar'
 
 interface CompanyPageProps {
   params: { id: string }
@@ -62,6 +65,17 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
   const jobPostingsResult = await getCompanyJobPostings(params.id)
   const employees = employeesResult.success ? employeesResult.data : []
   const jobPostings = jobPostingsResult.success ? jobPostingsResult.data : []
+  
+  // Récupérer les données de production
+  const productionResult = await getProductionLines(params.id)
+  const inventoryResult = await getCompanyInventory(params.id)
+  const providerContractsResult = await getCompanyContracts(params.id, true)
+  const clientContractsResult = await getCompanyContracts(params.id, false)
+  
+  const productionLines = productionResult.success ? productionResult.data : []
+  const inventory = inventoryResult.success ? inventoryResult.data : []
+  const providerContracts = providerContractsResult.success ? providerContractsResult.data : []
+  const clientContracts = clientContractsResult.success ? clientContractsResult.data : []
   
   const transactions = [
     ...company.capitalAccount.sentTransactions.map(t => ({ ...t, direction: 'out' as const })),
@@ -321,6 +335,159 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
                 />
               ))}
             </div>
+          )}
+        </div>
+      </GlassCard>
+      
+      {/* Section Production */}
+      <GlassCard>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Factory className="w-5 h-5 text-violet-400" />
+            Production
+          </h2>
+          {isOwner && (
+            <Button variant="secondary" size="sm">
+              Ajouter une ligne
+            </Button>
+          )}
+        </div>
+        
+        {productionLines.length === 0 ? (
+          <p className="text-sm text-white/40">Aucune ligne de production active</p>
+        ) : (
+          <div className="space-y-4">
+            {productionLines.map(line => {
+              const progress = line.nextCycleAt 
+                ? Math.max(0, 100 - Math.floor((new Date(line.nextCycleAt).getTime() - Date.now()) / (line.cycleHours * 60 * 60 * 1000) * 100))
+                : 0
+              
+              return (
+                <div key={line.id} className="p-4 rounded-xl bg-white/5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-medium text-white">{line.outputResource.name}</p>
+                      <p className="text-sm text-white/50">
+                        {line.outputQuantityPerCycle} {line.outputResource.unit} / {line.cycleHours}h
+                      </p>
+                    </div>
+                    <Badge variant={line.active ? 'success' : 'neutral'}>
+                      {line.active ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-white/40">Coût: <OrbeCurrency amount={line.costPerCycle} />/cycle</span>
+                    {line.nextCycleAt && (
+                      <span className="text-white/40">
+                        Prochain: {Math.max(0, Math.ceil((new Date(line.nextCycleAt).getTime() - Date.now()) / (1000 * 60 * 60)))}h
+                      </span>
+                    )}
+                  </div>
+                  
+                  {line.active && line.nextCycleAt && (
+                    <ProgressBar progress={progress} />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </GlassCard>
+      
+      {/* Section Inventaire */}
+      <GlassCard>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Package className="w-5 h-5 text-violet-400" />
+            Inventaire
+          </h2>
+          <span className="text-sm text-white/50">{inventory.length} ressources</span>
+        </div>
+        
+        {inventory.length === 0 ? (
+          <p className="text-sm text-white/40">Inventaire vide</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {inventory.map(item => (
+              <div key={item.id} className="p-3 rounded-xl bg-white/5 text-center">
+                <p className="font-medium text-white">{item.resourceType.name}</p>
+                <p className="text-lg font-bold text-violet-400">{item.quantity}</p>
+                <p className="text-xs text-white/40">{item.resourceType.unit}</p>
+                <p className="text-xs text-white/50 mt-1">
+                  Val: <OrbeCurrency amount={item.totalValue} />
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </GlassCard>
+      
+      {/* Section Contrats */}
+      <GlassCard>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <FileText className="w-5 h-5 text-violet-400" />
+            Contrats
+          </h2>
+          {isOwner && (
+            <Button variant="secondary" size="sm">
+              Nouveau contrat
+            </Button>
+          )}
+        </div>
+        
+        <div className="space-y-4">
+          {/* Contrats fournisseur */}
+          {providerContracts.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-white/50 mb-2">Fournisseur ({providerContracts.length})</h3>
+              <div className="space-y-2">
+                {providerContracts.map(contract => (
+                  <div key={contract.id} className="p-3 rounded-xl bg-white/5 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-white">
+                        {contract.quantityPerDelivery} {contract.resourceType.unit} → {contract.client.name}
+                      </p>
+                      <p className="text-xs text-white/40">
+                        <OrbeCurrency amount={contract.pricePerUnit} />/unité • Tous les {contract.frequencyHours}h
+                      </p>
+                    </div>
+                    <Badge variant={contract.status === 'ACTIVE' ? 'success' : 'warning'}>
+                      {contract.status === 'ACTIVE' ? 'Actif' : 'En pause'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Contrats client */}
+          {clientContracts.length > 0 && (
+            <div className={providerContracts.length > 0 ? 'mt-4 pt-4 border-t border-white/10' : ''}>
+              <h3 className="text-sm font-medium text-white/50 mb-2">Client ({clientContracts.length})</h3>
+              <div className="space-y-2">
+                {clientContracts.map(contract => (
+                  <div key={contract.id} className="p-3 rounded-xl bg-white/5 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-white">
+                        {contract.quantityPerDelivery} {contract.resourceType.unit} ← {contract.provider.name}
+                      </p>
+                      <p className="text-xs text-white/40">
+                        <OrbeCurrency amount={contract.pricePerUnit} />/unité • Tous les {contract.frequencyHours}h
+                      </p>
+                    </div>
+                    <Badge variant={contract.status === 'ACTIVE' ? 'success' : 'warning'}>
+                      {contract.status === 'ACTIVE' ? 'Actif' : 'En pause'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {providerContracts.length === 0 && clientContracts.length === 0 && (
+            <p className="text-sm text-white/40">Aucun contrat actif</p>
           )}
         </div>
       </GlassCard>
