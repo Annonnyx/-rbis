@@ -7,7 +7,7 @@ import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 import { GlassCard } from '@/components/GlassCard'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,7 +17,7 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const result = await loginUser(email, password)
+    const result = await loginUser(login, password)
     
     if (result?.error) {
       setError(result.error)
@@ -43,13 +43,13 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-2">Email</label>
+            <label className="block text-sm font-medium text-white/70 mb-2">Email ou Nom d'utilisateur</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all duration-200"
-              placeholder="votre@email.com"
+              placeholder="votre@email.com ou Ønyx"
               required
             />
           </div>

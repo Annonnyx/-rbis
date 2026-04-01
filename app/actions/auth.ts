@@ -176,8 +176,26 @@ export async function checkLocationUnlocks() {
   }
 }
 
-export async function loginUser(email: string, password: string) {
+export async function loginUser(login: string, password: string) {
   const supabase = await createClient()
+
+  // Déterminer si c'est un email ou un username
+  const isEmail = login.includes('@')
+  
+  let email = login
+  
+  // Si c'est un username, chercher l'email associé
+  if (!isEmail) {
+    const user = await prisma.user.findFirst({
+      where: { username: login },
+    })
+    
+    if (!user) {
+      return { error: 'Utilisateur non trouvé' }
+    }
+    
+    email = user.email
+  }
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
