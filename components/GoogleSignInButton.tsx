@@ -3,16 +3,22 @@
 import { supabase } from '@/lib/supabase'
 import { useState } from 'react'
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || window?.location?.origin || 'http://localhost:3000'
+
 export function GoogleSignInButton() {
   const [loading, setLoading] = useState(false)
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
     
+    // Use environment variable or fallback to window.location.origin
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    const redirectUrl = siteUrl || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${redirectUrl}/auth/callback`,
       },
     })
 
