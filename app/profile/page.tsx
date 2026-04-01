@@ -24,8 +24,14 @@ import {
   MapPin, 
   Mail, 
   Lock,
-  Wallet
+  Wallet,
+  Briefcase,
+  TrendingUp
 } from 'lucide-react'
+import { getUserSkills } from '@/lib/skills'
+import { getUserEmployment } from '@/app/actions/employment'
+import { SkillBar } from '@/components/SkillBar'
+import Link from 'next/link'
 
 // ============================================
 // Fonction utilitaire : couleur dérivée du username
@@ -107,6 +113,11 @@ export default async function ProfilePage() {
     where: { id: user.gameProfile.homeLocationId },
   })
   
+  // Récupérer les données carrière
+  const userSkills = await getUserSkills(user.id)
+  const employmentResult = await getUserEmployment(user.id)
+  const employment = employmentResult.success ? employmentResult.data : null
+  
   const avatarColor = getColorFromUsername(user.username)
   const initial = (user.displayName || user.username).charAt(0).toUpperCase()
   
@@ -160,6 +171,64 @@ export default async function ProfilePage() {
         <Suspense fallback={<LoadingSkeleton variant="card" count={4} />}>
           <StatsSection userId={user.id} />
         </Suspense>
+      </section>
+      
+      {/* Section Carrière */}
+      <section>
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Briefcase className="w-5 h-5 text-violet-400" />
+          Carrière
+        </h3>
+        
+        {/* Emploi actuel */}
+        <GlassCard className="mb-6">
+          <h4 className="text-sm font-medium text-white/50 mb-3">Emploi actuel</h4>
+          {employment ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-white">{employment.jobPosting.title}</p>
+                <Link 
+                  href={`/company/${employment.company.id}`}
+                  className="text-sm text-violet-400 hover:text-violet-300"
+                >
+                  {employment.company.name}
+                </Link>
+                <p className="text-sm text-white/50 mt-1">
+                  <OrbeCurrency amount={employment.salaryPerDay} /> / jour
+                </p>
+              </div>
+              <Badge variant="success">Actif</Badge>
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-white/50 mb-3">Vous n'avez pas d'emploi actif</p>
+              <Link href="/jobs">
+                <Button size="sm">Voir les offres</Button>
+              </Link>
+            </div>
+          )}
+        </GlassCard>
+        
+        {/* Compétences */}
+        <div>
+          <h4 className="text-sm font-medium text-white/50 mb-3 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Mes compétences
+          </h4>
+          <div className="grid md:grid-cols-2 gap-3">
+            {userSkills.map(skill => (
+              <SkillBar
+                key={skill.name}
+                name={skill.name}
+                icon={skill.icon}
+                level={skill.level}
+                experience={skill.experience}
+                progress={skill.progress}
+                xpToNext={skill.xpToNext}
+              />
+            ))}
+          </div>
+        </div>
       </section>
       
       {/* Section Paramètres */}

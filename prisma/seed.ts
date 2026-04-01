@@ -43,6 +43,18 @@ const LOCATIONS = [
 ]
 
 /**
+ * Catégories de compétences pour le système d'emploi
+ */
+const SKILL_CATEGORIES = [
+  { name: 'Production', icon: '⚙️' },
+  { name: 'Commerce', icon: '🛒' },
+  { name: 'Finance', icon: '💰' },
+  { name: 'Logistique', icon: '🚚' },
+  { name: 'Management', icon: '👥' },
+  { name: 'Innovation', icon: '💡' },
+]
+
+/**
  * Fonction principale de seed
  * Idempotent - peut être relancée sans erreur
  */
@@ -68,6 +80,21 @@ async function main() {
       },
     })
     console.log(`  ✓ Location: ${location.name}`)
+  }
+
+  // Seed SkillCategories
+  for (const skill of SKILL_CATEGORIES) {
+    await prisma.skillCategory.upsert({
+      where: { name: skill.name },
+      update: {
+        icon: skill.icon,
+      },
+      create: {
+        name: skill.name,
+        icon: skill.icon,
+      },
+    })
+    console.log(`  ✓ Skill: ${skill.name}`)
   }
 
   console.log('✅ Seed completed successfully')

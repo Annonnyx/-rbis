@@ -17,9 +17,16 @@ import type {
   SharePortfolio,
   MarketListing,
   PriceHistory,
+  SkillCategory,
+  UserSkill,
+  JobPosting,
+  Employment,
+  SalaryPayment,
   AccountOwnerType,
   SuggestionStatus,
-  MarketListingStatus
+  MarketListingStatus,
+  JobStatus,
+  EmploymentStatus
 } from '@prisma/client'
 
 // ============================================
@@ -38,9 +45,14 @@ export type {
   ShareTransaction,
   SharePortfolio,
   MarketListing,
-  PriceHistory
+  PriceHistory,
+  SkillCategory,
+  UserSkill,
+  JobPosting,
+  Employment,
+  SalaryPayment
 }
-export { AccountOwnerType, SuggestionStatus, MarketListingStatus }
+export { AccountOwnerType, SuggestionStatus, MarketListingStatus, JobStatus, EmploymentStatus }
 
 // ============================================
 // TYPES ÉTENDUS POUR L'UI
@@ -111,6 +123,18 @@ export interface TransferFormData {
   toAccountNumber: string
   amount: number // en Orbe (décimal)
   label?: string
+}
+
+/**
+ * Données pour créer une offre d'emploi
+ */
+export interface JobFormData {
+  title: string
+  description: string
+  skillCategoryId: string
+  minSkillLevel: number
+  salaryPerDay: number
+  maxEmployees?: number
 }
 
 // ============================================

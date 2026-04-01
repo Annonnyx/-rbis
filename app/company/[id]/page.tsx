@@ -21,8 +21,11 @@ import { IPOButton } from '@/components/IPOButton'
 import { BuySharesButton } from '@/components/BuySharesButton'
 import { 
   Building2, MapPin, User, Calendar, Sparkles, TrendingUp, 
-  TrendingDown, Activity, Users, DollarSign 
+  TrendingDown, Activity, Users, DollarSign, Briefcase
 } from 'lucide-react'
+import { getCompanyEmployees, getCompanyJobPostings } from '@/app/actions/employment'
+import { EmployeeRow } from '@/components/EmployeeRow'
+import { JobCard } from '@/components/JobCard'
 
 interface CompanyPageProps {
   params: { id: string }
@@ -53,6 +56,12 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
   const shareTransactions = shareInfo?.isListed
     ? await getCompanyTransactions(params.id, 5)
     : null
+  
+  // Récupérer les données d'emploi
+  const employeesResult = await getCompanyEmployees(params.id)
+  const jobPostingsResult = await getCompanyJobPostings(params.id)
+  const employees = employeesResult.success ? employeesResult.data : []
+  const jobPostings = jobPostingsResult.success ? jobPostingsResult.data : []
   
   const transactions = [
     ...company.capitalAccount.sentTransactions.map(t => ({ ...t, direction: 'out' as const })),
@@ -262,6 +271,57 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
               Voir le profil →
             </Link>
           </div>
+        </div>
+      </GlassCard>
+      
+      {/* Section Équipe et Emplois */}
+      <GlassCard>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-violet-400" />
+            Équipe et Recrutement
+          </h2>
+          {isOwner && (
+            <Button variant="secondary" size="sm">
+              Publier une offre
+            </Button>
+          )}
+        </div>
+        
+        {/* Employés actifs */}
+        <div className="mb-6">
+          <h3 className="text-sm font-medium text-white/50 mb-3">Employés ({employees.length})</h3>
+          {employees.length === 0 ? (
+            <p className="text-sm text-white/40">Aucun employé pour le moment</p>
+          ) : (
+            <div className="space-y-2">
+              {employees.map(emp => (
+                <EmployeeRow 
+                  key={emp.id} 
+                  employment={emp} 
+                  isOwner={isOwner}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Offres d'emploi */}
+        <div className="pt-4 border-t border-white/10">
+          <h3 className="text-sm font-medium text-white/50 mb-3">Offres d'emploi</h3>
+          {jobPostings.length === 0 ? (
+            <p className="text-sm text-white/40">Aucune offre publiée</p>
+          ) : (
+            <div className="space-y-3">
+              {jobPostings.map(job => (
+                <JobCard 
+                  key={job.id} 
+                  job={job} 
+                  isOwner={isOwner}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </GlassCard>
       
