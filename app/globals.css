@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   ØRBIS - Global Styles & Design Tokens
+   ============================================ */
+
+:root {
+  /* Colors */
+  --orbis-bg: #0a0a0f;
+  --orbis-violet: #7c3aed;
+  --orbis-violet-hover: #6d28d9;
+  --orbis-violet-light: #a78bfa;
+  --orbis-white: #ffffff;
+  --orbis-white-50: rgba(255, 255, 255, 0.5);
+  --orbis-white-10: rgba(255, 255, 255, 0.1);
+  --orbis-white-8: rgba(255, 255, 255, 0.08);
+  --orbis-white-5: rgba(255, 255, 255, 0.05);
+  
+  /* Status Colors */
+  --orbis-success: #22c55e;
+  --orbis-warning: #f59e0b;
+  --orbis-error: #ef4444;
+  --orbis-info: #3b82f6;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+@layer base {
+  body {
+    @apply bg-[var(--orbis-bg)] text-white antialiased;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--orbis-white-10);
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--orbis-white-50);
+  }
+  
+  /* Selection */
+  ::selection {
+    background: var(--orbis-violet);
+    color: white;
+  }
+}
+
+/* ============================================
+   Custom Animations
+   ============================================ */
+
+@layer utilities {
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
+    }
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in-up {
+    animation: fade-in-up 0.2s ease-out;
+  }
+  
+  @keyframes modal-overlay-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .animate-modal-overlay {
+    animation: modal-overlay-in 0.2s ease-out;
+  }
+  
+  @keyframes modal-content-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .animate-modal-content {
+    animation: modal-content-in 0.2s ease-out;
+  }
+  
+  /* Skeleton shimmer */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+/* ============================================
+   Glassmorphism Utilities
+   ============================================ */
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl;
+  }
+  
+  .glass-hover {
+    @apply hover:bg-white/[0.08] transition-all duration-200;
+  }
+  
+  .glass-input {
+    @apply bg-white/5 border border-white/10 rounded-xl 
+           focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 
+           focus:outline-none transition-all duration-200;
+  }
+}
