@@ -1,7 +1,15 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { GlassCard } from '@/components/GlassCard'
+import { getCurrentUser } from '@/app/actions/auth'
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Check if user is logged in and redirect to dashboard
+  const user = await getCurrentUser()
+  if (user) {
+    redirect('/dashboard')
+  }
+
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       {/* Hero Section */}

@@ -54,7 +54,10 @@ function CallbackHandler() {
     }
 
     // Exchange the code for a session
-    supabase.auth.exchangeCodeForSession(code).then(async ({ error: exchangeError }) => {
+    console.log('Exchanging code for session...')
+    supabase.auth.exchangeCodeForSession(code).then(async ({ data, error: exchangeError }) => {
+      console.log('Exchange result:', { data, error: exchangeError })
+      
       if (exchangeError) {
         console.error('Exchange error:', exchangeError)
         setError(exchangeError.message)
@@ -63,7 +66,9 @@ function CallbackHandler() {
       }
 
       // Check if user is authenticated
+      console.log('Getting user...')
       const { data: { user }, error: userError } = await supabase.auth.getUser()
+      console.log('Get user result:', { user, error: userError })
       
       if (userError || !user) {
         console.error('User error:', userError)
