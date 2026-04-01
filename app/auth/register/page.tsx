@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { registerUser, completeProfile, selectResidence } from '@/app/actions/auth'
 import { getUnlockedLocations } from '@/app/actions/map'
 import { GlassCard } from '@/components/GlassCard'
+import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 
 export default function RegisterPage() {
   const router = useRouter()
