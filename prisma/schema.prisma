@@ -1,5 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// ============================================
+// prisma/schema.prisma
+// Schéma de données Ørbis - Simulation socio-économique
+// ============================================
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +10,12 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
+
+// ============================================
+// ENUMS
+// ============================================
 
 enum AccountOwnerType {
   PERSONAL
@@ -22,92 +29,119 @@ enum SuggestionStatus {
   IMPLEMENTED
 }
 
+// ============================================
+// MODELS
+// ============================================
+
+/**
+ * Utilisateur - Entité centrale du système
+ * Auth gérée par Supabase, données profil ici
+ */
 model User {
-  id                  String    @id @default(uuid())
-  email               String    @unique
-  username            String    @unique
-  displayName         String?
-  displayNameChanged  Boolean   @default(false)
-  firstName           String?
-  lastName            String?
-  avatarUrl           String?
-  createdAt           DateTime  @default(now())
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  username           String    @unique
+  displayName        String?
+  displayNameChanged Boolean   @default(false)
+  firstName          String?
+  lastName           String?
+  avatarUrl          String?
+  createdAt          DateTime  @default(now())
 
   // Relations
-  gameProfile         GameProfile?
-  accounts            BankAccount[]
-  companies           Company[]
-  suggestions         Suggestion[]
-  votes               SuggestionVote[]
+  gameProfile   GameProfile?
+  accounts      BankAccount[]
+  companies     Company[]
+  suggestions   Suggestion[]
+  votes         SuggestionVote[]
 
   @@map("users")
 }
 
+/**
+ * Profil de jeu - Lié 1:1 à User
+ * Contient les données spécifiques au gameplay
+ */
 model GameProfile {
-  id              String      @id @default(uuid())
-  userId          String      @unique
-  homeLocationId  String
-  totalBalance    BigInt      @default(0)
-  createdAt       DateTime    @default(now())
+  id             String      @id @default(uuid())
+  userId         String      @unique
+  homeLocationId String
+  createdAt      DateTime    @default(now())
 
   // Relations
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  homeLocation    MapLocation @relation(fields: [homeLocationId], references: [id])
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  homeLocation MapLocation @relation(fields: [homeLocationId], references: [id])
 
   @@map("game_profiles")
 }
 
+/**
+ * Compte bancaire - PERSONAL ou COMPANY
+ * Tous les montants sont stockés en centimes (BigInt)
+ */
 model BankAccount {
-  id              String           @id @default(uuid())
-  ownerId         String
-  ownerType       AccountOwnerType
-  companyId       String?
-  balance         BigInt           @default(0)
-  accountNumber   String           @unique
-  createdAt       DateTime         @default(now())
+  id            String           @id @default(uuid())
+  ownerId       String
+  ownerType     AccountOwnerType
+  companyId     String?
+  balance       BigInt           @default(0)
+  accountNumber String           @unique
+  createdAt     DateTime         @default(now())
 
   // Relations
-  owner           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner                User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   sentTransactions     Transaction[] @relation("FromAccount")
   receivedTransactions Transaction[] @relation("ToAccount")
-  capitalCompany  Company?         @relation("CompanyCapital")
+  capitalCompany       Company?      @relation("CompanyCapital")
 
   @@map("bank_accounts")
 }
 
+/**
+ * Transaction entre comptes
+ * Les labels sont optionnels
+ */
 model Transaction {
-  id              String      @id @default(uuid())
-  fromAccountId   String
-  toAccountId     String
-  amount          BigInt
-  label           String?
-  createdAt       DateTime    @default(now())
+  id            String      @id @default(uuid())
+  fromAccountId String
+  toAccountId   String
+  amount        BigInt
+  label         String?
+  createdAt     DateTime    @default(now())
 
   // Relations
-  fromAccount     BankAccount @relation("FromAccount", fields: [fromAccountId], references: [id])
-  toAccount       BankAccount @relation("ToAccount", fields: [toAccountId], references: [id])
+  fromAccount BankAccount @relation("FromAccount", fields: [fromAccountId], references: [id], onDelete: Cascade)
+  toAccount   BankAccount @relation("ToAccount", fields: [toAccountId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
 }
 
+/**
+ * Entreprise créée par un utilisateur
+ * Chaque entreprise a un compte capital dédié
+ */
 model Company {
-  id                String      @id @default(uuid())
-  ownerId           String
-  name              String
-  objective         String      @db.VarChar(200)
-  description       String      @db.VarChar(500)
-  locationId        String
-  capitalAccountId  String      @unique
-  createdAt         DateTime    @default(now())
+  id               String   @id @default(uuid())
+  ownerId          String
+  name             String
+  objective        String   @db.VarChar(200)
+  description      String   @db.VarChar(500)
+  locationId       String
+  capitalAccountId String   @unique
+  createdAt        DateTime @default(now())
 
   // Relations
-  owner             User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  location          MapLocation @relation(fields: [locationId], references: [id])
-  capitalAccount    BankAccount @relation("CompanyCapital", fields: [capitalAccountId], references: [id])
+  owner          User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  location       MapLocation @relation(fields: [locationId], references: [id])
+  capitalAccount BankAccount @relation("CompanyCapital", fields: [capitalAccountId], references: [id])
 
   @@map("companies")
 }
 
+/**
+ * Localisation sur la carte du monde
+ * Certaines sont débloquées selon le nombre d'utilisateurs
+ */
 model MapLocation {
   id                    String        @id @default(uuid())
   name                  String
@@ -117,51 +151,43 @@ model MapLocation {
   requiredUsersToUnlock Int
 
   // Relations
-  residents             GameProfile[]
-  companies             Company[]
+  residents GameProfile[]
+  companies Company[]
 
   @@map("map_locations")
 }
 
+/**
+ * Suggestion faite par un utilisateur pour améliorer le jeu
+ */
 model Suggestion {
-  id            String           @id @default(uuid())
-  authorId      String
-  title         String
-  description   String
-  status        SuggestionStatus @default(PENDING)
-  upvotes       Int              @default(0)
-  createdAt     DateTime         @default(now())
+  id          String           @id @default(uuid())
+  authorId    String
+  title       String
+  description String
+  status      SuggestionStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
 
   // Relations
-  author        User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  votes         SuggestionVote[]
+  author User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  votes  SuggestionVote[]
 
   @@map("suggestions")
 }
 
+/**
+ * Vote sur une suggestion (table pivot avec contrainte unique)
+ */
 model SuggestionVote {
-  id            String    @id @default(uuid())
-  userId        String
-  suggestionId  String
-  createdAt     DateTime  @default(now())
+  id           String   @id @default(uuid())
+  userId       String
+  suggestionId String
+  createdAt    DateTime @default(now())
 
   // Relations
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  suggestion    Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, suggestionId])
   @@map("suggestion_votes")
-}
-
-// For future market/stock exchange feature
-model PriceHistory {
-  id          String   @id @default(uuid())
-  itemType    String   // 'RESOURCE', 'COMPANY_SHARE', 'ITEM'
-  itemId      String   // ID of the item being tracked
-  price       BigInt   // Price in centimes at this point in time
-  volume      Int?     // Trading volume (optional)
-  recordedAt  DateTime @default(now())
-
-  @@index([itemType, itemId, recordedAt])
-  @@map("price_history")
 }

@@ -1,167 +1,159 @@
 # Ørbis
 
-Une simulation socio-économique multijoueur en temps réel, minimaliste, qui évolue grâce aux suggestions des utilisateurs.
+> Une simulation socio-économique multijoueur où les utilisateurs créent des entreprises, gèrent un compte bancaire fictif, et font évoluer le monde via des suggestions.
 
 ## Stack Technique
 
-- **Framework** : Next.js 14 (App Router, TypeScript strict)
-- **Base de données** : Supabase (PostgreSQL) + Prisma ORM
-- **Auth** : Supabase Auth (email + password)
-- **Styling** : Tailwind CSS - style glassmorphism
-- **Carte** : Leaflet.js avec react-leaflet
-- **Déploiement** : Vercel-ready
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Langage**: TypeScript (strict mode)
+- **Base de données**: PostgreSQL via [Supabase](https://supabase.com/)
+- **ORM**: [Prisma](https://www.prisma.io/)
+- **Auth**: Supabase Auth
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Déploiement**: [Vercel](https://vercel.com/)
 
-## Monnaie Fictive
+---
 
-La monnaie du jeu s'appelle l'**Orbe**, symbole **◎**.
-Exemple d'affichage : `◎ 1 000,00`
+## Prérequis
 
-Les montants sont toujours stockés en entier (centimes d'Orbe) pour éviter les erreurs de flottants.
+- Node.js 18+
+- npm ou pnpm
+- Un projet Supabase actif
+- Un compte Vercel (pour le déploiement)
+
+---
 
 ## Installation
 
-1. **Cloner le projet**
+### 1. Cloner et installer les dépendances
+
 ```bash
 git clone <repo-url>
 cd orbis
-```
-
-2. **Installer les dépendances**
-```bash
 npm install
 ```
 
-3. **Configurer les variables d'environnement**
+### 2. Configuration des variables d'environnement
+
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Remplissez les variables dans `.env.local` :
+Remplissez les variables dans `.env` :
+
 - `NEXT_PUBLIC_SUPABASE_URL` : URL de votre projet Supabase
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` : Clé anonyme Supabase
-- `SUPABASE_SERVICE_ROLE_KEY` : Clé service Supabase
-- `DATABASE_URL` : URL de connexion PostgreSQL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` : Clé publique (anon)
+- `SUPABASE_SERVICE_ROLE_KEY` : Clé privée (service_role) - **ne jamais exposer**
+- `DATABASE_URL` : Connection pooling URL (avec `pgbouncer=true`)
+- `DIRECT_URL` : URL directe pour les migrations
 
-4. **Initialiser la base de données**
+### 3. Configuration de la base de données
+
 ```bash
-npx prisma migrate dev --name init
+# Générer le client Prisma
 npx prisma generate
-```
 
-5. **Seeder la base de données**
-```bash
+# Créer et appliquer les migrations
+npx prisma migrate dev --name init
+
+# (Optionnel) Remplir avec les données initiales
 npx prisma db seed
 ```
 
-6. **Lancer le serveur de développement**
+### 4. Lancer en développement
+
 ```bash
 npm run dev
 ```
 
-L'application sera accessible sur `http://localhost:3000`
+L'application est disponible sur `http://localhost:3000`
 
-## Structure du Projet
+---
+
+## Structure du projet
 
 ```
-app/
-├── actions/          # Server Actions (auth, bank, company, suggestions)
-├── auth/
-│   ├── login/        # Page de connexion
-│   └── register/     # Inscription (3 étapes)
-├── dashboard/        # Dashboard utilisateur
-├── map/              # Carte interactive (Leaflet)
-├── bank/             # Gestion bancaire
-├── company/
-│   ├── new/          # Créer une entreprise
-│   └── [id]/         # Page entreprise
-├── profile/          # Profil utilisateur
-├── suggestions/      # Système de suggestions
-└── page.tsx          # Landing page
-
-components/
-├── GlassCard.tsx     # Card glassmorphism
-├── OrbeCurrency.tsx  # Affichage monnaie
-├── Sidebar.tsx       # Navigation
-└── ui/
-    └── SuggestionCard.tsx
-
-lib/
-├── prisma.ts         # Client Prisma
-├── supabase.ts       # Client Supabase
-└── supabase-server.ts
-
-prisma/
-├── schema.prisma     # Schéma de base de données
-└── seed.ts           # Données initiales
-
-types/
-└── index.ts          # Types TypeScript
+orbis/
+├── app/                    # App Router Next.js
+│   ├── actions/           # Server Actions (mutations métier)
+│   ├── auth/              # Routes auth (login, register, callback)
+│   ├── dashboard/         # Dashboard utilisateur
+│   └── ...                # Autres routes
+├── components/            # Composants React
+│   ├── ui/               # Composants génériques (buttons, cards...)
+│   ├── bank/             # Composants spécifiques banque
+│   ├── map/              # Composants carte
+│   └── company/          # Composants entreprise
+├── lib/                   # Utilitaires partagés
+│   ├── prisma.ts        # Client Prisma (singleton)
+│   ├── supabase.ts      # Clients Supabase (server/browser)
+│   └── currency.ts      # Formatage monétaire
+├── types/                 # Types TypeScript globaux
+├── prisma/
+│   ├── schema.prisma    # Schéma de données
+│   └── seed.ts          # Données initiales
+├── public/               # Assets statiques
+└── ...config files
 ```
 
-## Fonctionnalités
+### Conventions
 
-### Authentification & Onboarding (3 étapes)
-1. Création compte (email + password + username)
-2. Prénom/Nom (modifiable une seule fois)
-3. Sélection de la résidence sur carte
+- **App Router**: Toutes les pages sont dans `app/`, organisées par domaine
+- **Server Actions**: Toutes les mutations serveur sont dans `app/actions/`
+- **Types**: Aucun `any`, tous les types sont dans `types/` ou générés par Prisma
+- **Commentaires**: Chaque fichier exporté a un commentaire JSDoc expliquant son rôle
 
-### Dashboard
-- Solde total toutes banques
-- Mes entreprises
-- Dernières transactions
-- Suggestions récentes
-- Stats utilisateur
+---
 
-### Carte Interactive
-- Leaflet.js avec fond CartoDB Dark Matter
-- Zones débloquées/verrouillées
-- Marqueurs entreprises
-- Déblocage progressif selon nombre d'utilisateurs
+## Modèle de données
 
-### Système Bancaire
-- Compte personnel + comptes entreprises
-- Transferts entre comptes
-- Historique des transactions
-- Affichage formaté : `◎ X XXX,XX`
+### Utilisateur
+- `username` unique et immuable (identifiant public)
+- `displayName` modifiable (une seule fois)
+- Auth gérée par Supabase, profil dans Prisma
 
-### Entreprises
-- Création avec capital minimum (◎ 300,00)
-- Capital déduit du compte personnel
-- Aperçu en temps réel
-- Page détaillée par entreprise
+### Économie
+- **BankAccount**: PERSONAL ou COMPANY, balance en centimes (BigInt)
+- **Transaction**: transferts entre comptes avec label optionnel
+- **Company**: entreprise avec compte capital dédié
 
-### Suggestions
-- Soumettre des idées
-- Système de votes
-- Filtres par statut
-- Tri par date/votes
+### Monde
+- **MapLocation**: zones géographiques, certaines débloquées par nombre d'utilisateurs
+- **Suggestion**: propositions d'amélioration votées par la communauté
 
-## Règles Métier
+---
 
-- **Crédit initial** : ◎ 1 000,00 à l'inscription
-- **Capital minimum entreprise** : ◎ 300,00
-- **Déblocage zones** : Selon nombre d'utilisateurs (100, 500, 1000)
-- **Display name** : Modifiable une seule fois
-- **Monnaie** : Toujours stockée en centimes (BigInt)
-
-## Scripts Disponibles
+## Commandes utiles
 
 ```bash
-npm run dev          # Développement
-npm run build        # Build production
-npm run start        # Démarrage production
-npm run lint         # ESLint
-npm run seed         # Seeder la base de données
+# Développement
+npm run dev              # Lancer le serveur de dev
+
+# Base de données
+npx prisma studio        # GUI Prisma
+npx prisma migrate dev   # Nouvelle migration
+npx prisma db seed       # Réinitialiser les données initiales
+
+# Build
+npm run build            # Build production
+npm run start            # Lancer en production
 ```
 
-## Déploiement Vercel
+---
 
-1. Créer un projet sur Vercel
-2. Connecter votre repository
-3. Configurer les variables d'environnement dans Vercel
-4. Déployer !
+## Déploiement
 
-## Licence
+1. Connecter le repo à Vercel
+2. Configurer les variables d'environnement dans l'interface Vercel
+3. Déployer
 
-Projet de démonstration / éducatif.
+Pour les migrations de base de données en production :
+```bash
+npx prisma migrate deploy
+```
 
+---
+
+## License
+
+MIT

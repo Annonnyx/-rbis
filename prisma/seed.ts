@@ -1,43 +1,76 @@
+// ============================================
+// prisma/seed.ts
+// Données initiales Ørbis - Idempotent
+// ============================================
+
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+/**
+ * Données des localisations de départ
+ * Coordonnées approximatives pour le lore
+ */
+const LOCATIONS = [
+  {
+    name: 'Nova',
+    lat: 48.8566,
+    lng: 2.3522,
+    unlocked: true,
+    requiredUsersToUnlock: 0,
+  },
+  {
+    name: 'Astra',
+    lat: 40.7128,  // New York
+    lng: -74.0060,
+    unlocked: false,
+    requiredUsersToUnlock: 100,
+  },
+  {
+    name: 'Forge',
+    lat: 35.6762,  // Tokyo
+    lng: 139.6503,
+    unlocked: false,
+    requiredUsersToUnlock: 500,
+  },
+  {
+    name: 'Apex',
+    lat: -33.8688, // Sydney
+    lng: 151.2093,
+    unlocked: false,
+    requiredUsersToUnlock: 1000,
+  },
+]
+
+/**
+ * Fonction principale de seed
+ * Idempotent - peut être relancée sans erreur
+ */
 async function main() {
-  console.log('Start seeding...')
+  console.log('🌱 Starting seed...')
 
-  // Create starting city (Nova)
-  const nova = await prisma.mapLocation.create({
-    data: {
-      name: 'Nova (ville de départ)',
-      lat: 48.8566,
-      lng: 2.3522,
-      unlocked: true,
-      requiredUsersToUnlock: 0,
-    },
-  })
-  console.log('Created location:', nova.name)
-
-  // Create other locked locations
-  const locations = [
-    { name: 'Aurora', lat: 51.5074, lng: -0.1278, requiredUsersToUnlock: 100 },
-    { name: 'Solara', lat: 40.7128, lng: -74.0060, requiredUsersToUnlock: 500 },
-    { name: 'Lunaris', lat: 35.6762, lng: 139.6503, requiredUsersToUnlock: 1000 },
-  ]
-
-  for (const location of locations) {
-    const created = await prisma.mapLocation.create({
-      data: {
+  // Seed MapLocations
+  for (const location of LOCATIONS) {
+    await prisma.mapLocation.upsert({
+      where: { name: location.name },
+      update: {
+        lat: location.lat,
+        lng: location.lng,
+        unlocked: location.unlocked,
+        requiredUsersToUnlock: location.requiredUsersToUnlock,
+      },
+      create: {
         name: location.name,
         lat: location.lat,
         lng: location.lng,
-        unlocked: false,
+        unlocked: location.unlocked,
         requiredUsersToUnlock: location.requiredUsersToUnlock,
       },
     })
-    console.log('Created location:', created.name, '- Unlocked at:', created.requiredUsersToUnlock, 'users')
+    console.log(`  ✓ Location: ${location.name}`)
   }
 
-  console.log('Seeding finished.')
+  console.log('✅ Seed completed successfully')
 }
 
 main()

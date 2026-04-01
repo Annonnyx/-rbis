@@ -1,116 +1,126 @@
-import { SuggestionStatus, AccountOwnerType } from '@prisma/client'
+// ============================================
+// types/index.ts
+// Types TypeScript globaux pour Ørbis
+// Basés sur les modèles Prisma + extensions UI
+// ============================================
 
-export interface User {
-  id: string
-  email: string
-  username: string
-  displayName?: string | null
-  displayNameChanged: boolean
-  firstName?: string | null
-  lastName?: string | null
-  avatarUrl?: string | null
-  createdAt: Date
+import type { 
+  User, 
+  BankAccount, 
+  Transaction, 
+  Company, 
+  MapLocation, 
+  Suggestion, 
+  SuggestionVote,
+  AccountOwnerType,
+  SuggestionStatus
+} from '@prisma/client'
+
+// ============================================
+// EXPORTS PRISMA
+// ============================================
+
+export type { User, BankAccount, Transaction, Company, MapLocation, Suggestion, SuggestionVote }
+export { AccountOwnerType, SuggestionStatus }
+
+// ============================================
+// TYPES ÉTENDUS POUR L'UI
+// ============================================
+
+/**
+ * Compte bancaire avec ses transactions
+ */
+export type BankAccountWithTransactions = BankAccount & {
+  sentTransactions: Transaction[]
+  receivedTransactions: Transaction[]
 }
 
-export interface GameProfile {
-  id: string
-  userId: string
-  homeLocationId: string
-  totalBalance: bigint
-  createdAt: Date
-  homeLocation?: MapLocation
+/**
+ * Entreprise avec son compte capital
+ */
+export type CompanyWithAccount = Company & {
+  capitalAccount: BankAccount
 }
 
-export interface BankAccount {
-  id: string
-  ownerId: string
-  ownerType: AccountOwnerType
-  companyId?: string | null
-  balance: bigint
-  accountNumber: string
-  createdAt: Date
-  company?: Company
+/**
+ * Utilisateur complet avec toutes ses relations
+ */
+export type UserWithProfile = User & {
+  gameProfile: {
+    homeLocation: MapLocation
+  } | null
 }
 
-export interface Transaction {
-  id: string
-  fromAccountId: string
-  toAccountId: string
-  amount: bigint
-  label?: string | null
-  createdAt: Date
-  fromAccount?: BankAccount
-  toAccount?: BankAccount
+/**
+ * Suggestion avec son auteur et les votes
+ */
+export type SuggestionWithAuthor = Suggestion & {
+  author: Pick<User, 'id' | 'username' | 'displayName'>
+  votes: SuggestionVote[]
+  _count?: {
+    votes: number
+  }
 }
 
-export interface Company {
-  id: string
-  ownerId: string
+// ============================================
+// TYPES UI / FORMULAIRES
+// ============================================
+
+/**
+ * Données pour la création d'une entreprise
+ */
+export interface CompanyFormData {
   name: string
   objective: string
   description: string
   locationId: string
-  capitalAccountId: string
-  createdAt: Date
-  location?: MapLocation
-  capitalAccount?: BankAccount
 }
 
-export interface MapLocation {
-  id: string
-  name: string
-  lat: number
-  lng: number
-  unlocked: boolean
-  requiredUsersToUnlock: number
-}
-
-export interface Suggestion {
-  id: string
-  authorId: string
-  title: string
-  description: string
-  status: SuggestionStatus
-  upvotes: number
-  createdAt: Date
-  author?: User
-  hasVoted?: boolean
-}
-
-export interface SuggestionVote {
-  id: string
-  userId: string
-  suggestionId: string
-  createdAt: Date
-}
-
-// Form data types
-export interface RegisterUserData {
-  email: string
-  password: string
-  username: string
-}
-
-export interface CompleteProfileData {
-  firstName: string
-  lastName: string
-}
-
-export interface CreateCompanyData {
-  name: string
-  objective: string
-  description: string
-  capital: number // in centimes
-}
-
-export interface SubmitSuggestionData {
+/**
+ * Données pour la création d'une suggestion
+ */
+export interface SuggestionFormData {
   title: string
   description: string
 }
 
-export interface TransferFundsData {
+/**
+ * Données pour un transfert bancaire
+ */
+export interface TransferFormData {
   fromAccountId: string
   toAccountNumber: string
-  amount: number // in centimes
+  amount: number // en Orbe (décimal)
   label?: string
+}
+
+// ============================================
+// TYPES AUTH
+// ============================================
+
+/**
+ * Résultat d'une action serveur
+ */
+export interface ActionResult<T = unknown> {
+  success?: boolean
+  error?: string
+  data?: T
+}
+
+/**
+ * Étape d'onboarding pour les nouveaux utilisateurs
+ */
+export enum OnboardingStep {
+  ACCOUNT = 1,
+  PROFILE = 2,
+  RESIDENCE = 3,
+  COMPLETE = 0,
+}
+
+/**
+ * Statut d'onboarding
+ */
+export interface OnboardingStatus {
+  step: OnboardingStep
+  complete: boolean
 }
