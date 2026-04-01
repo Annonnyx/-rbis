@@ -33,9 +33,8 @@ export async function registerUser(email: string, password: string, username: st
     return { error: 'Le mot de passe doit contenir au moins 8 caractères' }
   }
 
-  // Validation: lettres (avec accents), chiffres, espaces, tirets, underscores, points
-  if (!/^[\p{L}\p{N}\s._-]+$/u.test(username)) {
-    return { error: 'Le nom d\'utilisateur contient des caractères non autorisés' }
+  if (username.length < 1 || username.length > 50) {
+    return { error: 'Le nom d\'utilisateur doit contenir entre 1 et 50 caractères' }
   }
 
   // Vérifier si le username existe déjà
