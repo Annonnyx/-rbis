@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { clsx } from 'clsx'
 import { ThumbsUp, Clock, CheckCircle, XCircle, Sparkles } from 'lucide-react'
-import { GlassCard } from './GlassCard'
+import { GlassCard } from '../GlassCard'
 
 type SuggestionStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'IMPLEMENTED'
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
 
 export function useRealtimeNotifications(userId: string | null) {
