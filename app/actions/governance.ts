@@ -8,7 +8,7 @@
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import type { ActionResult } from '@/types'
-import type { Election, ElectionCandidate, CommunityLaw, TaxConfig } from '@prisma/client'
+import type { Election, ElectionCandidate, CommunityLaw, TaxConfig, CityRepresentative } from '@prisma/client'
 
 // ============================================
 // TYPES
