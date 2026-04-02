@@ -531,6 +531,9 @@ export async function runContractDelivery(contractId: string): Promise<ActionRes
         })
       }
       
+      // Calculer le montant total à payer
+      const totalPaid = BigInt(contract.quantityPerDelivery) * contract.pricePerUnit
+      
       // 5. Logger la livraison
       await tx.contractDelivery.create({
         data: {

@@ -63,7 +63,7 @@ export default async function AllianceDetailPage({ params }: AlliancePageProps) 
         <GlassCard padding="md" className="text-center">
           <Wallet className="w-5 h-5 text-violet-400 mx-auto mb-1" />
           <p className="text-2xl font-bold text-white">
-            <OrbeCurrency amount={alliance.treasury?.balance || 0n} />
+            <OrbeCurrency amount={alliance.treasury?.balance || BigInt(0)} />
           </p>
           <p className="text-xs text-white/50">Trésorerie</p>
         </GlassCard>
@@ -178,7 +178,7 @@ export default async function AllianceDetailPage({ params }: AlliancePageProps) 
             <div className="text-center py-8">
               <p className="text-sm text-white/50 mb-2">Solde disponible</p>
               <p className="text-4xl font-bold text-white mb-4">
-                <OrbeCurrency amount={alliance.treasury?.balance || 0n} />
+                <OrbeCurrency amount={alliance.treasury?.balance || BigInt(0)} />
               </p>
               
               {userMembership && (

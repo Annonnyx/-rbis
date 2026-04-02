@@ -43,7 +43,7 @@ export async function assignPermanentQuests(userId: string): Promise<ActionResul
         create: {
           userId,
           questTemplateId: quest.id,
-          progress: { current: 0, target: quest.requirement.target },
+          progress: { current: 0, target: (quest.requirement as any)?.target ?? 0 },
           status: 'ACTIVE',
         },
       })
@@ -99,7 +99,7 @@ export async function generateDailyQuests(userId: string): Promise<ActionResult>
         data: {
           userId,
           questTemplateId: quest.id,
-          progress: { current: 0, target: quest.requirement.target },
+          progress: { current: 0, target: (quest.requirement as any)?.target ?? 0 },
           status: 'ACTIVE',
           expiresAt,
         },
@@ -161,7 +161,7 @@ export async function generateWeeklyQuests(userId: string): Promise<ActionResult
         data: {
           userId,
           questTemplateId: quest.id,
-          progress: { current: 0, target: quest.requirement.target },
+          progress: { current: 0, target: (quest.requirement as any)?.target ?? 0 },
           status: 'ACTIVE',
           expiresAt,
         },
@@ -201,7 +201,7 @@ export async function updateQuestProgress(
     
     for (const quest of activeQuests) {
       const currentProgress = (quest.progress as any)?.current || 0
-      const target = quest.questTemplate.requirement.target as number
+      const target = (quest.questTemplate.requirement as any)?.target as number ?? 0
       const newProgress = currentProgress + value
       
       if (newProgress >= target) {

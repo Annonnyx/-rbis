@@ -144,10 +144,11 @@ export interface JobFormData {
 /**
  * Résultat d'une action serveur
  */
-export interface ActionResult<T = unknown> {
+export interface ActionResult<T = unknown, M = unknown> {
   success?: boolean
   error?: string
   data?: T
+  meta?: M
 }
 
 /**

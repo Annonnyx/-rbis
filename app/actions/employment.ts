@@ -301,6 +301,7 @@ export async function terminateEmployment(
       
       if (daysSinceLastPay > 0) {
         const prorataAmount = employment.salaryPerDay * BigInt(daysSinceLastPay)
+        const totalPaid = prorataAmount // Définition explicite de totalPaid
         
         // Payer le salaire prorata
         const companyAccount = await tx.bankAccount.findFirst({

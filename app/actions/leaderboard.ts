@@ -333,9 +333,9 @@ export async function getGlobalLeaderboardSnapshot(): Promise<ActionResult<{
     return {
       success: true,
       data: {
-        wealth: wealth.success ? wealth.data : [],
-        entrepreneurs: entrepreneurs.success ? entrepreneurs.data : [],
-        investors: investors.success ? investors.data : [],
+        wealth: wealth.success ? (wealth.data ?? []) : [],
+        entrepreneurs: entrepreneurs.success ? (entrepreneurs.data ?? []) : [],
+        investors: investors.success ? (investors.data ?? []) : [],
       },
     }
   } catch (error) {
