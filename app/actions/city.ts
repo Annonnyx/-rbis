@@ -14,11 +14,24 @@ import type { CityChat, CityAnnouncement } from '@prisma/client'
 // TYPES
 // ============================================
 
-export interface CityChatWithAuthor extends CityChat {
+export interface CityChatWithAuthor {
+  id: string
+  locationId: string
+  authorId: string
+  content: string
+  createdAt: Date
   author: { id: string; username: string; displayName: string | null }
 }
 
-export interface CityAnnouncementWithAuthor extends CityAnnouncement {
+export interface CityAnnouncementWithAuthor {
+  id: string
+  locationId: string
+  authorId: string
+  title: string
+  content: string
+  pinned: boolean
+  expiresAt: Date | null
+  createdAt: Date
   author: { id: string; username: string; displayName: string | null }
 }
 

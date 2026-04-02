@@ -22,7 +22,7 @@ export default async function BankPage() {
   if (!user.gameProfile) redirect('/auth/register')
   
   const result = await getUserAccounts(user.id)
-  const accounts = result.success ? result.accounts : []
+  const accounts = result.success ? (result.accounts ?? []) : []
   
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">

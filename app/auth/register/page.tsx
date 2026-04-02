@@ -61,7 +61,7 @@ function Step1({
     
     if (!result.success) {
       const fieldErrors: typeof errors = {}
-      result.error.errors.forEach(err => {
+      result.error.issues.forEach(err => {
         const field = err.path[0] as keyof Step1Data
         fieldErrors[field] = err.message
       })
@@ -173,7 +173,7 @@ function Step2({
     
     if (!result.success) {
       const fieldErrors: typeof errors = {}
-      result.error.errors.forEach(err => {
+      result.error.issues.forEach(err => {
         const field = err.path[0] as keyof Step2Data
         fieldErrors[field] = err.message
       })
@@ -406,13 +406,13 @@ export default function RegisterPage() {
 // Utility
 // ============================================
 
-function debounce<T extends (...args: unknown[]) => unknown>(
+function debounce<T extends (arg: string) => Promise<void>>(
   fn: T,
   delay: number
-): (...args: Parameters<T>) => void {
+): (arg: string) => void {
   let timeoutId: ReturnType<typeof setTimeout>
-  return (...args) => {
+  return (arg) => {
     clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => fn(...args), delay)
+    timeoutId = setTimeout(() => fn(arg), delay)
   }
 }

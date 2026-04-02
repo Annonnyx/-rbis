@@ -5,7 +5,7 @@
 
 import { redirect, notFound } from 'next/navigation'
 import { getCurrentUser } from '@/app/actions/auth'
-import { getCityMessages, getCityAnnouncements, getCityStats } from '@/app/actions/city'
+import { getCityMessages, getCityAnnouncements, getCityStats, type CityChatWithAuthor } from '@/app/actions/city'
 import { prisma } from '@/lib/prisma'
 import { PageHeader } from '@/components/PageHeader'
 import { GlassCard } from '@/components/ui/GlassCard'
@@ -43,9 +43,12 @@ export default async function CityPage({ params }: CityPageProps) {
     getCityStats(params.locationId),
   ])
   
-  const messages = messagesResult.success ? messagesResult.data.messages : []
+  const messages = messagesResult.success && messagesResult.data ? messagesResult.data.messages : []
   const announcements = announcementsResult.success ? announcementsResult.data : []
   const stats = statsResult.success ? statsResult.data : { residents: 0, companies: 0, recentMessages: 0 }
+  
+  // TypeScript safety: ensure stats is never undefined
+  const safeStats = stats || { residents: 0, companies: 0, recentMessages: 0 }
   
   // Récupérer les entreprises de la ville
   const companies = await prisma.company.findMany({
@@ -65,17 +68,17 @@ export default async function CityPage({ params }: CityPageProps) {
       <div className="grid grid-cols-3 gap-4 mb-8">
         <GlassCard padding="md" className="text-center">
           <Users className="w-5 h-5 text-violet-400 mx-auto mb-1" />
-          <p className="text-2xl font-bold text-white">{stats.residents}</p>
+          <p className="text-2xl font-bold text-white">{safeStats.residents}</p>
           <p className="text-xs text-white/50">Habitants</p>
         </GlassCard>
         <GlassCard padding="md" className="text-center">
           <Building2 className="w-5 h-5 text-violet-400 mx-auto mb-1" />
-          <p className="text-2xl font-bold text-white">{stats.companies}</p>
+          <p className="text-2xl font-bold text-white">{safeStats.companies}</p>
           <p className="text-xs text-white/50">Entreprises</p>
         </GlassCard>
         <GlassCard padding="md" className="text-center">
           <MessageSquare className="w-5 h-5 text-violet-400 mx-auto mb-1" />
-          <p className="text-2xl font-bold text-white">{stats.recentMessages}</p>
+          <p className="text-2xl font-bold text-white">{safeStats.recentMessages}</p>
           <p className="text-xs text-white/50">Messages 24h</p>
         </GlassCard>
       </div>

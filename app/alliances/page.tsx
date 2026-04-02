@@ -74,7 +74,7 @@ export default async function AlliancesPage() {
             )}
           />
         ) : (
-          alliances.map(alliance => {
+          alliances?.map(alliance => {
             const isMember = alliance.members.some(m => m.user.id === user.id)
             
             return (
