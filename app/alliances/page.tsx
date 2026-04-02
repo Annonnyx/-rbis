@@ -62,7 +62,7 @@ export default async function AlliancesPage() {
       
       {/* Liste des alliances */}
       <div className="grid md:grid-cols-2 gap-4">
-        {alliances.length === 0 ? (
+        {alliances?.length === 0 ? (
           <EmptyState
             icon={HandshakeIcon}
             title="Aucune alliance"
