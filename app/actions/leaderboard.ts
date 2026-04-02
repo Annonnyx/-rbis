@@ -36,10 +36,8 @@ export async function getWealthLeaderboard(
   locationId?: string
 ): Promise<ActionResult<LeaderboardEntry[]>> {
   try {
-    const where = locationId ? { homeLocationId: locationId } : {}
-    
     const users = await prisma.user.findMany({
-      where,
+      where: locationId ? { gameProfile: { homeLocationId: locationId } } : {},
       select: {
         id: true,
         username: true,
