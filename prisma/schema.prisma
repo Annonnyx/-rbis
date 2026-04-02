@@ -82,7 +82,6 @@ model User {
   taxConfigsUpdated TaxConfig[] @relation("UpdatedBy")
   lawsProposed  CommunityLaw[] @relation("Proposer")
   // Trade Routes
-  tradeRouteUsages TradeRouteUsage[] @relation("Route")
   // Quests & Achievements
   quests        UserQuest[]
   achievements  UserAchievement[]
@@ -187,7 +186,7 @@ model Company {
  */
 model MapLocation {
   id                    String        @id @default(uuid())
-  name                  String
+  name                  String        @unique
   lat                   Float
   lng                   Float
   unlocked              Boolean       @default(false)
@@ -757,7 +756,7 @@ model Election {
 
   // Relations
   location   MapLocation         @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  winner     User?               @relation(fields: [winnerId], references: [id], onDelete: SetNull)
+  winner     User?               @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
   candidates ElectionCandidate[]
   votes      ElectionVote[]
 
@@ -796,7 +795,7 @@ model ElectionVote {
 
   // Relations
   election  Election          @relation(fields: [electionId], references: [id], onDelete: Cascade)
-  voter     User              @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  voter     User              @relation("Voter", fields: [voterId], references: [id], onDelete: Cascade)
   candidate ElectionCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
   @@unique([electionId, voterId])
@@ -833,7 +832,7 @@ model TaxConfig {
 
   // Relations
   location    MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  updatedBy   User        @relation(fields: [lastUpdatedBy], references: [id], onDelete: Cascade)
+  updatedBy   User        @relation("UpdatedBy", fields: [lastUpdatedBy], references: [id], onDelete: Cascade)
 
   @@map("tax_configs")
 }
@@ -855,7 +854,7 @@ model CommunityLaw {
 
   // Relations
   location MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  proposer User       @relation(fields: [proposedBy], references: [id], onDelete: Cascade)
+  proposer User       @relation("Proposer", fields: [proposedBy], references: [id], onDelete: Cascade)
 
   @@index([locationId, status])
   @@map("community_laws")
@@ -945,7 +944,7 @@ enum AchievementRarity {
  */
 model QuestTemplate {
   id            String       @id @default(uuid())
-  title         String
+  title         String       @unique
   description   String       @db.VarChar(500)
   type          QuestType
   category      QuestCategory
@@ -989,7 +988,7 @@ model UserQuest {
  */
 model Achievement {
   id          String              @id @default(uuid())
-  title       String
+  title       String              @unique
   description String              @db.VarChar(500)
   icon        String              @default("🏆")
   category    AchievementCategory

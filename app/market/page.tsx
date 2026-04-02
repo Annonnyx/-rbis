@@ -37,7 +37,6 @@ import {
 } from 'lucide-react'
 import { getResourceTypes } from '@/app/actions/production'
 import { prisma } from '@/lib/prisma'
-import { OrbeCurrency } from '@/components/OrbeCurrency'
 
 interface MarketPageProps {
   searchParams: { tab?: string }

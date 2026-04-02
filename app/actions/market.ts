@@ -77,8 +77,8 @@ export async function listCompanyOnMarket(
   companyId: string,
   data: IPOData
 ): Promise<ActionResult> {
-  const MIN_IPO_CAPITAL = 100000n // ◎ 1 000,00 en centimes
-  const MIN_SHARE_PRICE = 10n // ◎ 0,10 en centimes (min ◎ 0,01 = 1 centime)
+  const MIN_IPO_CAPITAL = BigInt(100000) // ◎ 1 000,00 en centimes
+  const MIN_SHARE_PRICE = BigInt(1) // ◎ 0,10 en centimes (min ◎ 0,01 = 1 centime)
   
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -111,7 +111,7 @@ export async function listCompanyOnMarket(
         throw new Error('Nombre d\'actions invalide (min 100, max 1 000 000)')
       }
       
-      if (pricePerShare < 1n) { // min ◎ 0,01 = 1 centime
+      if (pricePerShare < BigInt(1)) { // min ◎ 0,01 = 1 centime
         throw new Error('Prix minimum par action: ◎ 0,01')
       }
       
@@ -137,7 +137,7 @@ export async function listCompanyOnMarket(
           userId: company.ownerId,
           companyId,
           quantity: companyShares,
-          averageBuyPrice: 0n, // L'entreprise n'a pas "acheté" ses propres actions
+          averageBuyPrice: BigInt(0), // L'entreprise n'a pas "acheté" ses propres actions
         },
       })
       
@@ -163,7 +163,7 @@ export async function listCompanyOnMarket(
           companyId,
           quantity: companyShares,
           pricePerShare,
-          totalAmount: 0n,
+          totalAmount: BigInt(0),
         },
       })
       
@@ -379,7 +379,7 @@ export async function buyShares(
       })
       
       if (recentTransactions.length > 0) {
-        let totalValue = 0n
+        let totalValue = BigInt(0)
         let totalQty = 0
         for (const t of recentTransactions) {
           totalValue += t.totalAmount
@@ -388,7 +388,7 @@ export async function buyShares(
         const newPrice = totalValue / BigInt(totalQty)
         
         // Prix minimum ◎ 0,01
-        const finalPrice = newPrice < 1n ? 1n : newPrice
+        const finalPrice = newPrice < BigInt(1) ? BigInt(1) : newPrice
         
         await tx.companyShare.update({
           where: { companyId },
@@ -454,7 +454,7 @@ export async function createMarketListing(
       
       // 3. Vérifier le prix minimum
       const askingPrice = toCentimes(data.askingPrice)
-      if (askingPrice < 1n) {
+      if (askingPrice < BigInt(1)) {
         throw new Error('Prix minimum: ◎ 0,01')
       }
       
@@ -586,7 +586,7 @@ export async function getUserPortfolio(userId: string): Promise<ActionResult<Use
     })
     
     const formattedHoldings: UserHolding[] = holdings.map(h => {
-      const currentPrice = h.company.shareInfo?.currentPrice || 0n
+      const currentPrice = h.company.shareInfo?.currentPrice || BigInt(0)
       const currentValue = BigInt(h.quantity) * currentPrice
       const investedValue = BigInt(h.quantity) * h.averageBuyPrice
       const profitLoss = currentValue - investedValue
@@ -603,8 +603,8 @@ export async function getUserPortfolio(userId: string): Promise<ActionResult<Use
     })
     
     // Calculer la valeur totale
-    const totalValue = formattedHoldings.reduce((sum, h) => sum + h.currentValue, 0n)
-    const totalInvested = formattedHoldings.reduce((sum, h) => sum + BigInt(h.quantity) * h.averageBuyPrice, 0n)
+    const totalValue = formattedHoldings.reduce((sum, h) => sum + h.currentValue, BigInt(0))
+    const totalInvested = formattedHoldings.reduce((sum, h) => sum + BigInt(h.quantity) * h.averageBuyPrice, BigInt(0))
     const totalProfitLoss = totalValue - totalInvested
     
     return { 

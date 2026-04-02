@@ -11,7 +11,7 @@ import { prisma } from '@/lib/prisma'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import type { ActionResult } from '@/types'
 
-const INITIAL_BALANCE = 100000n // ◎ 1 000,00 en centimes
+const INITIAL_BALANCE = BigInt(100000) // ◎ 1 000,00 en centimes
 
 /**
  * Génère un numéro de compte unique format ORB-XXXX-XXXX

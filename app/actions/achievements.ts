@@ -228,19 +228,20 @@ export async function getAchievementStats(userId: string): Promise<ActionResult<
   byRarity: Record<string, number>
 }>> {
   try {
-    const [total, unlocked, byRarity] = await Promise.all([
+    const [total, unlocked, userAchievements] = await Promise.all([
       prisma.achievement.count(),
       prisma.userAchievement.count({ where: { userId } }),
-      prisma.userAchievement.groupBy({
-        by: ['achievement.rarity'],
+      prisma.userAchievement.findMany({
         where: { userId },
-        _count: { achievementId: true },
+        include: { achievement: { select: { rarity: true } } },
       }),
     ])
     
+    // Grouper manuellement par rareté
     const rarityMap: Record<string, number> = {}
-    for (const group of byRarity) {
-      rarityMap[group['achievement.rarity']] = group._count.achievementId
+    for (const ua of userAchievements) {
+      const rarity = ua.achievement.rarity
+      rarityMap[rarity] = (rarityMap[rarity] || 0) + 1
     }
     
     return { success: true, data: { total, unlocked, byRarity: rarityMap } }

@@ -11,6 +11,7 @@ import { toCentimes } from '@/lib/currency'
 import type { ActionResult, TransferFormData } from '@/types'
 
 const ITEMS_PER_PAGE = 10
+const INITIAL_BALANCE = BigInt(100000) // ◎ 1 000,00 en centimes
 
 /**
  * Récupère tous les comptes bancaires d'un utilisateur
@@ -110,7 +111,7 @@ export async function transferFunds(data: TransferFormData): Promise<ActionResul
     const amountInCentimes = toCentimes(amount)
     
     // Vérifier que le montant est positif
-    if (amountInCentimes <= 0n) {
+    if (amountInCentimes <= BigInt(0)) {
       return { success: false, error: 'Le montant doit être supérieur à 0' }
     }
     

@@ -100,7 +100,7 @@ export async function getUserStats(userId: string): Promise<ActionResult<UserSta
       return { success: false, error: 'Utilisateur introuvable' }
     }
     
-    const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0n)
+    const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, BigInt(0))
     
     return {
       success: true,

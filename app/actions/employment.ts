@@ -82,7 +82,7 @@ export async function createJobPosting(
     }
     
     const salaryInCentimes = toCentimes(data.salaryPerDay)
-    if (salaryInCentimes < 1n) {
+    if (salaryInCentimes < BigInt(1)) {
       return { success: false, error: 'Salaire minimum: ◎ 0,01' }
     }
     

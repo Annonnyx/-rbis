@@ -92,7 +92,7 @@ export async function createProductionLine(
     }
     
     const costPerCycle = toCentimes(data.costPerCycle)
-    if (costPerCycle < 0n) {
+    if (costPerCycle < BigInt(0)) {
       return { success: false, error: 'Coût invalide' }
     }
     
@@ -306,7 +306,7 @@ export async function proposeContract(
     }
     
     const pricePerUnit = toCentimes(data.pricePerUnit)
-    if (pricePerUnit < 1n) {
+    if (pricePerUnit < BigInt(1)) {
       return { success: false, error: 'Prix minimum: ◎ 0,01' }
     }
     
@@ -452,7 +452,7 @@ export async function runContractDelivery(contractId: string): Promise<ActionRes
           data: {
             contractId,
             quantityDelivered: 0,
-            totalPaid: 0n,
+            totalPaid: BigInt(0),
             success: false,
             failureReason: 'Stock insuffisant',
           },
@@ -469,7 +469,7 @@ export async function runContractDelivery(contractId: string): Promise<ActionRes
           data: {
             contractId,
             quantityDelivered: 0,
-            totalPaid: 0n,
+            totalPaid: BigInt(0),
             success: false,
             failureReason: 'Fonds client insuffisants',
           },

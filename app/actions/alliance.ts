@@ -86,7 +86,7 @@ export async function createAlliance(
       await tx.allianceTreasury.create({
         data: {
           allianceId: alliance.id,
-          balance: 0n,
+          balance: BigInt(0),
         },
       })
       
@@ -309,7 +309,7 @@ export async function depositToTreasury(
 ): Promise<ActionResult> {
   try {
     const amountInCentimes = toCentimes(amount)
-    if (amountInCentimes <= 0n) {
+    if (amountInCentimes <= BigInt(0)) {
       return { success: false, error: 'Montant invalide' }
     }
     
@@ -369,7 +369,7 @@ export async function withdrawFromTreasury(
 ): Promise<ActionResult> {
   try {
     const amountInCentimes = toCentimes(amount)
-    if (amountInCentimes <= 0n) {
+    if (amountInCentimes <= BigInt(0)) {
       return { success: false, error: 'Montant invalide' }
     }
     
