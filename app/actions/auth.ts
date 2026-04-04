@@ -98,9 +98,9 @@ export async function registerUser(data: RegisterData): Promise<ActionResult<{ u
   
   // 2. Créer ou récupérer le user dans Prisma
   try {
-    // Vérifier si l'utilisateur existe déjà (cas de re-registration après échec partiel)
+    // Vérifier si l'utilisateur existe déjà par email (même ID Supabase peut changer si réinscription)
     const existingUser = await prisma.user.findUnique({
-      where: { id: authData.user.id },
+      where: { email: data.email },
     })
     
     if (existingUser) {
