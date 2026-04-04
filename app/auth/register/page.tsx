@@ -238,11 +238,11 @@ function Step2({
 // ============================================
 
 function Step3({ 
-  onComplete,
+  onSubmit,
   onBack,
   userId 
 }: { 
-  onComplete: () => void
+  onSubmit: (userId: string, locationId: string) => Promise<void>
   onBack: () => void
   userId: string
 }) {
@@ -260,15 +260,14 @@ function Step3({
     setLoading(true)
     setError('')
     
-    const result = await selectResidence(userId, selectedLocation)
-    
-    if (result.success) {
-      onComplete()
-    } else {
-      setError(result.error || 'Erreur lors de la sélection')
+    try {
+      await onSubmit(userId, selectedLocation)
+    } catch (err) {
+      console.error('Step 3 submit error:', err)
+      setError('Erreur lors de la sélection')
+    } finally {
+      setLoading(false)
     }
-    
-    setLoading(false)
   }
   
   return (
@@ -323,17 +322,22 @@ export default function RegisterPage() {
     setStep1Data(data)
     setError('')
     
-    const result = await registerUser({
-      email: data.email,
-      password: data.password,
-      username: data.username,
-    })
-    
-    if (result.success) {
-      setUserId(result.data!.userId)
-      setStep(2)
-    } else {
-      setError(result.error || 'Erreur lors de l\'inscription')
+    try {
+      const result = await registerUser({
+        email: data.email,
+        password: data.password,
+        username: data.username,
+      })
+      
+      if (result.success) {
+        setUserId(result.data!.userId)
+        setStep(2)
+      } else {
+        setError(result.error || 'Erreur lors de l\'inscription')
+      }
+    } catch (err) {
+      console.error('Step 1 error:', err)
+      setError('Erreur inattendue lors de l\'inscription')
     }
   }
   
@@ -355,8 +359,21 @@ export default function RegisterPage() {
     }
   }
   
-  function handleComplete() {
-    router.push('/dashboard')
+  async function handleStep3Submit(userId: string, locationId: string) {
+    setError('')
+    
+    try {
+      const result = await selectResidence(userId, locationId)
+      
+      if (result.success) {
+        router.push('/dashboard')
+      } else {
+        setError(result.error || 'Erreur lors de la sélection')
+      }
+    } catch (err) {
+      console.error('Step 3 error:', err)
+      setError('Erreur inattendue lors de la sélection')
+    }
   }
   
   const titles = ['', 'Créer un compte', 'Votre identité', 'Choisir votre résidence']
@@ -407,7 +424,7 @@ export default function RegisterPage() {
         
         {step === 3 && (
           <Step3 
-            onComplete={handleComplete}
+            onSubmit={handleStep3Submit}
             onBack={() => setStep(2)}
             userId={userId}
           />
