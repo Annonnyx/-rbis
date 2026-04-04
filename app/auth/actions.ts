@@ -11,9 +11,9 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 
 /**
  * Initialise la connexion OAuth avec Google
- * Redirige l'utilisateur vers la page de consentement Google
+ * Retourne l'URL OAuth pour ouverture côté client
  */
-export async function signInWithGoogle() {
+export async function signInWithGoogle(): Promise<string> {
   const supabase = await createServerSupabaseClient()
   
   // Récupérer l'origin pour le callback
@@ -36,10 +36,11 @@ export async function signInWithGoogle() {
     throw new Error('Erreur lors de l\'initialisation de la connexion Google')
   }
 
-  if (data.url) {
-    // Rediriger vers la page de consentement Google
-    redirect(data.url)
+  if (!data.url) {
+    throw new Error('URL OAuth non générée')
   }
+
+  return data.url
 }
 
 /**

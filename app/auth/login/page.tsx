@@ -30,7 +30,7 @@ export default function LoginPage() {
       
       if (session) {
         console.log('[LoginPage] Already has session, redirecting to dashboard')
-        router.replace('/dashboard')
+        window.location.replace('/dashboard')
       } else {
         setIsCheckingSession(false)
       }
