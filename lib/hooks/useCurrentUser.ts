@@ -26,10 +26,12 @@ export function useCurrentUser(): UseCurrentUserReturn {
   const [error, setError] = useState<Error | null>(null)
   
   useEffect(() => {
+    console.log('[useCurrentUser] Initializing...')
     const supabase = createBrowserSupabaseClient()
     
     // Récupérer l'utilisateur initial
     supabase.auth.getUser().then(({ data: { user }, error }) => {
+      console.log('[useCurrentUser] Initial user fetch:', { hasUser: !!user, error: error?.message })
       if (error) {
         setError(error)
       } else {
@@ -41,6 +43,7 @@ export function useCurrentUser(): UseCurrentUserReturn {
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('[useCurrentUser] Auth state change:', { event, hasUser: !!session?.user })
         setUser(session?.user ?? null)
         setLoading(false)
       }

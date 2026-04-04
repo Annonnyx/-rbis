@@ -26,29 +26,29 @@ export async function GET(request: NextRequest) {
 
   // Créer un client Supabase pour la route
   const cookieStore = request.cookies
-  const response = NextResponse.next({
-    request: { headers: request.headers },
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
 
   try {
+    // Créer un objet pour stocker les cookies à définir
+    const cookiesToSet: { name: string; value: string; options: any }[] = []
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookies) {
+            // Stocker les cookies pour les définir plus tard dans la réponse finale
+            cookiesToSet.push(...cookies)
+          },
+        },
+      }
+    )
+
     // Échanger le code contre une session
+    console.log('[OAuth Callback] Exchanging code for session...')
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (exchangeError || !data.user) {
@@ -57,7 +57,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { user, session } = data
-    console.log('[OAuth Callback] User authenticated:', user.id, user.email)
+    console.log('[OAuth Callback] Session created:', { 
+      userId: user.id, 
+      email: user.email,
+      accessToken: session?.access_token ? 'present' : 'missing',
+      refreshToken: session?.refresh_token ? 'present' : 'missing'
+    })
+    console.log('[OAuth Callback] Cookies to set:', cookiesToSet.length)
 
     // Synchroniser avec Prisma - créer ou mettre à jour l'utilisateur
     const existingUser = await prisma.user.findUnique({
@@ -118,15 +124,26 @@ export async function GET(request: NextRequest) {
       where: { userId: user.id },
     })
 
+    // Créer la réponse de redirection ET y inclure les cookies de session
+    let redirectUrl: string
     if (!gameProfile) {
-      // Onboarding non complet → rediriger vers l'étape 2 (identité)
-      console.log('[OAuth Callback] New user, redirecting to step 2 (identity)')
-      return NextResponse.redirect(`${origin}/auth/register?step=2&userId=${user.id}`)
+      redirectUrl = `${origin}/auth/register?step=2&userId=${user.id}`
+      console.log('[OAuth Callback] New user, redirecting to:', redirectUrl)
+    } else {
+      redirectUrl = `${origin}/dashboard`
+      console.log('[OAuth Callback] Onboarding complete, redirecting to:', redirectUrl)
     }
-
-    // Onboarding complet → rediriger vers le dashboard
-    console.log('[OAuth Callback] Onboarding complete, redirecting to dashboard')
-    return NextResponse.redirect(`${origin}/dashboard`)
+    
+    // Créer la réponse de redirection
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    
+    // AJOUTER LES COOKIES DE SESSION à la réponse de redirection
+    console.log('[OAuth Callback] Setting cookies in redirect response:', cookiesToSet.map(c => c.name))
+    for (const cookie of cookiesToSet) {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie.options)
+    }
+    
+    return redirectResponse
 
   } catch (error) {
     console.error('[OAuth Callback] Unexpected error:', error)

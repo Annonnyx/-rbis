@@ -38,9 +38,16 @@ export async function middleware(request: NextRequest) {
   )
 
   // Cette ligne rafraîchit la session si nécessaire
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
   
   const pathname = request.nextUrl.pathname
+  
+  console.log('[Middleware]', pathname, { 
+    hasUser: !!user, 
+    userId: user?.id,
+    error: userError?.message,
+    cookies: request.cookies.getAll().map(c => c.name)
+  })
   
   // Routes protégées (requièrent auth)
   const protectedRoutes = ['/dashboard', '/map', '/bank', '/company', '/profile', '/suggestions', '/market', '/jobs', '/alliances']
@@ -48,6 +55,7 @@ export async function middleware(request: NextRequest) {
   
   // Non connecté sur route protégée → login
   if (isProtected && !user) {
+    console.log('[Middleware] Redirecting to login (protected route, no user)')
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   

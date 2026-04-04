@@ -266,16 +266,22 @@ export async function loginUser(
   email: string,
   password: string
 ): Promise<ActionResult> {
+  console.log('[loginUser] Attempting login for:', email)
   const supabase = await createServerSupabaseClient()
   
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
   
   if (error) {
+    console.log('[loginUser] Login failed:', error.message)
     return { success: false, error: error.message }
   }
+  
+  console.log('[loginUser] Login successful, user:', data.user?.id)
+  console.log('[loginUser] Session present:', !!data.session)
+  console.log('[loginUser] Cookies should be set by middleware')
   
   return { success: true }
 }

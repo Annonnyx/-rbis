@@ -23,10 +23,12 @@ export default function LoginPage() {
   
   // Rediriger vers dashboard si déjà connecté
   useEffect(() => {
+    console.log('[LoginPage] User state changed:', { hasUser: !!user, userId: user?.id, loading: userLoading })
     if (user) {
+      console.log('[LoginPage] Redirecting to dashboard (user already logged in)')
       router.push('/dashboard')
     }
-  }, [user, router])
+  }, [user, router, userLoading])
   
   // Afficher un état de chargement pendant la vérification
   if (userLoading) {
@@ -46,11 +48,15 @@ export default function LoginPage() {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     
+    console.log('[LoginPage] Submitting login form...')
     const result = await loginUser(email, password)
+    console.log('[LoginPage] Login result:', result)
     
     if (result.success) {
+      console.log('[LoginPage] Login success, redirecting to dashboard')
       router.push('/dashboard')
     } else {
+      console.log('[LoginPage] Login failed:', result.error)
       setError(result.error || 'Erreur de connexion')
     }
     
