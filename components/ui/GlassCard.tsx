@@ -11,6 +11,7 @@ export interface GlassCardProps {
   className?: string
   padding?: 'sm' | 'md' | 'lg'
   hover?: boolean
+  onClick?: () => void
 }
 
 const paddingClasses = {
@@ -27,7 +28,8 @@ export function GlassCard({
   children, 
   className, 
   padding = 'md',
-  hover = false 
+  hover = false,
+  onClick
 }: GlassCardProps) {
   return (
     <div 
@@ -35,8 +37,10 @@ export function GlassCard({
         'backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl',
         paddingClasses[padding],
         hover && 'hover:bg-white/[0.08] transition-all duration-200',
+        onClick && 'cursor-pointer',
         className
       )}
+      onClick={onClick}
     >
       {children}
     </div>

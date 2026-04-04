@@ -26,7 +26,7 @@ export default async function MessagesPage({ searchParams }: MessagesPageProps) 
   
   // Récupérer les conversations
   const conversationsResult = await getConversations(user.id)
-  const conversations = conversationsResult.success ? conversationsResult.data : []
+  const conversations = conversationsResult.success ? conversationsResult.data || [] : []
   
   // Trouver la conversation sélectionnée
   const selectedConversation = searchParams.conversation 
@@ -38,7 +38,7 @@ export default async function MessagesPage({ searchParams }: MessagesPageProps) 
   if (selectedConversation) {
     const { getMessages } = await import('@/app/actions/social')
     const messagesResult = await getMessages(user.id, selectedConversation.id)
-    messages = messagesResult.success ? messagesResult.data : []
+    messages = messagesResult.success ? messagesResult.data || [] : []
   }
   
   return (

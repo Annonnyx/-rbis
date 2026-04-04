@@ -50,10 +50,10 @@ export default async function GovernanceCityPage({ params }: GovernanceCityPageP
     getLaws(params.locationId),
   ])
   
-  const elections = electionsResult.success ? electionsResult.data : []
-  const representative = representativeResult.success ? representativeResult.data.representative : null
+  const elections = electionsResult.success ? (electionsResult.data || []) : []
+  const representative = representativeResult.success && representativeResult.data ? representativeResult.data.representative : null
   const taxConfig = taxResult.success ? taxResult.data : null
-  const laws = lawsResult.success ? lawsResult.data : []
+  const laws = lawsResult.success ? (lawsResult.data ?? []) : []
   
   const isRepresentative = representative?.userId === user.id
   

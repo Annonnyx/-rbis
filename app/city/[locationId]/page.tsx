@@ -44,7 +44,7 @@ export default async function CityPage({ params }: CityPageProps) {
   ])
   
   const messages = messagesResult.success && messagesResult.data ? messagesResult.data.messages : []
-  const announcements = announcementsResult.success ? announcementsResult.data : []
+  const announcements = announcementsResult.success && announcementsResult.data ? announcementsResult.data : []
   const stats = statsResult.success ? statsResult.data : { residents: 0, companies: 0, recentMessages: 0 }
   
   // TypeScript safety: ensure stats is never undefined

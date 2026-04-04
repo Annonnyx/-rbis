@@ -129,7 +129,7 @@ export default async function ProfilePage() {
   
   const achievements = achievementsResult.success ? achievementsResult.data : []
   const achievementStats = achievementStatsResult.success ? achievementStatsResult.data : { total: 0, unlocked: 0, byRarity: {} }
-  const hasLegendary = achievementStats.byRarity.LEGENDARY > 0
+  const hasLegendary = (achievementStats?.byRarity?.LEGENDARY || 0) > 0
   
   const avatarColor = getColorFromUsername(user.username)
   const initial = (user.displayName || user.username).charAt(0).toUpperCase()
@@ -265,12 +265,12 @@ export default async function ProfilePage() {
           <Award className="w-5 h-5 text-violet-400" />
           Réalisations
           <span className="text-sm font-normal text-white/50">
-            ({achievementStats.unlocked}/{achievementStats.total})
+            ({achievementStats?.unlocked || 0}/{achievementStats?.total || 0})
           </span>
         </h3>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {achievements.slice(0, 12).map(({ achievement, unlocked, unlockedAt }) => (
+          {achievements?.slice(0, 12).map(({ achievement, unlocked, unlockedAt }) => (
             <div
               key={achievement.id}
               className={`p-3 rounded-xl border transition-all ${
@@ -294,7 +294,7 @@ export default async function ProfilePage() {
           ))}
         </div>
         
-        {achievements.length > 12 && (
+        {achievements?.length && achievements.length > 12 && (
           <div className="text-center mt-4">
             <p className="text-sm text-white/50">
               +{achievements.length - 12} réalisations supplémentaires

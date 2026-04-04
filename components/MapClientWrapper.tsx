@@ -24,7 +24,7 @@ export function MapClientWrapper({ locations, companies, userHomeId }: MapClient
     <MapClient 
       locations={locations}
       companies={companies}
-      userHomeId={userHomeId}
+      userHomeId={userHomeId || ""}
     />
   )
 }

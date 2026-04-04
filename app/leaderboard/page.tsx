@@ -13,6 +13,7 @@ import {
   getInvestorsLeaderboard,
   getCitizensLeaderboard,
   getProductionLeaderboard,
+  type LeaderboardEntry,
 } from '@/app/actions/leaderboard'
 import { PageHeader } from '@/components/PageHeader'
 import { GlassCard } from '@/components/ui/GlassCard'
@@ -42,7 +43,7 @@ export default async function LeaderboardPage() {
     getProductionLeaderboard(50),
   ])
   
-  const renderLeaderboard = (data: any[]) => {
+  const renderLeaderboard = (data: LeaderboardEntry[]) => {
     if (data.length === 0) {
       return <p className="text-center text-white/50 py-8">Aucune donnée disponible</p>
     }
@@ -148,7 +149,7 @@ export default async function LeaderboardPage() {
             </div>
             <p className="text-sm text-white/50">Classement par solde total sur tous les comptes</p>
           </GlassCard>
-          {renderLeaderboard(wealth.success ? wealth.data : [])}
+          {renderLeaderboard(wealth.success ? (wealth.data ?? []) : [])}
         </TabsContent>
         
         <TabsContent value="entrepreneurs">
@@ -159,7 +160,7 @@ export default async function LeaderboardPage() {
             </div>
             <p className="text-sm text-white/50">Classement par nombre d'entreprises et capital</p>
           </GlassCard>
-          {renderLeaderboard(entrepreneurs.success ? entrepreneurs.data : [])}
+          {renderLeaderboard(entrepreneurs.success ? (entrepreneurs.data ?? []) : [])}
         </TabsContent>
         
         <TabsContent value="investors">
@@ -170,7 +171,7 @@ export default async function LeaderboardPage() {
             </div>
             <p className="text-sm text-white/50">Classement par valeur du portfolio d'actions</p>
           </GlassCard>
-          {renderLeaderboard(investors.success ? investors.data : [])}
+          {renderLeaderboard(investors.success ? (investors.data ?? []) : [])}
         </TabsContent>
         
         <TabsContent value="citizens">
@@ -181,7 +182,7 @@ export default async function LeaderboardPage() {
             </div>
             <p className="text-sm text-white/50">Classement par votes et participation</p>
           </GlassCard>
-          {renderLeaderboard(citizens.success ? citizens.data : [])}
+          {renderLeaderboard(citizens.success ? (citizens.data ?? []) : [])}
         </TabsContent>
         
         <TabsContent value="production">
@@ -192,7 +193,7 @@ export default async function LeaderboardPage() {
             </div>
             <p className="text-sm text-white/50">Classement par volume total produit</p>
           </GlassCard>
-          {renderLeaderboard(production.success ? production.data : [])}
+          {renderLeaderboard(production.success ? (production.data ?? []) : [])}
         </TabsContent>
       </Tabs>
     </div>

@@ -3,7 +3,7 @@
 // Données initiales Ørbis - Idempotent
 // ============================================
 
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, ResourceCategory, QuestType, QuestCategory, AchievementCategory, AchievementRarity } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -58,15 +58,15 @@ const SKILL_CATEGORIES = [
  * Types de ressources pour le système de production
  */
 const RESOURCE_TYPES = [
-  { name: 'Savon', category: 'PROCESSED', basePrice: 500, unit: 'unité' },
-  { name: 'Pain', category: 'PROCESSED', basePrice: 300, unit: 'unité' },
-  { name: 'Vêtements', category: 'PROCESSED', basePrice: 2000, unit: 'unité' },
-  { name: 'Électricité', category: 'ENERGY', basePrice: 100, unit: 'kWh' },
-  { name: 'Eau', category: 'RAW', basePrice: 50, unit: 'litre' },
-  { name: 'Métal', category: 'RAW', basePrice: 800, unit: 'kg' },
-  { name: 'Bois', category: 'RAW', basePrice: 400, unit: 'kg' },
-  { name: 'Pétrole', category: 'RAW', basePrice: 1500, unit: 'baril' },
-  { name: 'Données', category: 'SERVICE', basePrice: 1000, unit: 'GB' },
+  { name: 'Savon', category: ResourceCategory.PROCESSED, basePrice: 500, unit: 'unité' },
+  { name: 'Pain', category: ResourceCategory.PROCESSED, basePrice: 300, unit: 'unité' },
+  { name: 'Vêtements', category: ResourceCategory.PROCESSED, basePrice: 2000, unit: 'unité' },
+  { name: 'Électricité', category: ResourceCategory.ENERGY, basePrice: 100, unit: 'kWh' },
+  { name: 'Eau', category: ResourceCategory.RAW, basePrice: 50, unit: 'litre' },
+  { name: 'Métal', category: ResourceCategory.RAW, basePrice: 800, unit: 'kg' },
+  { name: 'Bois', category: ResourceCategory.RAW, basePrice: 400, unit: 'kg' },
+  { name: 'Pétrole', category: ResourceCategory.RAW, basePrice: 1500, unit: 'baril' },
+  { name: 'Données', category: ResourceCategory.SERVICE, basePrice: 1000, unit: 'GB' },
 ]
 
 /**
@@ -74,23 +74,23 @@ const RESOURCE_TYPES = [
  */
 const QUEST_TEMPLATES = [
   // PERMANENTES
-  { title: 'Premier virement', description: 'Effectuer votre première transaction bancaire', type: 'PERMANENT', category: 'ECONOMY', requirement: { type: 'transaction_count', target: 1 }, rewardOrbes: 50, repeatable: false },
-  { title: 'Entrepreneur', description: 'Créer votre première entreprise', type: 'PERMANENT', category: 'ECONOMY', requirement: { type: 'company_created', target: 1 }, rewardOrbes: 200, repeatable: false },
-  { title: 'Actionnaire', description: 'Acheter des actions pour la première fois', type: 'PERMANENT', category: 'ECONOMY', requirement: { type: 'shares_bought', target: 1 }, rewardOrbes: 100, repeatable: false },
-  { title: 'Citoyen engagé', description: 'Voter pour une suggestion', type: 'PERMANENT', category: 'SOCIAL', requirement: { type: 'suggestion_voted', target: 1 }, rewardOrbes: 30, repeatable: false },
-  { title: 'Messager', description: 'Envoyer votre premier message privé', type: 'PERMANENT', category: 'SOCIAL', requirement: { type: 'message_sent', target: 1 }, rewardOrbes: 25, repeatable: false },
+  { title: 'Premier virement', description: 'Effectuer votre première transaction bancaire', type: QuestType.PERMANENT, category: QuestCategory.ECONOMY, requirement: { type: 'transaction_count', target: 1 }, rewardOrbes: 50, repeatable: false },
+  { title: 'Entrepreneur', description: 'Créer votre première entreprise', type: QuestType.PERMANENT, category: QuestCategory.ECONOMY, requirement: { type: 'company_created', target: 1 }, rewardOrbes: 200, repeatable: false },
+  { title: 'Actionnaire', description: 'Acheter des actions pour la première fois', type: QuestType.PERMANENT, category: QuestCategory.ECONOMY, requirement: { type: 'shares_bought', target: 1 }, rewardOrbes: 100, repeatable: false },
+  { title: 'Citoyen engagé', description: 'Voter pour une suggestion', type: QuestType.PERMANENT, category: QuestCategory.SOCIAL, requirement: { type: 'suggestion_voted', target: 1 }, rewardOrbes: 30, repeatable: false },
+  { title: 'Messager', description: 'Envoyer votre premier message privé', type: QuestType.PERMANENT, category: QuestCategory.SOCIAL, requirement: { type: 'message_sent', target: 1 }, rewardOrbes: 25, repeatable: false },
   
   // QUOTIDIENNES
-  { title: 'Journée active', description: 'Effectuer 3 transactions', type: 'DAILY', category: 'ECONOMY', requirement: { type: 'transaction_count', target: 3 }, rewardOrbes: 30, repeatable: true },
-  { title: 'Communicateur', description: 'Envoyer 5 messages', type: 'DAILY', category: 'SOCIAL', requirement: { type: 'message_sent', target: 5 }, rewardOrbes: 20, repeatable: true },
-  { title: 'Voyageur', description: 'Explorer une ville différente', type: 'DAILY', category: 'EXPLORATION', requirement: { type: 'city_visited', target: 1 }, rewardOrbes: 15, repeatable: true },
+  { title: 'Journée active', description: 'Effectuer 3 transactions', type: QuestType.DAILY, category: QuestCategory.ECONOMY, requirement: { type: 'transaction_count', target: 3 }, rewardOrbes: 30, repeatable: true },
+  { title: 'Communicateur', description: 'Envoyer 5 messages', type: QuestType.DAILY, category: QuestCategory.SOCIAL, requirement: { type: 'message_sent', target: 5 }, rewardOrbes: 20, repeatable: true },
+  { title: 'Voyageur', description: 'Explorer une ville différente', type: QuestType.DAILY, category: QuestCategory.EXPLORATION, requirement: { type: 'city_visited', target: 1 }, rewardOrbes: 15, repeatable: true },
   
   // HEBDOMADAIRES
-  { title: 'Semaine productive', description: 'Compléter 5 cycles de production', type: 'WEEKLY', category: 'PRODUCTION', requirement: { type: 'production_cycles', target: 5 }, rewardOrbes: 150, repeatable: true },
-  { title: 'Investisseur actif', description: 'Acheter 10 actions', type: 'WEEKLY', category: 'ECONOMY', requirement: { type: 'shares_bought', target: 10 }, rewardOrbes: 100, repeatable: true },
-  { title: 'Gros virement', description: 'Transférer plus de 1000 Orbes', type: 'WEEKLY', category: 'ECONOMY', requirement: { type: 'orbes_transferred', target: 100000 }, rewardOrbes: 80, repeatable: true },
-  { title: 'Ambassadeur', description: 'Envoyer 20 messages', type: 'WEEKLY', category: 'SOCIAL', requirement: { type: 'message_sent', target: 20 }, rewardOrbes: 75, repeatable: true },
-  { title: 'Entrepreneur en série', description: 'Créer 2 entreprises', type: 'WEEKLY', category: 'ECONOMY', requirement: { type: 'company_created', target: 2 }, rewardOrbes: 120, repeatable: true },
+  { title: 'Semaine productive', description: 'Compléter 5 cycles de production', type: QuestType.WEEKLY, category: QuestCategory.PRODUCTION, requirement: { type: 'production_cycles', target: 5 }, rewardOrbes: 150, repeatable: true },
+  { title: 'Investisseur actif', description: 'Acheter 10 actions', type: QuestType.WEEKLY, category: QuestCategory.ECONOMY, requirement: { type: 'shares_bought', target: 10 }, rewardOrbes: 100, repeatable: true },
+  { title: 'Gros virement', description: 'Transférer plus de 1000 Orbes', type: QuestType.WEEKLY, category: QuestCategory.ECONOMY, requirement: { type: 'orbes_transferred', target: 100000 }, rewardOrbes: 80, repeatable: true },
+  { title: 'Ambassadeur', description: 'Envoyer 20 messages', type: QuestType.WEEKLY, category: QuestCategory.SOCIAL, requirement: { type: 'message_sent', target: 20 }, rewardOrbes: 75, repeatable: true },
+  { title: 'Entrepreneur en série', description: 'Créer 2 entreprises', type: QuestType.WEEKLY, category: QuestCategory.ECONOMY, requirement: { type: 'company_created', target: 2 }, rewardOrbes: 120, repeatable: true },
 ]
 
 /**
@@ -98,28 +98,28 @@ const QUEST_TEMPLATES = [
  */
 const ACHIEVEMENTS = [
   // COMMON
-  { title: 'Fondateur', description: 'Créer votre première entreprise', icon: '🏦', category: 'ECONOMY', rarity: 'COMMON', condition: { type: 'company_created', target: 1 } },
-  { title: 'Votant', description: 'Voter 10 fois pour des suggestions', icon: '🗳️', category: 'SOCIAL', rarity: 'COMMON', condition: { type: 'suggestion_voted', target: 10 } },
-  { title: 'Messager', description: 'Envoyer 50 messages', icon: '💬', category: 'SOCIAL', rarity: 'COMMON', condition: { type: 'message_sent', target: 50 } },
-  { title: 'Commerçant', description: 'Effectuer 20 transactions', icon: '💸', category: 'ECONOMY', rarity: 'COMMON', condition: { type: 'transaction_count', target: 20 } },
+  { title: 'Fondateur', description: 'Créer votre première entreprise', icon: '🏦', category: AchievementCategory.ECONOMY, rarity: AchievementRarity.COMMON, condition: { type: 'company_created', target: 1 } },
+  { title: 'Votant', description: 'Voter 10 fois pour des suggestions', icon: '🗳️', category: AchievementCategory.SOCIAL, rarity: AchievementRarity.COMMON, condition: { type: 'suggestion_voted', target: 10 } },
+  { title: 'Messager', description: 'Envoyer 50 messages', icon: '💬', category: AchievementCategory.SOCIAL, rarity: AchievementRarity.COMMON, condition: { type: 'message_sent', target: 50 } },
+  { title: 'Commerçant', description: 'Effectuer 20 transactions', icon: '💸', category: AchievementCategory.ECONOMY, rarity: AchievementRarity.COMMON, condition: { type: 'transaction_count', target: 20 } },
   
   // RARE
-  { title: 'Bull Market', description: 'Avoir un portfolio d\'actions > ◎ 10 000', icon: '📈', category: 'ECONOMY', rarity: 'RARE', condition: { type: 'portfolio_value', target: 1000000 } },
-  { title: 'Producteur', description: 'Compléter 50 cycles de production', icon: '⚙️', category: 'ECONOMY', rarity: 'RARE', condition: { type: 'production_cycles', target: 50 } },
-  { title: 'Politicien', description: 'Proposer 5 lois communautaires', icon: '🏛️', category: 'SOCIAL', rarity: 'RARE', condition: { type: 'law_proposed', target: 5 } },
-  { title: 'Stratège', description: 'Gagner une élection', icon: '🗳️', category: 'SOCIAL', rarity: 'RARE', condition: { type: 'election_won', target: 1 } },
+  { title: 'Bull Market', description: 'Avoir un portfolio d\'actions > ◎ 10 000', icon: '📈', category: AchievementCategory.ECONOMY, rarity: AchievementRarity.RARE, condition: { type: 'portfolio_value', target: 1000000 } },
+  { title: 'Producteur', description: 'Compléter 50 cycles de production', icon: '⚙️', category: AchievementCategory.ECONOMY, rarity: AchievementRarity.RARE, condition: { type: 'production_cycles', target: 50 } },
+  { title: 'Politicien', description: 'Proposer 5 lois communautaires', icon: '🏛️', category: AchievementCategory.SOCIAL, rarity: AchievementRarity.RARE, condition: { type: 'law_proposed', target: 5 } },
+  { title: 'Stratège', description: 'Gagner une élection', icon: '🗳️', category: AchievementCategory.SOCIAL, rarity: AchievementRarity.RARE, condition: { type: 'election_won', target: 1 } },
   
   // EPIC
-  { title: 'Globetrotteur', description: 'Avoir une entreprise dans 3 villes', icon: '🌍', category: 'EXPLORER', rarity: 'EPIC', condition: { type: 'companies_in_cities', target: 3 } },
-  { title: 'Magnat', description: 'Posséder 5 entreprises', icon: '🏭', category: 'ECONOMY', rarity: 'EPIC', condition: { type: 'company_created', target: 5 } },
-  { title: 'Philanthrope', description: 'Voter 100 fois', icon: '🎁', category: 'SOCIAL', rarity: 'EPIC', condition: { type: 'suggestion_voted', target: 100 } },
-  { title: 'Grand messager', description: 'Envoyer 500 messages', icon: '📨', category: 'SOCIAL', rarity: 'EPIC', condition: { type: 'message_sent', target: 500 } },
+  { title: 'Globetrotteur', description: 'Avoir une entreprise dans 3 villes', icon: '🌍', category: AchievementCategory.EXPLORER, rarity: AchievementRarity.EPIC, condition: { type: 'companies_in_cities', target: 3 } },
+  { title: 'Magnat', description: 'Posséder 5 entreprises', icon: '🏭', category: AchievementCategory.ECONOMY, rarity: AchievementRarity.EPIC, condition: { type: 'company_created', target: 5 } },
+  { title: 'Philanthrope', description: 'Voter 100 fois', icon: '🎁', category: AchievementCategory.SOCIAL, rarity: AchievementRarity.EPIC, condition: { type: 'suggestion_voted', target: 100 } },
+  { title: 'Grand messager', description: 'Envoyer 500 messages', icon: '📨', category: AchievementCategory.SOCIAL, rarity: AchievementRarity.EPIC, condition: { type: 'message_sent', target: 500 } },
   
   // LEGENDARY
-  { title: 'Représentant', description: 'Être élu représentant d\'une ville', icon: '👑', category: 'LEGEND', rarity: 'LEGENDARY', condition: { type: 'election_won', target: 1 } },
-  { title: 'Milliardaire', description: 'Avoir un solde total > ◎ 1 000 000', icon: '⚡', category: 'ECONOMY', rarity: 'LEGENDARY', condition: { type: 'total_balance', target: 100000000 } },
-  { title: 'Légende vivante', description: 'Débloquer toutes les réalisations', icon: '🌟', category: 'LEGEND', rarity: 'LEGENDARY', condition: { type: 'all_achievements', target: 1 } },
-  { title: 'Maître du commerce', description: 'Effectuer 1000 transactions', icon: '💎', category: 'ECONOMY', rarity: 'LEGENDARY', condition: { type: 'transaction_count', target: 1000 } },
+  { title: 'Représentant', description: 'Être élu représentant d\'une ville', icon: '👑', category: AchievementCategory.LEGEND, rarity: AchievementRarity.LEGENDARY, condition: { type: 'election_won', target: 1 } },
+  { title: 'Milliardaire', description: 'Avoir un solde total > ◎ 1 000 000', icon: '⚡', category: AchievementCategory.ECONOMY, rarity: AchievementRarity.LEGENDARY, condition: { type: 'total_balance', target: 100000000 } },
+  { title: 'Légende vivante', description: 'Débloquer toutes les réalisations', icon: '🌟', category: AchievementCategory.LEGEND, rarity: AchievementRarity.LEGENDARY, condition: { type: 'all_achievements', target: 1 } },
+  { title: 'Maître du commerce', description: 'Effectuer 1000 transactions', icon: '💎', category: AchievementCategory.ECONOMY, rarity: AchievementRarity.LEGENDARY, condition: { type: 'transaction_count', target: 1000 } },
 ]
 
 /**

@@ -38,7 +38,7 @@ export interface ListedCompany {
     lastPriceUpdate: Date
     isListed: boolean
   } | null
-  priceHistory: { price: bigint; recordedAt: Date }[]
+  priceHistory: { price: bigint; recordedAt: Date; volume: number }[]
 }
 
 export interface UserHolding {

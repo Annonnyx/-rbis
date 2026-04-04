@@ -114,7 +114,7 @@ export default async function SuggestionsPage({ searchParams }: SuggestionsPageP
             </Badge>
           </Link>
           <Link href={buildUrl({ status: 'ACCEPTED' })}>
-            <Badge variant={status === 'ACCEPTED' ? 'blue' : 'neutral'} className="cursor-pointer">
+            <Badge variant={status === 'ACCEPTED' ? 'violet' : 'neutral'} className="cursor-pointer">
               Acceptées
             </Badge>
           </Link>

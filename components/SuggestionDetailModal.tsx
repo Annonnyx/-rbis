@@ -43,7 +43,7 @@ export function SuggestionDetailModal({
   if (!suggestion) return null
   
   async function handleVote() {
-    if (loading) return
+    if (loading || !suggestion) return
     setLoading(true)
     
     // Optimistic update

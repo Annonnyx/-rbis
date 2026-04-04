@@ -48,7 +48,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
   // Récupérer toutes les catégories de compétences pour les filtres
   const skillCategories = await prisma.skillCategory.findMany()
   
-  const jobs = jobsResult.success ? jobsResult.data : []
+  const jobs = jobsResult.success ? (jobsResult.data ?? []) : []
   
   const buildUrl = (params: Record<string, string>) => {
     const current = new URLSearchParams(searchParams as Record<string, string>)

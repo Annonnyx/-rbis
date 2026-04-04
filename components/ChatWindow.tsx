@@ -132,7 +132,8 @@ export function ChatWindow({
           <Button 
             onClick={handleSend} 
             disabled={sending || !newMessage.trim()}
-            size="icon"
+            size="sm"
+            className="p-2"
           >
             <Send className="w-4 h-4" />
           </Button>

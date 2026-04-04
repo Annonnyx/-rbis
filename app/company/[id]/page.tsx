@@ -24,7 +24,7 @@ import {
   TrendingDown, Activity, Users, DollarSign, Briefcase,
   Package, Factory, FileText
 } from 'lucide-react'
-import { getCompanyEmployees, getCompanyJobPostings } from '@/app/actions/employment'
+import { getCompanyEmployees, getCompanyJobPostings, type JobWithDetails } from '@/app/actions/employment'
 import { EmployeeRow } from '@/components/EmployeeRow'
 import { JobCard } from '@/components/JobCard'
 import { getProductionLines, getCompanyInventory, getCompanyContracts } from '@/app/actions/production'
@@ -63,8 +63,8 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
   // Récupérer les données d'emploi
   const employeesResult = await getCompanyEmployees(params.id)
   const jobPostingsResult = await getCompanyJobPostings(params.id)
-  const employees = employeesResult.success ? employeesResult.data : []
-  const jobPostings = jobPostingsResult.success ? jobPostingsResult.data : []
+  const employees = employeesResult.success ? (employeesResult.data ?? []) : []
+  const jobPostings: JobWithDetails[] = jobPostingsResult.success ? (jobPostingsResult.data ?? []) : []
   
   // Récupérer les données de production
   const productionResult = await getProductionLines(params.id)
@@ -72,10 +72,10 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
   const providerContractsResult = await getCompanyContracts(params.id, true)
   const clientContractsResult = await getCompanyContracts(params.id, false)
   
-  const productionLines = productionResult.success ? productionResult.data : []
-  const inventory = inventoryResult.success ? inventoryResult.data : []
-  const providerContracts = providerContractsResult.success ? providerContractsResult.data : []
-  const clientContracts = clientContractsResult.success ? clientContractsResult.data : []
+  const productionLines = productionResult.success ? (productionResult.data ?? []) : []
+  const inventory = inventoryResult.success ? (inventoryResult.data ?? []) : []
+  const providerContracts = providerContractsResult.success ? (providerContractsResult.data ?? []) : []
+  const clientContracts = clientContractsResult.success ? (clientContractsResult.data ?? []) : []
   
   const transactions = [
     ...company.capitalAccount.sentTransactions.map(t => ({ ...t, direction: 'out' as const })),
@@ -386,7 +386,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
                   </div>
                   
                   {line.active && line.nextCycleAt && (
-                    <ProgressBar progress={progress} />
+                    <ProgressBar current={progress} max={100} />
                   )}
                 </div>
               )

@@ -36,7 +36,7 @@ export default async function SpectatorPage() {
     getGlobalLeaderboardSnapshot(),
   ])
   
-  const topWealth = leaderboardSnapshot.success ? leaderboardSnapshot.data.wealth.slice(0, 10) : []
+  const topWealth = leaderboardSnapshot.success ? leaderboardSnapshot.data?.wealth?.slice(0, 10) : []
   
   return (
     <div className="min-h-screen">
@@ -122,7 +122,7 @@ export default async function SpectatorPage() {
               <h3 className="text-xl font-semibold text-white">Top 10 Richesse</h3>
             </div>
             <div className="space-y-2">
-              {topWealth.map((entry, index) => (
+              {topWealth?.map((entry, index) => (
                 <div 
                   key={entry.userId} 
                   className="flex items-center justify-between p-2 rounded-lg bg-white/5"
@@ -144,7 +144,7 @@ export default async function SpectatorPage() {
                   </span>
                 </div>
               ))}
-              {topWealth.length === 0 && (
+              {topWealth?.length === 0 && (
                 <p className="text-center text-white/40 py-4">Aucune donnée disponible</p>
               )}
             </div>

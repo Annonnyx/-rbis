@@ -47,7 +47,7 @@ export async function getUserAccounts(userId: string) {
     return { success: true, accounts }
   } catch (error) {
     console.error('Get user accounts error:', error)
-    return { success: false, error: 'Erreur lors de la récupération des comptes' }
+    return { success: false, error: 'Erreur lors de la récupération des comptes', accounts: [] }
   }
 }
 

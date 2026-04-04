@@ -133,14 +133,14 @@ export async function getCompanyById(id: string) {
               orderBy: { createdAt: 'desc' },
               take: 5,
               include: {
-                toAccount: { select: { accountNumber: true } },
+                toAccount: { select: { accountNumber: true, ownerType: true } },
               },
             },
             receivedTransactions: {
               orderBy: { createdAt: 'desc' },
               take: 5,
               include: {
-                fromAccount: { select: { accountNumber: true } },
+                fromAccount: { select: { accountNumber: true, ownerType: true } },
               },
             },
           },

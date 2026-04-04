@@ -95,7 +95,10 @@ export function StockChart({ prices, height = 200, showArea = true }: StockChart
                 borderRadius: '8px',
                 color: '#fff',
               }}
-              formatter={(value: number) => [`◎ ${value.toFixed(2)}`, 'Prix']}
+              formatter={(value: any, name: any) => {
+                const numValue = typeof value === 'number' ? value : parseFloat(value);
+                return isNaN(numValue) ? ['', ''] : [`◎ ${numValue.toFixed(2)}`, 'Prix'];
+              }}
             />
             <Area 
               type="monotone" 
@@ -132,7 +135,10 @@ export function StockChart({ prices, height = 200, showArea = true }: StockChart
                 borderRadius: '8px',
                 color: '#fff',
               }}
-              formatter={(value: number) => [`◎ ${value.toFixed(2)}`, 'Prix']}
+              formatter={(value: any, name: any) => {
+                const numValue = typeof value === 'number' ? value : parseFloat(value);
+                return isNaN(numValue) ? ['', ''] : [`◎ ${numValue.toFixed(2)}`, 'Prix'];
+              }}
             />
             <Line 
               type="monotone" 

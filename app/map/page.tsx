@@ -28,7 +28,7 @@ export default async function MapPage() {
   
   // Récupérer les entreprises pour la carte
   const companiesResult = await getAllCompaniesOnMap()
-  const companies = companiesResult.success ? companiesResult.companies : []
+  const companies = companiesResult.success ? (companiesResult.companies ?? []) : []
   
   return (
     <div className="h-screen flex flex-col lg:flex-row">

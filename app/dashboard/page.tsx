@@ -75,9 +75,10 @@ async function CompaniesSection({ userId }: { userId: string }) {
 // ============================================
 
 async function TransactionsSection({ userId }: { userId: string }) {
-  const { accounts } = await getUserAccounts(userId).then(r => 
+  const result = await getUserAccounts(userId).then(r => 
     r.success ? r : { accounts: [] }
   )
+  const accounts = result.accounts || []
   
   // Récupérer toutes les transactions des comptes de l'utilisateur
   const accountIds = accounts.map(a => a.id)
@@ -134,7 +135,7 @@ async function SuggestionsSection() {
     where: { status: 'PENDING' },
     include: {
       author: { select: { id: true, username: true, displayName: true } },
-      votes: { select: { userId: true } },
+      votes: true,
     },
     orderBy: { createdAt: 'desc' },
     take: 3,
@@ -179,9 +180,10 @@ export default async function DashboardPage() {
   if (!user.gameProfile) redirect('/auth/register')
   
   // Calcul du solde total
-  const { accounts } = await getUserAccounts(user.id).then(r => 
+  const result = await getUserAccounts(user.id).then(r => 
     r.success ? r : { accounts: [] }
   )
+  const accounts = result.accounts || []
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0n)
   
   return (

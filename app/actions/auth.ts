@@ -241,6 +241,7 @@ export async function getCurrentUser() {
       gameProfile: {
         include: { homeLocation: true },
       },
+      companies: true,
     },
   })
   

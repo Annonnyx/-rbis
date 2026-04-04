@@ -6,10 +6,11 @@
 
 import { cn } from '@/lib/utils'
 import { TrendingUp, TrendingDown, Minus, LucideIcon } from 'lucide-react'
+import { ReactNode } from 'react'
 
 export interface StatBadgeProps {
   label: string
-  value: string | number
+  value: string | number | ReactNode
   trend?: 'up' | 'down' | 'neutral'
   icon?: LucideIcon
   className?: string

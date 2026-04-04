@@ -107,16 +107,16 @@ export default async function QuestsPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         <GlassCard padding="md" className="text-center">
-          <p className="text-2xl font-bold text-white">{stats.completed}</p>
+          <p className="text-2xl font-bold text-white">{stats?.completed || 0}</p>
           <p className="text-xs text-white/50">Quêtes complétées</p>
         </GlassCard>
         <GlassCard padding="md" className="text-center">
-          <p className="text-2xl font-bold text-white">{stats.active}</p>
+          <p className="text-2xl font-bold text-white">{stats?.active || 0}</p>
           <p className="text-xs text-white/50">Quêtes actives</p>
         </GlassCard>
         <GlassCard padding="md" className="text-center">
           <p className="text-2xl font-bold text-amber-400">
-            <OrbeCurrency amount={BigInt(stats.totalOrbesEarned)} />
+            <OrbeCurrency amount={BigInt(stats?.totalOrbesEarned || 0)} />
           </p>
           <p className="text-xs text-white/50">Orbes gagnés</p>
         </GlassCard>
@@ -139,38 +139,38 @@ export default async function QuestsPage() {
         </TabsList>
         
         <TabsContent value="daily" className="space-y-4">
-          {dailyQuests.length === 0 ? (
+          {dailyQuests?.length === 0 ? (
             <EmptyState
               icon={Calendar}
               title="Aucune quête quotidienne"
               description="Revenez demain pour de nouvelles quêtes !"
             />
           ) : (
-            dailyQuests.map(renderQuestCard)
+            dailyQuests?.map(renderQuestCard)
           )}
         </TabsContent>
         
         <TabsContent value="weekly" className="space-y-4">
-          {weeklyQuests.length === 0 ? (
+          {weeklyQuests?.length === 0 ? (
             <EmptyState
               icon={Clock}
               title="Aucune quête hebdomadaire"
               description="Revenez la semaine prochaine pour de nouvelles quêtes !"
             />
           ) : (
-            weeklyQuests.map(renderQuestCard)
+            weeklyQuests?.map(renderQuestCard)
           )}
         </TabsContent>
         
         <TabsContent value="permanent" className="space-y-4">
-          {permanentQuests.length === 0 ? (
+          {permanentQuests?.length === 0 ? (
             <EmptyState
               icon={Award}
               title="Aucune quête permanente"
               description="Toutes les quêtes permanentes sont complétées !"
             />
           ) : (
-            permanentQuests.map(renderQuestCard)
+            permanentQuests?.map(renderQuestCard)
           )}
         </TabsContent>
       </Tabs>

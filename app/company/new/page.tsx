@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { Input } from '@/components/ui/Input'
@@ -15,22 +15,19 @@ import { Modal } from '@/components/ui/Modal'
 import { OrbeCurrency } from '@/components/OrbeCurrency'
 import { Badge } from '@/components/ui/Badge'
 import { createCompany } from '@/app/actions/company'
+import { getUserAccounts } from '@/app/actions/bank'
+import { getCurrentUser } from '@/app/actions/auth'
 import { toOrbe, toCentimes } from '@/lib/currency'
-import { AlertCircle, Building2, Check, Wallet } from 'lucide-react'
+import { AlertCircle, Building2, Check, Wallet, Loader2 } from 'lucide-react'
 import type { BankAccount } from '@/types'
 
-interface CompanyNewPageProps {
-  accounts: BankAccount[]
-  userLocationId: string
-  userLocationName: string
-}
-
-export default function NewCompanyPage({ 
-  accounts, 
-  userLocationId, 
-  userLocationName 
-}: CompanyNewPageProps) {
+export default function NewCompanyPage() {
   const router = useRouter()
+  const [accounts, setAccounts] = useState<BankAccount[]>([])
+  const [userId, setUserId] = useState('')
+  const [userLocationId, setUserLocationId] = useState('')
+  const [userLocationName, setUserLocationName] = useState('')
+  const [loadingData, setLoadingData] = useState(true)
   const [step, setStep] = useState<'form' | 'confirm' | 'creating' | 'success'>('form')
   const [error, setError] = useState('')
   
@@ -43,6 +40,25 @@ export default function NewCompanyPage({
     description: '',
     capital: 300,
   })
+
+  // Fetch user data on mount
+  useEffect(() => {
+    async function loadData() {
+      const user = await getCurrentUser()
+      if (user) {
+        setUserId(user.id)
+        setUserLocationId(user.gameProfile?.homeLocationId || '')
+        setUserLocationName(user.gameProfile?.homeLocation?.name || 'Votre ville')
+        
+        const accountsResult = await getUserAccounts(user.id)
+        if (accountsResult.success && accountsResult.accounts) {
+          setAccounts(accountsResult.accounts)
+        }
+      }
+      setLoadingData(false)
+    }
+    loadData()
+  }, [])
   
   const remainingBalance = useMemo(() => {
     return Math.max(0, maxCapital - formData.capital)

@@ -83,7 +83,7 @@ export function ConversationList({
                   </span>
                 )}
                 {conv.unreadCount > 0 && (
-                  <Badge variant="primary" className="text-xs">
+                  <Badge variant="violet" className="text-xs">
                     {conv.unreadCount}
                   </Badge>
                 )}

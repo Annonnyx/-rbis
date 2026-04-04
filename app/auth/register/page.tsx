@@ -7,6 +7,7 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { z } from 'zod'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { Input } from '@/components/ui/Input'
@@ -23,7 +24,16 @@ import {
   updateUserProfile,
   selectResidence 
 } from '@/app/actions/auth'
-import { MapLocationSelector } from '@/components/MapLocationSelector'
+
+// Dynamic import to avoid SSR issues with Leaflet
+const MapLocationSelector = dynamic(
+  () => import('@/components/MapLocationSelector').then(mod => mod.MapLocationSelector),
+  { ssr: false, loading: () => (
+    <div className="h-64 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+      <div className="animate-pulse text-white/40">Chargement de la carte...</div>
+    </div>
+  )}
+)
 
 // ============================================
 // Étape 1 : Identifiants
