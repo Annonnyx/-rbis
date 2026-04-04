@@ -9,7 +9,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServerSupabaseClient, createServiceSupabaseClient } from '@/lib/supabase'
 import type { ActionResult } from '@/types'
 
 const INITIAL_BALANCE = BigInt(100000) // ◎ 1 000,00 en centimes
@@ -117,17 +117,17 @@ export async function registerUser(data: RegisterData): Promise<ActionResult<{ u
 
 /**
  * Met à jour le profil utilisateur (étape 2)
- * Stocke firstName/lastName dans Supabase metadata, PAS dans Prisma
+ * Stocke firstName/lastName dans Supabase metadata via service role, PAS dans Prisma
  */
 export async function updateUserProfile(
   userId: string,
   data: { firstName: string; lastName: string }
 ): Promise<ActionResult> {
-  const supabase = await createServerSupabaseClient()
+  const supabaseAdmin = createServiceSupabaseClient()
   
-  // Mettre à jour les metadata de l'utilisateur courant (via sa session)
-  const { error: updateError } = await supabase.auth.updateUser({
-    data: {
+  // Mettre à jour les metadata via service role (pas besoin de session)
+  const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    user_metadata: {
       firstName: data.firstName,
       lastName: data.lastName,
       onboarding_step: 2,
@@ -220,9 +220,10 @@ export async function selectResidence(
       },
     })
     
-    // 7. Mettre à jour le metadata Supabase pour marquer l'onboarding complet
-    await supabase.auth.updateUser({
-      data: { onboarding_step: 3, onboarding_complete: true },
+    // 7. Mettre à jour le metadata Supabase via service role
+    const supabaseAdmin = createServiceSupabaseClient()
+    await supabaseAdmin.auth.admin.updateUserById(userId, {
+      user_metadata: { onboarding_step: 3, onboarding_complete: true },
     })
     
     // 8. Vérifier les déblocages de locations
