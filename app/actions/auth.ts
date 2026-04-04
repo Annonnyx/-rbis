@@ -101,15 +101,16 @@ export async function registerUser(data: RegisterData): Promise<ActionResult<{ u
     return { success: false, error: 'Erreur lors de la création du compte' }
   }
   
-  // 2. Connecter immédiatement pour créer une session (nécessaire pour étape 2)
+  // 2. Auto-login après inscription (optionnel, peut échouer si email non confirmé)
+  // L'utilisateur pourra se connecter manuellement après l'étape 3
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: data.email,
     password: data.password,
   })
   
   if (signInError) {
-    console.error('Auto-login error:', signInError)
-    // On continue quand même, l'utilisateur pourra se reconnecter manuellement
+    console.log('[registerUser] Auto-login skipped (email not confirmed or other error):', signInError.message)
+    // On continue quand même, l'utilisateur pourra se reconnecter manuellement après l'étape 3
   }
   
   return { success: true, data: { userId: authData.user.id } }
@@ -196,8 +197,17 @@ export async function selectResidence(
       where: { userId: prismaUserId },
     })
     
+    // Si le profil existe déjà, l'onboarding est déjà complet
     if (existingProfile) {
-      return { success: false, error: 'Profil déjà existant' }
+      console.log(`[selectResidence] Profile already exists for user ${prismaUserId}, onboarding already complete`)
+      
+      // Mettre à jour le metadata pour marquer comme complété
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        user_metadata: { onboarding_step: 3, onboarding_complete: true },
+      })
+      
+      revalidatePath('/dashboard')
+      return { success: true } // Considérer comme succès
     }
     
     // 5. Créer l'utilisateur dans Prisma s'il n'existe pas
