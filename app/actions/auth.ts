@@ -179,26 +179,37 @@ export async function selectResidence(
       return { success: false, error: 'Cette ville n\'est pas disponible' }
     }
     
-    // 3. Vérifier que l'utilisateur n'a pas déjà un profil
+    // 3. Vérifier si l'utilisateur existe déjà dans Prisma (par ID ou email)
+    const existingUserById = await prisma.user.findUnique({
+      where: { id: userId },
+    })
+    
+    const existingUserByEmail = await prisma.user.findUnique({
+      where: { email },
+    })
+    
+    // 4. Vérifier que l'utilisateur n'a pas déjà un profil
     const existingProfile = await prisma.gameProfile.findUnique({
-      where: { userId },
+      where: { userId: existingUserById?.id || userId },
     })
     
     if (existingProfile) {
       return { success: false, error: 'Profil déjà existant' }
     }
     
-    // 4. Créer l'utilisateur dans Prisma avec TOUTES les données
-    await prisma.user.create({
-      data: {
-        id: userId,
-        email,
-        username,
-        firstName,
-        lastName,
-        displayName: `${firstName} ${lastName}`,
-      },
-    })
+    // 5. Créer l'utilisateur dans Prisma s'il n'existe pas
+    if (!existingUserById && !existingUserByEmail) {
+      await prisma.user.create({
+        data: {
+          id: userId,
+          email,
+          username,
+          firstName,
+          lastName,
+          displayName: `${firstName} ${lastName}`,
+        },
+      })
+    }
     
     // 5. Créer le compte bancaire avec solde initial
     const accountNumber = generateAccountNumber()
