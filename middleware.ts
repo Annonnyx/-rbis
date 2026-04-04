@@ -59,8 +59,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   
-  // Connecté sur page de login/register → laisser passer (pas de redirection forcée)
-  // La logique est gérée côté client pour éviter les boucles
+  // Connecté sur page de login/register → dashboard
+  const isAuthPage = pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')
+  if (isAuthPage && user) {
+    console.log('[Middleware] Redirecting to dashboard (auth page, user logged in)')
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
 
   return response
 }

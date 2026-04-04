@@ -47,13 +47,9 @@ export default function LoginPage() {
       setLoading(false)
     } else {
       console.log('[LoginPage] Login success, user:', data.user?.id)
-      console.log('[LoginPage] Session established')
-      setSuccess(true)
-      setLoading(false)
-      // Redirection après un court délai pour laisser l'utilisateur voir le message
-      setTimeout(() => {
-        window.location.href = '/dashboard'
-      }, 500)
+      console.log('[LoginPage] Session established - refreshing page')
+      // Rafraîchir la page pour que le middleware détecte la session
+      window.location.reload()
     }
   }
   
