@@ -51,13 +51,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   
-  // 2. Connecté sur page de login → rediriger vers register (pour continuer onboarding ou compléter)
-  if (isLoginPage && user) {
-    return NextResponse.redirect(new URL('/auth/register', request.url))
-  }
-  
-  // 3. Sur /auth/register, on laisse passer car la logique est gérée côté client
-  // (évite les boucles de redirection)
+  // 2. Connecté sur page auth → laisser passer (pas de redirection forcée)
+  // L'utilisateur peut vouloir changer de compte ou continuer l'onboarding
+  // La logique de redirection est gérée côté client dans les pages
   
   return response
 }
