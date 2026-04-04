@@ -260,7 +260,7 @@ function Step3({
     setLoading(true)
     setError('')
     
-    const result = await selectResidence(userId, selectedLocation)
+    const result = await selectResidence(selectedLocation)
     
     if (result.success) {
       onComplete()

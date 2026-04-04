@@ -1,6 +1,7 @@
 // ============================================
 // app/actions/auth.ts
 // Server Actions pour l'authentification et l'onboarding
+// Onboarding 3 étapes : Auth Supabase (1) → Metadata (2) → Création Prisma complète (3)
 // ============================================
 
 'use server'
@@ -68,7 +69,8 @@ async function checkLocationUnlocks(): Promise<void> {
 
 /**
  * Inscrit un nouvel utilisateur (étape 1)
- * Crée le user Supabase + User Prisma
+ * Crée le user Supabase Auth uniquement, PAS dans Prisma
+ * Stocke username dans metadata pour étape 3
  */
 export interface RegisterData {
   email: string
@@ -79,12 +81,15 @@ export interface RegisterData {
 export async function registerUser(data: RegisterData): Promise<ActionResult<{ userId: string }>> {
   const supabase = await createServerSupabaseClient()
   
-  // 1. Créer le user dans Supabase Auth
+  // 1. Créer le user dans Supabase Auth uniquement
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
     options: {
-      data: { username: data.username },
+      data: { 
+        username: data.username,
+        onboarding_step: 1 
+      },
     },
   })
   
@@ -96,68 +101,66 @@ export async function registerUser(data: RegisterData): Promise<ActionResult<{ u
     return { success: false, error: 'Erreur lors de la création du compte' }
   }
   
-  // 2. Créer ou récupérer le user dans Prisma
-  try {
-    // Vérifier si l'utilisateur existe déjà par email (même ID Supabase peut changer si réinscription)
-    const existingUser = await prisma.user.findUnique({
-      where: { email: data.email },
-    })
-    
-    if (existingUser) {
-      return { success: true, data: { userId: existingUser.id } }
-    }
-    
-    const user = await prisma.user.create({
-      data: {
-        id: authData.user.id,
-        email: data.email,
-        username: data.username,
-      },
-    })
-    
-    return { success: true, data: { userId: user.id } }
-  } catch (error) {
-    // En cas d'erreur Prisma, on log mais on ne supprime pas le user Supabase
-    // Il pourra être récupéré ou recréé plus tard
-    console.error('Prisma user creation error:', error)
-    return { success: false, error: 'Erreur lors de la création du profil' }
-  }
+  return { success: true, data: { userId: authData.user.id } }
 }
 
 /**
  * Met à jour le profil utilisateur (étape 2)
+ * Stocke firstName/lastName dans Supabase metadata, PAS dans Prisma
  */
 export async function updateUserProfile(
   userId: string,
   data: { firstName: string; lastName: string }
 ): Promise<ActionResult> {
-  try {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        displayName: `${data.firstName} ${data.lastName}`,
-      },
-    })
-    
-    return { success: true }
-  } catch (error) {
-    console.error('Profile update error:', error)
+  const supabase = await createServerSupabaseClient()
+  
+  // Mettre à jour les metadata de l'utilisateur courant (via sa session)
+  const { error: updateError } = await supabase.auth.updateUser({
+    data: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      onboarding_step: 2,
+    },
+  })
+  
+  if (updateError) {
+    console.error('Profile update error:', updateError)
     return { success: false, error: 'Erreur lors de la mise à jour du profil' }
   }
+  
+  return { success: true }
 }
 
 /**
  * Sélectionne la résidence et finalise l'onboarding (étape 3)
- * Crée GameProfile + BankAccount + crédite + débloque locations
+ * Crée l'utilisateur Prisma avec TOUTES les données + GameProfile + BankAccount
  */
 export async function selectResidence(
-  userId: string,
   locationId: string
 ): Promise<ActionResult> {
   try {
-    // 1. Vérifier que la location est bien débloquée
+    const supabase = await createServerSupabaseClient()
+    
+    // 1. Récupérer les données Supabase Auth (metadata stockées aux étapes 1 et 2)
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !authUser) {
+      return { success: false, error: 'Session invalide' }
+    }
+    
+    const metadata = authUser.user_metadata
+    const email = authUser.email
+    const username = metadata?.username
+    const firstName = metadata?.firstName
+    const lastName = metadata?.lastName
+    
+    if (!email || !username || !firstName || !lastName) {
+      return { success: false, error: 'Données de profil incomplètes' }
+    }
+    
+    const userId = authUser.id
+    
+    // 2. Vérifier que la location est bien débloquée
     const location = await prisma.mapLocation.findUnique({
       where: { id: locationId },
     })
@@ -166,7 +169,7 @@ export async function selectResidence(
       return { success: false, error: 'Cette ville n\'est pas disponible' }
     }
     
-    // 2. Vérifier que l'utilisateur n'a pas déjà un profil
+    // 3. Vérifier que l'utilisateur n'a pas déjà un profil
     const existingProfile = await prisma.gameProfile.findUnique({
       where: { userId },
     })
@@ -175,9 +178,21 @@ export async function selectResidence(
       return { success: false, error: 'Profil déjà existant' }
     }
     
-    // 3. Créer le compte bancaire avec solde initial
+    // 4. Créer l'utilisateur dans Prisma avec TOUTES les données
+    await prisma.user.create({
+      data: {
+        id: userId,
+        email,
+        username,
+        firstName,
+        lastName,
+        displayName: `${firstName} ${lastName}`,
+      },
+    })
+    
+    // 5. Créer le compte bancaire avec solde initial
     const accountNumber = generateAccountNumber()
-    const bankAccount = await prisma.bankAccount.create({
+    await prisma.bankAccount.create({
       data: {
         ownerId: userId,
         ownerType: 'PERSONAL',
@@ -186,7 +201,7 @@ export async function selectResidence(
       },
     })
     
-    // 4. Créer le GameProfile
+    // 6. Créer le GameProfile
     await prisma.gameProfile.create({
       data: {
         userId,
@@ -194,7 +209,12 @@ export async function selectResidence(
       },
     })
     
-    // 5. Vérifier les déblocages de locations
+    // 7. Mettre à jour le metadata Supabase pour marquer l'onboarding complet
+    await supabase.auth.updateUser({
+      data: { onboarding_step: 3, onboarding_complete: true },
+    })
+    
+    // 8. Vérifier les déblocages de locations
     await checkLocationUnlocks()
     
     revalidatePath('/dashboard')
