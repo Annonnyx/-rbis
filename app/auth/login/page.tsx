@@ -18,11 +18,13 @@ export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
   
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setSuccess(false)
     
     const formData = new FormData(e.currentTarget)
     const email = formData.get('email') as string
@@ -45,9 +47,13 @@ export default function LoginPage() {
       setLoading(false)
     } else {
       console.log('[LoginPage] Login success, user:', data.user?.id)
-      console.log('[LoginPage] Session established, redirecting to dashboard')
-      // Utiliser window.location pour forcer la navigation complète
-      window.location.href = '/dashboard'
+      console.log('[LoginPage] Session established')
+      setSuccess(true)
+      setLoading(false)
+      // Redirection après un court délai pour laisser l'utilisateur voir le message
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 500)
     }
   }
   
@@ -74,6 +80,12 @@ export default function LoginPage() {
           <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
             <AlertCircle className="w-4 h-4" />
             {error}
+          </div>
+        )}
+        
+        {success && (
+          <div className="mb-6 p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-center gap-2">
+            <span>✓ Connexion réussie ! Redirection...</span>
           </div>
         )}
         
