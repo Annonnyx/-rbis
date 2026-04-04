@@ -147,16 +147,17 @@ export async function updateUserProfile(
  * Crée l'utilisateur Prisma avec TOUTES les données + GameProfile + BankAccount
  */
 export async function selectResidence(
+  userId: string,
   locationId: string
 ): Promise<ActionResult> {
   try {
-    const supabase = await createServerSupabaseClient()
+    const supabaseAdmin = createServiceSupabaseClient()
     
-    // 1. Récupérer les données Supabase Auth (metadata stockées aux étapes 1 et 2)
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+    // 1. Récupérer les données Supabase Auth via service role (pas besoin de session)
+    const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId)
     
     if (authError || !authUser) {
-      return { success: false, error: 'Session invalide' }
+      return { success: false, error: 'Utilisateur non trouvé' }
     }
     
     const metadata = authUser.user_metadata
@@ -168,8 +169,6 @@ export async function selectResidence(
     if (!email || !username || !firstName || !lastName) {
       return { success: false, error: 'Données de profil incomplètes' }
     }
-    
-    const userId = authUser.id
     
     // 2. Vérifier que la location est bien débloquée
     const location = await prisma.mapLocation.findUnique({
@@ -220,8 +219,7 @@ export async function selectResidence(
       },
     })
     
-    // 7. Mettre à jour le metadata Supabase via service role
-    const supabaseAdmin = createServiceSupabaseClient()
+    // 7. Mettre à jour le metadata Supabase via service role (reuse supabaseAdmin)
     await supabaseAdmin.auth.admin.updateUserById(userId, {
       user_metadata: { onboarding_step: 3, onboarding_complete: true },
     })
