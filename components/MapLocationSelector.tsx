@@ -81,12 +81,14 @@ export function MapLocationSelector({ selectedId, onSelect }: MapLocationSelecto
   
   return (
     <div className="space-y-4">
-      {/* Mini Map */}
-      <div className="h-48 rounded-xl overflow-hidden border border-white/10">
+      {/* Map - plus grande et avec meilleur contraste */}
+      <div className="h-80 md:h-96 rounded-xl overflow-hidden border border-white/10">
         <MapContainer
           center={mapCenter}
-          zoom={13}
-          scrollWheelZoom={false}
+          zoom={2}
+          minZoom={2}
+          maxZoom={10}
+          scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
@@ -104,7 +106,12 @@ export function MapLocationSelector({ selectedId, onSelect }: MapLocationSelecto
                 click: () => onSelect(location.id),
               }}
             >
-              <Popup>{location.name}</Popup>
+              <Popup>
+                <div className="text-center">
+                  <strong className="text-violet-600">{location.name}</strong>
+                  <p className="text-xs text-gray-500 mt-1">✓ Disponible</p>
+                </div>
+              </Popup>
             </Marker>
           ))}
           
@@ -114,7 +121,13 @@ export function MapLocationSelector({ selectedId, onSelect }: MapLocationSelecto
               position={[location.lat, location.lng]}
               icon={lockedIcon}
             >
-              <Popup>{location.name} (Verrouillée)</Popup>
+              <Popup>
+                <div className="text-center">
+                  <span className="text-gray-400">{location.name}</span>
+                  <p className="text-xs text-gray-400 mt-1">🔒 Verrouillée</p>
+                  <p className="text-xs text-amber-600">{location.requiredUsersToUnlock} utilisateurs requis</p>
+                </div>
+              </Popup>
             </Marker>
           ))}
         </MapContainer>
@@ -135,10 +148,10 @@ export function MapLocationSelector({ selectedId, onSelect }: MapLocationSelecto
               className={`
                 flex items-center justify-between p-3 rounded-xl border transition-all duration-200
                 ${isSelected 
-                  ? 'bg-violet-500/20 border-violet-500/50' 
+                  ? 'bg-violet-500/30 border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]' 
                   : isLocked 
-                    ? 'bg-white/[0.02] border-white/5 opacity-50 cursor-not-allowed'
-                    : 'bg-white/5 border-white/10 hover:bg-white/[0.08]'
+                    ? 'bg-white/[0.02] border-white/5 opacity-40 cursor-not-allowed grayscale'
+                    : 'bg-violet-500/10 border-violet-500/30 hover:bg-violet-500/20 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
                 }
               `}
             >
@@ -152,9 +165,13 @@ export function MapLocationSelector({ selectedId, onSelect }: MapLocationSelecto
                   <p className={`font-medium ${isSelected ? 'text-violet-300' : 'text-white'}`}>
                     {location.name}
                   </p>
-                  <p className="text-xs text-white/40">
-                    {location.lat.toFixed(2)}, {location.lng.toFixed(2)}
-                  </p>
+                  {isLocked ? (
+                    <p className="text-xs text-amber-400/70">
+                      🔒 {location.requiredUsersToUnlock} utilisateurs requis
+                    </p>
+                  ) : (
+                    <p className="text-xs text-green-400/70">✓ Disponible</p>
+                  )}
                 </div>
               </div>
               
