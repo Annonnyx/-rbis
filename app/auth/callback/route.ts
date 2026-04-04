@@ -119,9 +119,9 @@ export async function GET(request: NextRequest) {
     })
 
     if (!gameProfile) {
-      // Onboarding non complet → rediriger vers le register pour choisir la résidence
-      console.log('[OAuth Callback] Onboarding incomplete, redirecting to register')
-      return NextResponse.redirect(`${origin}/auth/register?step=3&userId=${user.id}`)
+      // Onboarding non complet → rediriger vers l'étape 2 (identité)
+      console.log('[OAuth Callback] New user, redirecting to step 2 (identity)')
+      return NextResponse.redirect(`${origin}/auth/register?step=2&userId=${user.id}`)
     }
 
     // Onboarding complet → rediriger vers le dashboard

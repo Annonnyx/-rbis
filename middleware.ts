@@ -1,9 +1,9 @@
 // ============================================
 // middleware.ts
-// Protection des routes et redirections auth
+// Protection des routes et redirections auth - SIMPLIFIÉ
 // ============================================
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
@@ -36,46 +36,34 @@ export async function middleware(request: NextRequest) {
   
   const { data: { user } } = await supabase.auth.getUser()
   
+  const pathname = request.nextUrl.pathname
+  
   // Routes protégées (requièrent auth)
-  const protectedRoutes = ['/dashboard', '/map', '/bank', '/company', '/profile', '/suggestions']
-  const isProtected = protectedRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  )
+  const protectedRoutes = ['/dashboard', '/map', '/bank', '/company', '/profile', '/suggestions', '/market', '/jobs', '/alliances']
+  const isProtected = protectedRoutes.some(route => pathname.startsWith(route))
   
-  // Routes auth (rediriger vers dashboard si déjà connecté ET onboarding complet)
-  const authRoutes = ['/auth/login', '/auth/register']
-  const isAuthRoute = authRoutes.some(route =>
-    request.nextUrl.pathname.startsWith(route)
-  )
+  // Page de login
+  const isLoginPage = pathname === '/auth/login'
+  const isRegisterPage = pathname.startsWith('/auth/register')
   
-  // Redirections
+  // 1. Non connecté sur route protégée → login
   if (isProtected && !user) {
-    // Non connecté sur route protégée → login
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   
-  // Ne rediriger vers dashboard que si l'utilisateur a complété l'onboarding
-  // (a un profil dans la base de données)
-  if (isAuthRoute && user) {
-    // Vérifier si l'utilisateur a un profil complet
-    const { data: profile } = await supabase
-      .from('User')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-    
-    if (profile) {
-      // Onboarding complet → dashboard
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-    // Sinon, laisser l'utilisateur sur la page d'inscription pour compléter l'onboarding
+  // 2. Connecté sur page de login → rediriger vers register (pour continuer onboarding ou compléter)
+  if (isLoginPage && user) {
+    return NextResponse.redirect(new URL('/auth/register', request.url))
   }
+  
+  // 3. Sur /auth/register, on laisse passer car la logique est gérée côté client
+  // (évite les boucles de redirection)
   
   return response
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

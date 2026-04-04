@@ -5,8 +5,8 @@
 
 'use client'
 
-import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useCallback, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { z } from 'zod'
 import { GlassCard } from '@/components/ui/GlassCard'
@@ -352,16 +352,32 @@ function Step3({
 }
 
 // ============================================
-// Main Component
+// Main Component avec Suspense pour useSearchParams
 // ============================================
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [step1Data, setStep1Data] = useState<Partial<Step1Data>>({})
   const [step2Data, setStep2Data] = useState<Partial<Step2Data>>({})
   const [userId, setUserId] = useState('')
   const [error, setError] = useState('')
+  
+  // Lire les query params pour les utilisateurs venant de Google OAuth
+  useEffect(() => {
+    const stepParam = searchParams.get('step')
+    const userIdParam = searchParams.get('userId')
+    
+    if (stepParam && userIdParam) {
+      const stepNum = parseFloat(stepParam)
+      if (!isNaN(stepNum) && stepNum >= 2 && stepNum <= 3) {
+        setStep(stepNum)
+        setUserId(userIdParam)
+        console.log('[RegisterPage] Loaded from query params:', { step: stepNum, userId: userIdParam })
+      }
+    }
+  }, [searchParams])
   
   async function handleStep1(data: Step1Data) {
     setStep1Data(data)
@@ -483,6 +499,22 @@ export default function RegisterPage() {
         )}
       </GlassCard>
     </div>
+  )
+}
+
+// ============================================
+// Export avec Suspense
+// ============================================
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="animate-pulse text-white/40">Chargement...</div>
+      </div>
+    }>
+      <RegisterPageContent />
+    </Suspense>
   )
 }
 
