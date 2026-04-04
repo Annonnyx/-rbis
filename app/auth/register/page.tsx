@@ -192,7 +192,7 @@ function Step2({
       return
     }
     
-    onNext(result.data)
+    await onNext(result.data)
     setLoading(false)
   }
   
@@ -341,12 +341,17 @@ export default function RegisterPage() {
     setStep2Data(data)
     setError('')
     
-    const result = await updateUserProfile(userId, data)
-    
-    if (result.success) {
-      setStep(3)
-    } else {
-      setError(result.error || 'Erreur lors de la mise à jour')
+    try {
+      const result = await updateUserProfile(userId, data)
+      
+      if (result.success) {
+        setStep(3)
+      } else {
+        setError(result.error || 'Erreur lors de la mise à jour')
+      }
+    } catch (err) {
+      console.error('Step 2 error:', err)
+      setError('Erreur inattendue lors de la mise à jour')
     }
   }
   
