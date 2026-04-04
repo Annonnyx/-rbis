@@ -5,42 +5,19 @@
 
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { loginUser } from '@/app/actions/auth'
-import { useCurrentUser } from '@/lib/hooks/useCurrentUser'
 import { AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { user, loading: userLoading } = useCurrentUser()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const redirectAttempted = useRef(false)
-  
-  // Rediriger vers dashboard si déjà connecté (une seule fois)
-  useEffect(() => {
-    console.log('[LoginPage] User state changed:', { hasUser: !!user, userId: user?.id, loading: userLoading, redirectAttempted: redirectAttempted.current })
-    
-    if (user && !userLoading && !redirectAttempted.current) {
-      console.log('[LoginPage] Redirecting to dashboard (user already logged in)')
-      redirectAttempted.current = true
-      router.push('/dashboard')
-    }
-  }, [user, router, userLoading])
-  
-  // Afficher un état de chargement pendant la vérification
-  if (userLoading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="animate-pulse text-white/40">Vérification de la session...</div>
-      </div>
-    )
-  }
   
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
