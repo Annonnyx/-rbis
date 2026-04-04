@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { GlassCard } from '@/components/ui/GlassCard'
@@ -18,26 +18,6 @@ export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [isCheckingSession, setIsCheckingSession] = useState(true)
-  
-  // Vérifier si déjà connecté au chargement
-  useEffect(() => {
-    const checkSession = async () => {
-      const supabase = createBrowserSupabaseClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      console.log('[LoginPage] Initial session check:', { hasSession: !!session })
-      
-      if (session) {
-        console.log('[LoginPage] Already has session, redirecting to dashboard')
-        window.location.replace('/dashboard')
-      } else {
-        setIsCheckingSession(false)
-      }
-    }
-    
-    checkSession()
-  }, [router])
   
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -71,11 +51,11 @@ export default function LoginPage() {
     }
   }
   
-  // Afficher un état de chargement pendant la vérification de session
-  if (isCheckingSession) {
+  // Afficher un état de chargement
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="animate-pulse text-white/40">Vérification de la session...</div>
+        <div className="animate-pulse text-white/40">Connexion en cours...</div>
       </div>
     )
   }
