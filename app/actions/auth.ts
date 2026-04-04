@@ -81,7 +81,7 @@ export interface RegisterData {
 export async function registerUser(data: RegisterData): Promise<ActionResult<{ userId: string }>> {
   const supabase = await createServerSupabaseClient()
   
-  // 1. Créer le user dans Supabase Auth uniquement
+  // 1. Créer le user dans Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
@@ -99,6 +99,17 @@ export async function registerUser(data: RegisterData): Promise<ActionResult<{ u
   
   if (!authData.user) {
     return { success: false, error: 'Erreur lors de la création du compte' }
+  }
+  
+  // 2. Connecter immédiatement pour créer une session (nécessaire pour étape 2)
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: data.email,
+    password: data.password,
+  })
+  
+  if (signInError) {
+    console.error('Auto-login error:', signInError)
+    // On continue quand même, l'utilisateur pourra se reconnecter manuellement
   }
   
   return { success: true, data: { userId: authData.user.id } }
