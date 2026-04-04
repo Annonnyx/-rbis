@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { GlassCard } from '@/components/ui/GlassCard'
@@ -20,12 +20,15 @@ export default function LoginPage() {
   const { user, loading: userLoading } = useCurrentUser()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const redirectAttempted = useRef(false)
   
-  // Rediriger vers dashboard si déjà connecté
+  // Rediriger vers dashboard si déjà connecté (une seule fois)
   useEffect(() => {
-    console.log('[LoginPage] User state changed:', { hasUser: !!user, userId: user?.id, loading: userLoading })
-    if (user) {
+    console.log('[LoginPage] User state changed:', { hasUser: !!user, userId: user?.id, loading: userLoading, redirectAttempted: redirectAttempted.current })
+    
+    if (user && !userLoading && !redirectAttempted.current) {
       console.log('[LoginPage] Redirecting to dashboard (user already logged in)')
+      redirectAttempted.current = true
       router.push('/dashboard')
     }
   }, [user, router, userLoading])
