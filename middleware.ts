@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(route)
   )
   
-  // Routes auth (rediriger vers dashboard si déjà connecté)
+  // Routes auth (rediriger vers dashboard si déjà connecté ET onboarding complet)
   const authRoutes = ['/auth/login', '/auth/register']
   const isAuthRoute = authRoutes.some(route =>
     request.nextUrl.pathname.startsWith(route)
@@ -54,9 +54,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   
+  // Ne rediriger vers dashboard que si l'utilisateur a complété l'onboarding
+  // (a un profil dans la base de données)
   if (isAuthRoute && user) {
-    // Connecté sur route auth → dashboard
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Vérifier si l'utilisateur a un profil complet
+    const { data: profile } = await supabase
+      .from('User')
+      .select('id')
+      .eq('id', user.id)
+      .single()
+    
+    if (profile) {
+      // Onboarding complet → dashboard
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+    // Sinon, laisser l'utilisateur sur la page d'inscription pour compléter l'onboarding
   }
   
   return response
