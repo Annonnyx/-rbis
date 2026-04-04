@@ -11,7 +11,7 @@ import Link from 'next/link'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
-import { loginUser } from '@/app/actions/auth'
+import { createBrowserSupabaseClient } from '@/lib/supabase-browser'
 import { AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
@@ -29,15 +29,23 @@ export default function LoginPage() {
     const password = formData.get('password') as string
     
     console.log('[LoginPage] Submitting login form...')
-    const result = await loginUser(email, password)
-    console.log('[LoginPage] Login result:', result)
     
-    if (result.success) {
-      console.log('[LoginPage] Login success, redirecting to dashboard')
-      router.push('/dashboard')
+    // Utiliser le client Supabase côté client pour que les cookies soient correctement définis
+    const supabase = createBrowserSupabaseClient()
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    
+    console.log('[LoginPage] Login result:', { success: !error, error: error?.message })
+    
+    if (error) {
+      console.log('[LoginPage] Login failed:', error.message)
+      setError(error.message)
     } else {
-      console.log('[LoginPage] Login failed:', result.error)
-      setError(result.error || 'Erreur de connexion')
+      console.log('[LoginPage] Login success, user:', data.user?.id)
+      console.log('[LoginPage] Session established, redirecting to dashboard')
+      router.push('/dashboard')
     }
     
     setLoading(false)
