@@ -3,7 +3,9 @@
 // Landing page avec animation et compteur temps réel
 // ============================================
 
+import Link from 'next/link'
 import { GlassCard } from '@/components/ui/GlassCard'
+import { Button } from '@/components/ui/Button'
 import { UserCounter } from '@/components/UserCounter'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 
@@ -34,17 +36,34 @@ export default function HomePage() {
             Créez votre entreprise, gérez votre banque, et façonnez le monde avec d'autres joueurs en temps réel.
           </p>
           
-          {/* CTA Buttons */}
+          {/* CTA Buttons - Classic + Google */}
           <div className="flex flex-col gap-4 justify-center max-w-sm mx-auto">
-            <GoogleSignInButton
-              variant="primary"
-              size="lg"
-              label="Commencer l'aventure"
-            />
+            {/* Classic buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/auth/register" className="flex-1">
+                <Button size="lg" className="w-full">
+                  S'inscrire
+                </Button>
+              </Link>
+              <Link href="/auth/login" className="flex-1">
+                <Button variant="secondary" size="lg" className="w-full">
+                  Se connecter
+                </Button>
+              </Link>
+            </div>
+            
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-2">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-white/40">ou</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+            
+            {/* Google button */}
             <GoogleSignInButton
               variant="secondary"
               size="lg"
-              label="Se connecter"
+              label="Continuer avec Google"
             />
           </div>
         </div>
