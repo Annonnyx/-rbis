@@ -13,7 +13,7 @@ import { GlassCard } from '@/components/ui/GlassCard'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { AlertCircle, Check, Loader2 } from 'lucide-react'
+import { AlertCircle, Check, Loader2, Mail } from 'lucide-react'
 import { 
   step1Schema, step2Schema, 
   type Step1Data, type Step2Data 
@@ -155,6 +155,51 @@ function Step1({
         Continuer
       </Button>
     </form>
+  )
+}
+
+// ============================================
+// Étape 1.5 : Vérification Email
+// ============================================
+
+function StepEmailVerification({
+  email,
+  onContinue,
+}: {
+  email: string
+  onContinue: () => void
+}) {
+  return (
+    <div className="space-y-6 text-center">
+      <div className="p-4 rounded-xl bg-violet-500/10 border border-violet-500/20">
+        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-violet-500/20 flex items-center justify-center">
+          <Mail className="w-6 h-6 text-violet-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-white mb-2">
+          Vérifiez votre email
+        </h3>
+        <p className="text-sm text-white/60 mb-3">
+          Un email de confirmation a été envoyé à
+        </p>
+        <p className="text-sm font-medium text-violet-300 mb-4">
+          {email}
+        </p>
+        <p className="text-xs text-white/40">
+          Cliquez sur le lien dans l'email pour confirmer votre compte, puis revenez ici pour continuer.
+        </p>
+      </div>
+
+      <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+        <p className="text-xs text-amber-300">
+          <AlertCircle className="w-3 h-3 inline mr-1" />
+          Si vous ne voyez pas l'email, vérifiez votre dossier spam.
+        </p>
+      </div>
+
+      <Button onClick={onContinue} className="w-full">
+        J'ai vérifié mon email - Continuer
+      </Button>
+    </div>
   )
 }
 
@@ -331,7 +376,7 @@ export default function RegisterPage() {
       
       if (result.success) {
         setUserId(result.data!.userId)
-        setStep(2)
+        setStep(1.5) // Aller à l'étape vérification email
       } else {
         setError(result.error || 'Erreur lors de l\'inscription')
       }
@@ -376,8 +421,8 @@ export default function RegisterPage() {
     }
   }
   
-  const titles = ['', 'Créer un compte', 'Votre identité', 'Choisir votre résidence']
-  const subtitles = ['', 'Étape 1 sur 3', 'Étape 2 sur 3', 'Étape 3 sur 3']
+  const titles = ['', 'Créer un compte', 'Vérification email', 'Votre identité', 'Choisir votre résidence']
+  const subtitles = ['', 'Étape 1 sur 4', 'Étape 2 sur 4', 'Étape 3 sur 4', 'Étape 4 sur 4']
   
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4 py-8">
@@ -388,11 +433,11 @@ export default function RegisterPage() {
       <GlassCard padding="lg" className="relative z-10 w-full max-w-md">
         {/* Progress bar */}
         <div className="flex gap-2 mb-8">
-          {[1, 2, 3].map(s => (
+          {[1, 2, 3, 4].map(s => (
             <div
               key={s}
               className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                s <= step ? 'bg-violet-500' : 'bg-white/10'
+                s <= Math.ceil(step) ? 'bg-violet-500' : 'bg-white/10'
               }`}
             />
           ))}
@@ -413,11 +458,18 @@ export default function RegisterPage() {
         {step === 1 && (
           <Step1 onNext={handleStep1} data={step1Data} />
         )}
+
+        {step === 1.5 && (
+          <StepEmailVerification
+            email={step1Data.email || ''}
+            onContinue={() => setStep(2)}
+          />
+        )}
         
         {step === 2 && (
           <Step2 
             onNext={handleStep2} 
-            onBack={() => setStep(1)} 
+            onBack={() => setStep(1.5)} 
             data={step2Data} 
           />
         )}
