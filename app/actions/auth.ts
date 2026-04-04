@@ -188,9 +188,12 @@ export async function selectResidence(
       where: { email },
     })
     
+    // Utiliser l'ID existant ou celui de Supabase
+    const prismaUserId = existingUserById?.id || existingUserByEmail?.id || userId
+    
     // 4. Vérifier que l'utilisateur n'a pas déjà un profil
     const existingProfile = await prisma.gameProfile.findUnique({
-      where: { userId: existingUserById?.id || userId },
+      where: { userId: prismaUserId },
     })
     
     if (existingProfile) {
@@ -215,7 +218,7 @@ export async function selectResidence(
     const accountNumber = generateAccountNumber()
     await prisma.bankAccount.create({
       data: {
-        ownerId: userId,
+        ownerId: prismaUserId,
         ownerType: 'PERSONAL',
         balance: INITIAL_BALANCE,
         accountNumber,
@@ -225,7 +228,7 @@ export async function selectResidence(
     // 6. Créer le GameProfile
     await prisma.gameProfile.create({
       data: {
-        userId,
+        userId: prismaUserId,
         homeLocationId: locationId,
       },
     })
