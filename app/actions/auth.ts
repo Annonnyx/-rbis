@@ -96,8 +96,17 @@ export async function registerUser(data: RegisterData): Promise<ActionResult<{ u
     return { success: false, error: 'Erreur lors de la création du compte' }
   }
   
-  // 2. Créer le user dans Prisma
+  // 2. Créer ou récupérer le user dans Prisma
   try {
+    // Vérifier si l'utilisateur existe déjà (cas de re-registration après échec partiel)
+    const existingUser = await prisma.user.findUnique({
+      where: { id: authData.user.id },
+    })
+    
+    if (existingUser) {
+      return { success: true, data: { userId: existingUser.id } }
+    }
+    
     const user = await prisma.user.create({
       data: {
         id: authData.user.id,
