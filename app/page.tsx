@@ -3,10 +3,9 @@
 // Landing page avec animation et compteur temps réel
 // ============================================
 
-import Link from 'next/link'
 import { GlassCard } from '@/components/ui/GlassCard'
-import { Button } from '@/components/ui/Button'
 import { UserCounter } from '@/components/UserCounter'
+import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 
 export default function HomePage() {
   return (
@@ -36,17 +35,17 @@ export default function HomePage() {
           </p>
           
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/register">
-              <Button size="lg" className="w-full sm:w-auto px-8">
-                Commencer l'aventure
-              </Button>
-            </Link>
-            <Link href="/auth/login">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto px-8">
-                Se connecter
-              </Button>
-            </Link>
+          <div className="flex flex-col gap-4 justify-center max-w-sm mx-auto">
+            <GoogleSignInButton
+              variant="primary"
+              size="lg"
+              label="Commencer l'aventure"
+            />
+            <GoogleSignInButton
+              variant="secondary"
+              size="lg"
+              label="Se connecter"
+            />
           </div>
         </div>
         
