@@ -1,16 +1,19 @@
 // ============================================
 // middleware.ts
-// Protection des routes et redirections auth - SIMPLIFIÉ
+// Protection des routes et redirections auth
 // ============================================
 
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // Créer une réponse mutable
   let response = NextResponse.next({
-    request: { headers: request.headers },
+    request: {
+      headers: request.headers,
+    },
   })
-  
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -20,12 +23,12 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
+          // Mettre à jour les cookies dans la requête pour les prochains middlewares
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value)
           })
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          })
+          
+          // Mettre à jour les cookies dans la réponse pour le navigateur
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options)
           })
@@ -33,7 +36,8 @@ export async function middleware(request: NextRequest) {
       },
     }
   )
-  
+
+  // Cette ligne rafraîchit la session si nécessaire
   const { data: { user } } = await supabase.auth.getUser()
   
   const pathname = request.nextUrl.pathname
@@ -42,19 +46,14 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = ['/dashboard', '/map', '/bank', '/company', '/profile', '/suggestions', '/market', '/jobs', '/alliances']
   const isProtected = protectedRoutes.some(route => pathname.startsWith(route))
   
-  // Page de login
-  const isLoginPage = pathname === '/auth/login'
-  const isRegisterPage = pathname.startsWith('/auth/register')
-  
-  // 1. Non connecté sur route protégée → login
+  // Non connecté sur route protégée → login
   if (isProtected && !user) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   
-  // 2. Connecté sur page auth → laisser passer (pas de redirection forcée)
-  // L'utilisateur peut vouloir changer de compte ou continuer l'onboarding
-  // La logique de redirection est gérée côté client dans les pages
-  
+  // Connecté sur page de login/register → laisser passer (pas de redirection forcée)
+  // La logique est gérée côté client pour éviter les boucles
+
   return response
 }
 

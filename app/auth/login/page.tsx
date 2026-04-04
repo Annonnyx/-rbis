@@ -5,19 +5,37 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { loginUser } from '@/app/actions/auth'
+import { useCurrentUser } from '@/lib/hooks/useCurrentUser'
 import { AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { user, loading: userLoading } = useCurrentUser()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  
+  // Rediriger vers dashboard si déjà connecté
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard')
+    }
+  }, [user, router])
+  
+  // Afficher un état de chargement pendant la vérification
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="animate-pulse text-white/40">Vérification de la session...</div>
+      </div>
+    )
+  }
   
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
