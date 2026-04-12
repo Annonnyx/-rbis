@@ -9,7 +9,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { createServerSupabaseClient, createServiceSupabaseClient } from '@/lib/supabase'
+import { createServerSupabaseClient, createServiceSupabaseClient } from '@/lib/supabase-server'
 import type { ActionResult } from '@/types'
 
 const INITIAL_BALANCE = BigInt(100000) // ◎ 1 000,00 en centimes

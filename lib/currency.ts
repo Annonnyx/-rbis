@@ -50,3 +50,34 @@ export function formatOrbeRaw(centimes: bigint): string {
     maximumFractionDigits: 2,
   }).format(orbe)
 }
+
+// ============================================
+// Sérialisation BigInt pour Server/Client
+// ============================================
+
+/**
+ * Sérialise un BigInt en string pour le transport JSON
+ * @param centimes - BigInt à sérialiser
+ * @returns String représentant le BigInt
+ */
+export function serializeBigInt(centimes: bigint): string {
+  return centimes.toString()
+}
+
+/**
+ * Désérialise une string en BigInt
+ * @param value - String représentant un BigInt
+ * @returns BigInt
+ */
+export function deserializeBigInt(value: string): bigint {
+  return BigInt(value)
+}
+
+/**
+ * Convertit un montant sérialisé en nombre Orbe pour les graphiques
+ * @param serializedValue - String BigInt sérialisé
+ * @returns Nombre décimal
+ */
+export function serializedToOrbe(serializedValue: string): number {
+  return Number(BigInt(serializedValue)) / 100
+}

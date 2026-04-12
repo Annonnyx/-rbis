@@ -27,12 +27,16 @@ export function GoogleSignInButton({
   async function handleClick() {
     setLoading(true)
     try {
-      await signInWithGoogle()
+      const url = await signInWithGoogle()
+      if (url) {
+        window.location.href = url
+      } else {
+        throw new Error('URL OAuth non reçue')
+      }
     } catch (error) {
       console.error('Google sign in error:', error)
       setLoading(false)
     }
-    // La redirection est gérée par la server action
   }
 
   return (
