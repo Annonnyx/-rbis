@@ -1,0 +1,270 @@
+{
+  "app": {
+    "name": "Ørbis",
+    "tagline": "Un mundo virtual que crece con tus sugerencias",
+    "description": "Una simulación económica colaborativa donde creas tu empresa, gestionas tus finanzas y das forma a la economía."
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "business": "Mi Empresa",
+    "market": "Bolsa",
+    "bank": "Mi Banco",
+    "map": "Mapa",
+    "suggestions": "Sugerencias",
+    "profile": "Perfil",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión"
+  },
+  "home": {
+    "hero": {
+      "title": "Ørbis",
+      "subtitle": "Un mundo virtual que crece con tus sugerencias.",
+      "description": "Crea tu empresa, gestiona tus finanzas, da forma a la economía.",
+      "cta": {
+        "start": "Comenzar la aventura",
+        "learn": "Saber más"
+      }
+    },
+    "features": {
+      "title": "Una economía virtual completa",
+      "business": {
+        "title": "Crea tu empresa",
+        "description": "Lanza tu negocio con 300 Ø. Define tu producto o servicio y hazlo prosperar."
+      },
+      "bank": {
+        "title": "Gestiona tus finanzas",
+        "description": "Múltiples cuentas bancarias, transacciones seguras y control total de tu dinero."
+      },
+      "market": {
+        "title": "Bolsa en tiempo real",
+        "description": "Invierte en empresas de otros jugadores. La bolsa evoluciona con la economía."
+      },
+      "map": {
+        "title": "Mapa interactivo",
+        "description": "Elige tu ubicación en el mapa. Descubre dónde se encuentran otras empresas."
+      },
+      "suggestions": {
+        "title": "Sugerencias",
+        "description": "Propón nuevas funcionalidades, reglas o eventos. El juego evoluciona con tus ideas."
+      },
+      "currency": {
+        "title": "La moneda Ørbe",
+        "description": "Usa la Ørbe (Ø), una moneda ficticia con su propio símbolo único."
+      }
+    },
+    "howItWorks": {
+      "title": "¿Cómo funciona?",
+      "step1": {
+        "title": "Registro",
+        "description": "Conéctate con Google. Recibe 1000 Ø y elige tu ubicación."
+      },
+      "step2": {
+        "title": "Crea",
+        "description": "Lanza tu empresa, define tu estrategia y empieza a ganar."
+      },
+      "step3": {
+        "title": "Influye",
+        "description": "Haz sugerencias para dar forma a la economía. Vota por las mejores ideas."
+      }
+    },
+    "footer": "Ørbis - La simulación económica colaborativa"
+  },
+  "login": {
+    "title": "Bienvenido a Ørbis",
+    "subtitle": "Inicia sesión para acceder a tu cuenta",
+    "error": "Ocurrió un error durante el inicio de sesión. Por favor, inténtalo de nuevo.",
+    "google": "Continuar con Google",
+    "rewards": {
+      "title": "Al iniciar sesión, recibirás:",
+      "orbe": "1000 Ørbe (Ø) de saldo inicial",
+      "location": "Una ubicación en el mapa",
+      "account": "Una cuenta bancaria personal"
+    }
+  },
+  "dashboard": {
+    "title": "Hola, {name}",
+    "subtitle": "Aquí está tu panel de Ørbis",
+    "balance": "Saldo principal",
+    "stats": {
+      "users": "Usuarios",
+      "businesses": "Empresas",
+      "suggestions": "Sugerencias",
+      "marketCap": "Cap. Bursátil"
+    },
+    "cards": {
+      "business": "Mi Empresa",
+      "noBusiness": "Sin empresa",
+      "createBusiness": "Crear una empresa →",
+      "capital": "Capital",
+      "bank": "Mi Banco",
+      "accounts": "cuenta(s)",
+      "location": "Mi Ubicación",
+      "noLocation": "No definida"
+    },
+    "quickActions": {
+      "title": "Acciones rápidas",
+      "suggest": "Proponer una idea",
+      "market": "Ver la bolsa",
+      "transfer": "Hacer una transferencia"
+    }
+  },
+  "business": {
+    "title": "Mi Empresa",
+    "create": {
+      "title": "Crear mi empresa",
+      "capitalRequired": "Capital mínimo requerido",
+      "name": "Nombre de la empresa",
+      "description": "Descripción",
+      "objective": "Objetivo",
+      "objectivePlaceholder": "Ej: Convertirse en líder del jabón ecológico",
+      "product": "Producto",
+      "productPlaceholder": "Ej: Jabón artesanal",
+      "service": "Servicio",
+      "servicePlaceholder": "Ej: Entrega a domicilio",
+      "cancel": "Cancelar",
+      "submit": "Crear ({amount})",
+      "noBusiness": "Sin empresa",
+      "descriptionText": "Aún no has creado una empresa. Lanza tu negocio por solo 300 Ø.",
+      "button": "Crear mi empresa"
+    },
+    "status": {
+      "active": "Activa",
+      "inactive": "Inactiva"
+    },
+    "stats": {
+      "capital": "Capital",
+      "stockPrice": "Precio de la acción",
+      "availableShares": "Acciones disponibles",
+      "of": "de"
+    },
+    "details": {
+      "description": "Descripción",
+      "objective": "Objetivo",
+      "product": "Producto",
+      "service": "Servicio"
+    },
+    "edit": "Editar"
+  },
+  "bank": {
+    "title": "Mi Banco",
+    "transfer": "Transferir",
+    "totalBalance": "Saldo total",
+    "accounts": "cuenta(s)",
+    "main": "Principal",
+    "createAccount": "Crear nueva cuenta",
+    "transactions": {
+      "title": "Transacciones recientes",
+      "empty": "Aún no hay transacciones",
+      "deposit": "Depósito",
+      "withdrawal": "Retiro",
+      "transfer": "Transferencia",
+      "payment": "Pago"
+    }
+  },
+  "market": {
+    "title": "Bolsa Ørbis",
+    "subtitle": "Invierte en empresas del mundo Ørbis",
+    "myBusiness": "Mi empresa",
+    "overview": {
+      "listed": "Empresas cotizadas",
+      "volume": "Volumen total",
+      "marketCap": "Cap. Bursátil"
+    },
+    "stocks": {
+      "title": "Acciones disponibles",
+      "empty": "Aún no hay empresas cotizadas",
+      "available": "acciones disponibles"
+    },
+    "trade": {
+      "buy": "Comprar",
+      "sell": "Vender",
+      "quantity": "Cantidad",
+      "total": "Total",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar"
+    }
+  },
+  "suggestions": {
+    "title": "Sugerencias",
+    "subtitle": "Propón ideas para hacer evolucionar Ørbis",
+    "new": "Nueva sugerencia",
+    "form": {
+      "title": "Título",
+      "titlePlaceholder": "Ej: Añadir un indicador de higiene",
+      "type": "Tipo",
+      "types": {
+        "feature": "Nueva funcionalidad",
+        "rule": "Regla del juego",
+        "event": "Evento",
+        "economy": "Economía"
+      },
+      "description": "Descripción detallada",
+      "descriptionPlaceholder": "Describe tu idea en detalle...",
+      "cancel": "Cancelar",
+      "submit": "Proponer"
+    },
+    "empty": "Aún no hay sugerencias. ¡Sé el primero en proponer una idea!",
+    "vote": "voto",
+    "votes": "votos",
+    "status": {
+      "pending": "Pendiente",
+      "underReview": "En revisión",
+      "approved": "Aprobada",
+      "rejected": "Rechazada",
+      "implemented": "Implementada"
+    }
+  },
+  "map": {
+    "title": "Mapa",
+    "close": "Cerrar",
+    "businesses": "empresa(s)",
+    "residents": "residente(s)",
+    "noBusinesses": "Aún no hay empresas en esta ciudad",
+    "locked": {
+      "title": "Zonas por desbloquear",
+      "unlockAt": "Se desbloquea a {count} usuarios"
+    }
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "identity": {
+      "title": "Identidad",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    },
+    "stats": {
+      "accounts": "Cuentas bancarias",
+      "location": "Ubicación",
+      "noLocation": "No definida",
+      "business": "Empresa",
+      "noBusiness": "Ninguna"
+    },
+    "memberSince": "Miembro desde {date}",
+    "edit": "Editar",
+    "nameChangeLimit": "Solo puedes cambiar tu nombre una vez al mes"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "all": "Todos",
+    "none": "Ninguno",
+    "or": "o",
+    "and": "y",
+    "currency": "Ø"
+  }
+}

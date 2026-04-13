@@ -1,0 +1,270 @@
+{
+  "app": {
+    "name": "Ørbis",
+    "tagline": "Eine virtuelle Welt, die mit Ihren Vorschlägen wächst",
+    "description": "Eine kollaborative Wirtschaftssimulation, in der Sie Ihr Unternehmen gründen, Ihre Finanzen verwalten und die Wirtschaft gestalten."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "business": "Mein Unternehmen",
+    "market": "Börse",
+    "bank": "Meine Bank",
+    "map": "Karte",
+    "suggestions": "Vorschläge",
+    "profile": "Profil",
+    "login": "Anmelden",
+    "logout": "Abmelden"
+  },
+  "home": {
+    "hero": {
+      "title": "Ørbis",
+      "subtitle": "Eine virtuelle Welt, die mit Ihren Vorschlägen wächst.",
+      "description": "Gründen Sie Ihr Unternehmen, verwalten Sie Ihre Finanzen, gestalten Sie die Wirtschaft.",
+      "cta": {
+        "start": "Abenteuer beginnen",
+        "learn": "Mehr erfahren"
+      }
+    },
+    "features": {
+      "title": "Eine vollständige virtuelle Wirtschaft",
+      "business": {
+        "title": "Gründen Sie Ihr Unternehmen",
+        "description": "Starten Sie Ihr Unternehmen mit 300 Ø. Definieren Sie Ihr Produkt oder Ihre Dienstleistung und lassen Sie es gedeihen."
+      },
+      "bank": {
+        "title": "Verwalten Sie Ihre Finanzen",
+        "description": "Mehrere Bankkonten, sichere Transaktionen und totale Kontrolle über Ihr Geld."
+      },
+      "market": {
+        "title": "Börse in Echtzeit",
+        "description": "Investieren Sie in Unternehmen anderer Spieler. Die Börse entwickelt sich mit der Wirtschaft."
+      },
+      "map": {
+        "title": "Interaktive Karte",
+        "description": "Wählen Sie Ihren Standort auf der Karte. Entdecken Sie, wo sich andere Unternehmen befinden."
+      },
+      "suggestions": {
+        "title": "Vorschläge",
+        "description": "Schlagen Sie neue Funktionen, Regeln oder Ereignisse vor. Das Spiel entwickelt sich mit Ihren Ideen."
+      },
+      "currency": {
+        "title": "Die Ørbe-Währung",
+        "description": "Verwenden Sie die Ørbe (Ø), eine fiktive Währung mit ihrem eigenen einzigartigen Symbol."
+      }
+    },
+    "howItWorks": {
+      "title": "Wie funktioniert es?",
+      "step1": {
+        "title": "Anmeldung",
+        "description": "Melden Sie sich mit Google an. Erhalten Sie 1000 Ø und wählen Sie Ihren Standort."
+      },
+      "step2": {
+        "title": "Gründen",
+        "description": "Starten Sie Ihr Unternehmen, definieren Sie Ihre Strategie und beginnen Sie zu verdienen."
+      },
+      "step3": {
+        "title": "Beeinflussen",
+        "description": "Machen Sie Vorschläge, um die Wirtschaft zu gestalten. Stimmen Sie für die besten Ideen."
+      }
+    },
+    "footer": "Ørbis - Die kollaborative Wirtschaftssimulation"
+  },
+  "login": {
+    "title": "Willkommen bei Ørbis",
+    "subtitle": "Melden Sie sich an, um auf Ihr Konto zuzugreifen",
+    "error": "Bei der Anmeldung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "google": "Mit Google fortfahren",
+    "rewards": {
+      "title": "Durch die Anmeldung erhalten Sie:",
+      "orbe": "1000 Ørbe (Ø) Startguthaben",
+      "location": "Einen Standort auf der Karte",
+      "account": "Ein persönliches Bankkonto"
+    }
+  },
+  "dashboard": {
+    "title": "Hallo, {name}",
+    "subtitle": "Hier ist Ihr Ørbis-Dashboard",
+    "balance": "Hauptguthaben",
+    "stats": {
+      "users": "Benutzer",
+      "businesses": "Unternehmen",
+      "suggestions": "Vorschläge",
+      "marketCap": "Marktkap."
+    },
+    "cards": {
+      "business": "Mein Unternehmen",
+      "noBusiness": "Kein Unternehmen",
+      "createBusiness": "Unternehmen gründen →",
+      "capital": "Kapital",
+      "bank": "Meine Bank",
+      "accounts": "Konto(s)",
+      "location": "Mein Standort",
+      "noLocation": "Nicht festgelegt"
+    },
+    "quickActions": {
+      "title": "Schnelle Aktionen",
+      "suggest": "Idee vorschlagen",
+      "market": "Börse ansehen",
+      "transfer": "Überweisung tätigen"
+    }
+  },
+  "business": {
+    "title": "Mein Unternehmen",
+    "create": {
+      "title": "Mein Unternehmen gründen",
+      "capitalRequired": "Erforderliches Mindestkapital",
+      "name": "Unternehmensname",
+      "description": "Beschreibung",
+      "objective": "Ziel",
+      "objectivePlaceholder": "Bsp.: Marktführer bei umweltfreundlicher Seife werden",
+      "product": "Produkt",
+      "productPlaceholder": "Bsp.: Handgemachte Seife",
+      "service": "Dienstleistung",
+      "servicePlaceholder": "Bsp.: Lieferung nach Hause",
+      "cancel": "Abbrechen",
+      "submit": "Gründen ({amount})",
+      "noBusiness": "Kein Unternehmen",
+      "descriptionText": "Sie haben noch kein Unternehmen gegründet. Starten Sie Ihr Unternehmen für nur 300 Ø.",
+      "button": "Mein Unternehmen gründen"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "stats": {
+      "capital": "Kapital",
+      "stockPrice": "Aktienkurs",
+      "availableShares": "Verfügbare Aktien",
+      "of": "von"
+    },
+    "details": {
+      "description": "Beschreibung",
+      "objective": "Ziel",
+      "product": "Produkt",
+      "service": "Dienstleistung"
+    },
+    "edit": "Bearbeiten"
+  },
+  "bank": {
+    "title": "Meine Bank",
+    "transfer": "Überweisen",
+    "totalBalance": "Gesamtguthaben",
+    "accounts": "Konto(s)",
+    "main": "Haupt",
+    "createAccount": "Neues Konto erstellen",
+    "transactions": {
+      "title": "Letzte Transaktionen",
+      "empty": "Noch keine Transaktionen",
+      "deposit": "Einzahlung",
+      "withdrawal": "Abhebung",
+      "transfer": "Überweisung",
+      "payment": "Zahlung"
+    }
+  },
+  "market": {
+    "title": "Ørbis Börse",
+    "subtitle": "Investieren Sie in Unternehmen der Ørbis-Welt",
+    "myBusiness": "Mein Unternehmen",
+    "overview": {
+      "listed": "Börsennotierte Unternehmen",
+      "volume": "Gesamtvolumen",
+      "marketCap": "Marktkapitalisierung"
+    },
+    "stocks": {
+      "title": "Verfügbare Aktien",
+      "empty": "Noch keine börsennotierten Unternehmen",
+      "available": "Aktien verfügbar"
+    },
+    "trade": {
+      "buy": "Kaufen",
+      "sell": "Verkaufen",
+      "quantity": "Menge",
+      "total": "Gesamt",
+      "cancel": "Abbrechen",
+      "confirm": "Bestätigen"
+    }
+  },
+  "suggestions": {
+    "title": "Vorschläge",
+    "subtitle": "Schlagen Sie Ideen vor, um Ørbis weiterzuentwickeln",
+    "new": "Neuer Vorschlag",
+    "form": {
+      "title": "Titel",
+      "titlePlaceholder": "Bsp.: Hygieneanzeige hinzufügen",
+      "type": "Typ",
+      "types": {
+        "feature": "Neue Funktion",
+        "rule": "Spielregel",
+        "event": "Ereignis",
+        "economy": "Wirtschaft"
+      },
+      "description": "Detaillierte Beschreibung",
+      "descriptionPlaceholder": "Beschreiben Sie Ihre Idee im Detail...",
+      "cancel": "Abbrechen",
+      "submit": "Vorschlagen"
+    },
+    "empty": "Noch keine Vorschläge. Seien Sie der Erste, der eine Idee vorschlägt!",
+    "vote": "Stimme",
+    "votes": "Stimmen",
+    "status": {
+      "pending": "Ausstehend",
+      "underReview": "In Prüfung",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "implemented": "Umgesetzt"
+    }
+  },
+  "map": {
+    "title": "Karte",
+    "close": "Schließen",
+    "businesses": "Unternehmen",
+    "residents": "Bewohner",
+    "noBusinesses": "Noch keine Unternehmen in dieser Stadt",
+    "locked": {
+      "title": "Freizuschaltende Zonen",
+      "unlockAt": "Schaltet sich bei {count} Benutzern frei"
+    }
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "identity": {
+      "title": "Identität",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "cancel": "Abbrechen",
+      "save": "Speichern"
+    },
+    "stats": {
+      "accounts": "Bankkonten",
+      "location": "Standort",
+      "noLocation": "Nicht festgelegt",
+      "business": "Unternehmen",
+      "noBusiness": "Keines"
+    },
+    "memberSince": "Mitglied seit {date}",
+    "edit": "Bearbeiten",
+    "nameChangeLimit": "Sie können Ihren Namen nur einmal pro Monat ändern"
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "all": "Alle",
+    "none": "Keine",
+    "or": "oder",
+    "and": "und",
+    "currency": "Ø"
+  }
+}

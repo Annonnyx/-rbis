@@ -2,187 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================
-   ØRBIS - Global Styles & Design Tokens
-   ============================================ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 239 84% 67%;
+    --radius: 0.75rem;
+  }
 
-:root {
-  /* Colors */
-  --orbis-bg: #0a0a0f;
-  --orbis-violet: #7c3aed;
-  --orbis-violet-hover: #6d28d9;
-  --orbis-violet-light: #a78bfa;
-  --orbis-white: #ffffff;
-  --orbis-white-50: rgba(255, 255, 255, 0.5);
-  --orbis-white-10: rgba(255, 255, 255, 0.1);
-  --orbis-white-8: rgba(255, 255, 255, 0.08);
-  --orbis-white-5: rgba(255, 255, 255, 0.05);
-  
-  /* Status Colors */
-  --orbis-success: #22c55e;
-  --orbis-warning: #f59e0b;
-  --orbis-error: #ef4444;
-  --orbis-info: #3b82f6;
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 239 84% 67%;
+  }
 }
-
-/* ============================================
-   Base Styles
-   ============================================ */
 
 @layer base {
+  * {
+    @apply border-border;
+  }
   body {
-    background: var(--orbis-bg);
-    color: white;
-    font-family: var(--font-geist-sans), system-ui, sans-serif;
-  }
-  
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: var(--orbis-white-10);
-    border-radius: 3px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--orbis-white-50);
-  }
-  
-  /* Selection */
-  ::selection {
-    background: var(--orbis-violet);
-    color: white;
+    @apply bg-background text-foreground;
   }
 }
 
-/* ============================================
-   Custom Animations
-   ============================================ */
+/* Liquid Glass Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
-@layer utilities {
-  @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
-    }
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Orbe Symbol Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
   }
-  
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-  
-  @keyframes fade-in-up {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .animate-fade-in-up {
-    animation: fade-in-up 0.2s ease-out;
-  }
-  
-  @keyframes modal-overlay-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  
-  .animate-modal-overlay {
-    animation: modal-overlay-in 0.2s ease-out;
-  }
-  
-  @keyframes modal-content-in {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  
-  .animate-modal-content {
-    animation: modal-content-in 0.2s ease-out;
-  }
-  
-  /* Skeleton shimmer */
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-  
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.03) 25%,
-      rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 255, 255, 0.03) 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+  50% {
+    transform: translateY(-10px);
   }
 }
 
-/* ============================================
-   Safe Area (iOS)
-   ============================================ */
-
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* ============================================
-   Glassmorphism Utilities
-   ============================================ */
-
-@layer components {
-  .glass {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-  }
-  
-  .glass-hover {
-    transition: all 0.2s ease;
-  }
-  
-  .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.08);
-  }
-  
-  .glass-input {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.75rem;
-    transition: all 0.2s ease;
-  }
-  
-  .glass-input:focus {
-    border-color: rgba(124, 58, 237, 0.5);
-    box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.2);
-    outline: none;
-  }
+.orbe-float {
+  animation: float 3s ease-in-out infinite;
 }

@@ -1,8 +1,3 @@
-// ============================================
-// prisma/schema.prisma
-// Schéma de données Ørbis - Simulation socio-économique
-// ============================================
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,1011 +5,277 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
-// ============================================
-// ENUMS
-// ============================================
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
-enum AccountOwnerType {
-  PERSONAL
-  COMPANY
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
-enum SuggestionStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  IMPLEMENTED
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
-enum MarketListingStatus {
-  ACTIVE
-  SOLD
-  CANCELLED
-}
-
-// ============================================
-// MODELS
-// ============================================
-
-/**
- * Utilisateur - Entité centrale du système
- * Auth gérée par Supabase, données profil ici
- */
 model User {
-  id                 String    @id @default(uuid())
-  email              String    @unique
-  username           String    @unique
-  displayName        String?
-  displayNameChanged Boolean   @default(false)
-  firstName          String?
-  lastName           String?
-  avatarUrl          String?
-  createdAt          DateTime  @default(now())
-
-  // Relations
-  gameProfile   GameProfile?
-  accounts      BankAccount[]
-  companies     Company[]
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  name          String?
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  identifier    String    @unique @default(cuid())
+  nameChangedAt DateTime? @map("name_changed_at")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  accounts      Account[]
+  sessions      Session[]
+  bankAccounts  BankAccount[]
+  location      UserLocation?
+  business      Business?
   suggestions   Suggestion[]
-  votes         SuggestionVote[]
-  shareBuys     ShareTransaction[] @relation("Buyer")
-  shareSells    ShareTransaction[] @relation("Seller")
-  portfolio     SharePortfolio[]
-  marketListings MarketListing[] @relation("Seller")
-  skills        UserSkill[]
-  employments   Employment[] @relation("Employee")
-  conversationsA Conversation[] @relation("ParticipantA")
-  conversationsB Conversation[] @relation("ParticipantB")
-  sentMessages Message[] @relation("MessageSender")
-  receivedMessages Message[] @relation("MessageReceiver")
-  cityChats     CityChat[]
-  cityAnnouncements CityAnnouncement[]
-  foundedAlliances Alliance[] @relation("AllianceFounder")
-  allianceMemberships AllianceMember[]
-  // Governance
-  electionsWon  Election[] @relation("Winner")
-  electionCandidates ElectionCandidate[]
-  electionVotes ElectionVote[] @relation("Voter")
-  mandates      CityRepresentative[]
-  taxConfigsUpdated TaxConfig[] @relation("UpdatedBy")
-  lawsProposed  CommunityLaw[] @relation("Proposer")
-  // Trade Routes
-  // Quests & Achievements
-  quests        UserQuest[]
-  achievements  UserAchievement[]
+  stockTrades   StockTrade[]
+  votes         Vote[]
 
   @@map("users")
 }
 
-/**
- * Profil de jeu - Lié 1:1 à User
- * Contient les données spécifiques au gameplay
- */
-model GameProfile {
-  id             String      @id @default(uuid())
-  userId         String      @unique
-  homeLocationId String
-  createdAt      DateTime    @default(now())
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-  // Relations
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  homeLocation MapLocation @relation(fields: [homeLocationId], references: [id])
-
-  @@map("game_profiles")
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
-/**
- * Compte bancaire - PERSONAL ou COMPANY
- * Tous les montants sont stockés en centimes (BigInt)
- */
 model BankAccount {
-  id            String           @id @default(uuid())
-  ownerId       String
-  ownerType     AccountOwnerType
-  companyId     String?
-  balance       BigInt           @default(0)
-  accountNumber String           @unique
-  createdAt     DateTime         @default(now())
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  type        AccountType
+  name        String
+  balance     Decimal  @default(0) @db.Decimal(15, 2)
+  currency    String   @default("Ø")
+  isMain      Boolean  @default(false) @map("is_main")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  // Relations
-  owner                User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  sentTransactions     Transaction[] @relation("FromAccount")
-  receivedTransactions Transaction[] @relation("ToAccount")
-  capitalCompany       Company?      @relation("CompanyCapital")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  business    Business? @relation(fields: [businessId], references: [id])
+  businessId  String?  @map("business_id")
 
   @@map("bank_accounts")
 }
 
-/**
- * Transaction entre comptes
- * Les labels sont optionnels
- */
 model Transaction {
-  id            String      @id @default(uuid())
-  fromAccountId String
-  toAccountId   String
-  amount        BigInt
-  label         String?
-  createdAt     DateTime    @default(now())
+  id          String   @id @default(cuid())
+  accountId   String   @map("account_id")
+  type        TransactionType
+  amount      Decimal  @db.Decimal(15, 2)
+  description String?
+  relatedAccountId String? @map("related_account_id")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  // Relations
-  fromAccount BankAccount @relation("FromAccount", fields: [fromAccountId], references: [id], onDelete: Cascade)
-  toAccount   BankAccount @relation("ToAccount", fields: [toAccountId], references: [id], onDelete: Cascade)
+  account     BankAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
 }
 
-/**
- * Entreprise créée par un utilisateur
- * Chaque entreprise a un compte capital dédié
- */
-model Company {
-  id               String   @id @default(uuid())
-  ownerId          String
-  name             String
-  objective        String   @db.VarChar(200)
-  description      String   @db.VarChar(500)
-  locationId       String
-  capitalAccountId String   @unique
-  createdAt        DateTime @default(now())
+model UserLocation {
+  id        String   @id @default(cuid())
+  userId    String   @unique @map("user_id")
+  lat       Decimal  @db.Decimal(10, 8)
+  lng       Decimal  @db.Decimal(11, 8)
+  address   String?
+  cityId    String?  @map("city_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  // Relations
-  owner          User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  location       MapLocation @relation(fields: [locationId], references: [id])
-  capitalAccount BankAccount @relation("CompanyCapital", fields: [capitalAccountId], references: [id])
-  shareInfo      CompanyShare?
-  transactions   ShareTransaction[]
-  portfolio      SharePortfolio[]
-  listings       MarketListing[]
-  priceHistory   PriceHistory[]
-  jobPostings    JobPosting[]
-  employments    Employment[]
-  inventory      CompanyInventory[]
-  productionLines ProductionLine[]
-  providerContracts Contract[] @relation("Provider")
-  clientContracts Contract[] @relation("Client")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city      City?    @relation(fields: [cityId], references: [id])
 
-  @@map("companies")
+  @@map("user_locations")
 }
 
-/**
- * Localisation sur la carte du monde
- * Certaines sont débloquées selon le nombre d'utilisateurs
- */
-model MapLocation {
-  id                    String        @id @default(uuid())
-  name                  String        @unique
-  lat                   Float
-  lng                   Float
-  unlocked              Boolean       @default(false)
-  requiredUsersToUnlock Int
+model City {
+  id          String   @id @default(cuid())
+  name        String
+  nameEn      String?  @map("name_en")
+  nameFr      String?  @map("name_fr")
+  nameDe      String?  @map("name_de")
+  nameEs      String?  @map("name_es")
+  lat         Decimal  @db.Decimal(10, 8)
+  lng         Decimal  @db.Decimal(11, 8)
+  isUnlocked  Boolean  @default(false) @map("is_unlocked")
+  unlockThreshold Int  @default(0) @map("unlock_threshold")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  // Relations
-  residents GameProfile[]
-  companies Company[]
-  cityChats CityChat[]
-  cityAnnouncements CityAnnouncement[]
-  // Governance
-  elections   Election[]
-  representatives CityRepresentative[]
-  taxConfigs  TaxConfig[]
-  communityLaws CommunityLaw[]
-  // Trade Routes
-  tradeRoutesFrom TradeRoute[] @relation("FromLocation")
-  tradeRoutesTo TradeRoute[] @relation("ToLocation")
+  locations   UserLocation[]
+  businesses  Business[]
 
-  @@map("map_locations")
+  @@map("cities")
 }
 
-/**
- * Suggestion faite par un utilisateur pour améliorer le jeu
- */
+model Business {
+  id          String   @id @default(cuid())
+  userId      String   @unique @map("user_id")
+  name        String
+  description String?
+  objective   String?
+  product     String?
+  service     String?
+  cityId      String?  @map("city_id")
+  capital     Decimal  @default(0) @db.Decimal(15, 2)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city        City?    @relation(fields: [cityId], references: [id])
+  accounts    BankAccount[]
+  stock       Stock?
+
+  @@map("businesses")
+}
+
 model Suggestion {
-  id          String           @id @default(uuid())
-  authorId    String
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
   title       String
-  description String
+  description String   @db.Text
+  type        SuggestionType
   status      SuggestionStatus @default(PENDING)
-  createdAt   DateTime         @default(now())
+  votes       Int      @default(0)
+  implementedAt DateTime? @map("implemented_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  // Relations
-  author User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  votes  SuggestionVote[]
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votesList   Vote[]
 
   @@map("suggestions")
 }
 
-/**
- * Vote sur une suggestion (table pivot avec contrainte unique)
- */
-model SuggestionVote {
-  id           String   @id @default(uuid())
-  userId       String
-  suggestionId String
-  createdAt    DateTime @default(now())
+model Vote {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  suggestionId String   @map("suggestion_id")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  // Relations
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  suggestion   Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, suggestionId])
-  @@map("suggestion_votes")
+  @@map("votes")
 }
 
-// ============================================
-// MODÈLES BOURSE & MARCHÉ FINANCIER
-// ============================================
+model Stock {
+  id          String   @id @default(cuid())
+  businessId  String   @unique @map("business_id")
+  symbol      String   @unique
+  totalShares Int      @default(1000) @map("total_shares")
+  availableShares Int  @default(1000) @map("available_shares")
+  currentPrice Decimal @default(1.00) @db.Decimal(15, 2) @map("current_price")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-/**
- * Informations boursières d'une entreprise
- * Une seule entrée par entreprise cotée
- */
-model CompanyShare {
-  id               String   @id @default(uuid())
-  companyId        String   @unique
-  totalShares      Int      @default(0)
-  availableShares  Int      @default(0)
-  currentPrice       BigInt   @default(1000) // centimes d'Orbe, min ◎ 0,01 (1 centime)
-  lastPriceUpdate  DateTime @default(now())
-  isListed         Boolean  @default(false)
-  createdAt        DateTime @default(now())
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  trades      StockTrade[]
+  history     StockHistory[]
 
-  // Relations
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@map("company_shares")
+  @@map("stocks")
 }
 
-/**
- * Transaction d'actions entre joueurs ou IPO
- * Historique immuable de toutes les transactions
- */
-model ShareTransaction {
-  id            String   @id @default(uuid())
-  buyerId       String
-  sellerId      String?  // null si achat initial à l'entreprise (IPO)
-  companyId     String
-  quantity      Int
-  pricePerShare BigInt   // prix au moment de la transaction
-  totalAmount   BigInt
-  createdAt     DateTime @default(now())
-
-  // Relations
-  buyer   User    @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
-  seller  User?   @relation("Seller", fields: [sellerId], references: [id], onDelete: SetNull)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@map("share_transactions")
-}
-
-/**
- * Portfolio d'actions d'un utilisateur
- * Table pivot avec quantité et prix moyen d'achat
- */
-model SharePortfolio {
-  id              String @id @default(uuid())
-  userId          String
-  companyId       String
-  quantity        Int    @default(0)
-  averageBuyPrice BigInt @default(0) // prix moyen pondéré d'achat
-
-  // Relations
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, companyId])
-  @@map("share_portfolios")
-}
-
-/**
- * Annonce de vente sur le marché secondaire
- * Permet aux joueurs de vendre leurs actions à d'autres joueurs
- */
-model MarketListing {
-  id          String              @id @default(uuid())
-  sellerId    String
-  companyId   String
+model StockTrade {
+  id          String   @id @default(cuid())
+  stockId     String   @map("stock_id")
+  buyerId     String   @map("buyer_id")
+  sellerId    String?  @map("seller_id")
   quantity    Int
-  askingPrice BigInt              // prix demandé par action
-  status      MarketListingStatus @default(ACTIVE)
-  createdAt   DateTime            @default(now())
-  expiresAt   DateTime?           // expiration optionnelle
-  soldAt      DateTime?           // date de vente
+  price       Decimal  @db.Decimal(15, 2)
+  total       Decimal  @db.Decimal(15, 2)
+  type        TradeType
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  // Relations
-  seller  User    @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stock       Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  buyer       User     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
 
-  @@map("market_listings")
+  @@map("stock_trades")
 }
 
-/**
- * Historique des prix d'une entreprise
- * Une entrée à chaque changement de prix ou toutes les heures
- */
-model PriceHistory {
-  id         String   @id @default(uuid())
-  companyId  String
-  price      BigInt
-  recordedAt DateTime @default(now())
-  volume     Int      @default(0) // volume de transactions à ce prix
+model StockHistory {
+  id          String   @id @default(cuid())
+  stockId     String   @map("stock_id")
+  price       Decimal  @db.Decimal(15, 2)
+  timestamp   DateTime @default(now())
 
-  // Relations
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stock       Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
 
-  @@index([companyId, recordedAt])
-  @@map("price_history")
+  @@map("stock_history")
 }
 
-// ============================================
-// MODÈLES SYSTÈME D'EMPLOI
-// ============================================
+model GlobalSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-enum JobStatus {
-  OPEN
-  CLOSED
+  @@map("global_settings")
 }
 
-enum EmploymentStatus {
-  ACTIVE
-  TERMINATED
+enum AccountType {
+  PERSONAL
+  BUSINESS
 }
 
-/**
- * Catégorie de compétences (référence)
- */
-model SkillCategory {
-  id   String @id @default(uuid())
-  name String @unique
-  icon String @default("⭐")
-
-  // Relations
-  userSkills UserSkill[]
-  jobPostings JobPosting[]
-
-  @@map("skill_categories")
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+  PAYMENT
+  DIVIDEND
 }
 
-/**
- * Compétence d'un utilisateur avec niveau et XP
- */
-model UserSkill {
-  id               String @id @default(uuid())
-  userId           String
-  skillCategoryId  String
-  level            Int    @default(1)
-  experience       Int    @default(0)
-
-  // Relations
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skillCategory SkillCategory @relation(fields: [skillCategoryId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, skillCategoryId])
-  @@map("user_skills")
+enum SuggestionType {
+  FEATURE
+  RULE
+  EVENT
+  ECONOMY
 }
 
-/**
- * Offre d'emploi publiée par une entreprise
- */
-model JobPosting {
-  id             String    @id @default(uuid())
-  companyId      String
-  title          String
-  description    String
-  skillCategoryId String
-  minSkillLevel  Int       @default(1)
-  salaryPerDay   BigInt
-  maxEmployees   Int       @default(1)
-  status         JobStatus @default(OPEN)
-  createdAt      DateTime  @default(now())
-
-  // Relations
-  company       Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  skillCategory SkillCategory @relation(fields: [skillCategoryId], references: [id], onDelete: Cascade)
-  applications  Employment[]
-
-  @@map("job_postings")
-}
-
-/**
- * Contrat d'emploi
- */
-model Employment {
-  id             String            @id @default(uuid())
-  employeeId     String
-  companyId      String
-  jobPostingId   String
-  startedAt      DateTime          @default(now())
-  salaryPerDay   BigInt
-  status         EmploymentStatus  @default(ACTIVE)
-  lastPaidAt     DateTime?
-  terminatedAt   DateTime?
-  terminationReason String?
-
-  // Relations
-  employee      User            @relation("Employee", fields: [employeeId], references: [id], onDelete: Cascade)
-  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  jobPosting    JobPosting      @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
-  payments      SalaryPayment[]
-
-  @@unique([employeeId, status], name: "unique_active_employment")
-  @@map("employments")
-}
-
-/**
- * Paiement de salaire
- */
-model SalaryPayment {
-  id           String   @id @default(uuid())
-  employmentId String
-  amount       BigInt
-  paidAt       DateTime @default(now())
-  daysPaid     Int      @default(1)
-
-  // Relations
-  employment Employment @relation(fields: [employmentId], references: [id], onDelete: Cascade)
-
-  @@map("salary_payments")
-}
-
-// ============================================
-// MODÈLES SYSTÈME DE PRODUCTION
-// ============================================
-
-enum ResourceCategory {
-  RAW
-  PROCESSED
-  ENERGY
-  SERVICE
-}
-
-enum ContractStatus {
-  ACTIVE
-  PAUSED
-  TERMINATED
-}
-
-/**
- * Types de ressources (référence)
- */
-model ResourceType {
-  id        String          @id @default(uuid())
-  name      String          @unique
-  category  ResourceCategory
-  basePrice BigInt          @default(1000) // prix de référence en centimes
-  unit      String          @default("unité")
-
-  // Relations
-  inventories  CompanyInventory[]
-  productionLines ProductionLine[]
-  contracts    Contract[]
-
-  @@map("resource_types")
-}
-
-/**
- * Inventaire d'une entreprise
- */
-model CompanyInventory {
-  id              String @id @default(uuid())
-  companyId       String
-  resourceTypeId  String
-  quantity        Int    @default(0)
-  averageCostPrice BigInt @default(0) // prix moyen d'acquisition
-
-  // Relations
-  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  resourceType ResourceType @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
-
-  @@unique([companyId, resourceTypeId])
-  @@map("company_inventories")
-}
-
-/**
- * Ligne de production
- */
-model ProductionLine {
-  id                   String    @id @default(uuid())
-  companyId            String
-  outputResourceId     String
-  outputQuantityPerCycle Int     @default(1)
-  cycleHours           Int       @default(24) // durée d'un cycle en heures
-  costPerCycle         BigInt    @default(0) // coût fixe par cycle
-  active               Boolean   @default(false)
-  lastCycleAt          DateTime?
-  nextCycleAt          DateTime?
-  createdAt            DateTime  @default(now())
-
-  // Relations
-  company        Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  outputResource ResourceType @relation(fields: [outputResourceId], references: [id], onDelete: Cascade)
-
-  @@map("production_lines")
-}
-
-/**
- * Contrat de fourniture entre entreprises
- */
-model Contract {
-  id                   String         @id @default(uuid())
-  providerId           String
-  clientId             String
-  resourceTypeId       String
-  quantityPerDelivery  Int
-  pricePerUnit         BigInt
-  frequencyHours       Int            @default(24)
-  status               ContractStatus @default(ACTIVE)
-  startedAt            DateTime       @default(now())
-  nextDeliveryAt       DateTime?
-  terminatedAt         DateTime?
-
-  // Relations
-  provider     Company           @relation("Provider", fields: [providerId], references: [id], onDelete: Cascade)
-  client       Company           @relation("Client", fields: [clientId], references: [id], onDelete: Cascade)
-  resourceType ResourceType      @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
-  deliveries   ContractDelivery[]
-  tradeRouteUsages TradeRouteUsage[]
-
-  @@map("contracts")
-}
-
-/**
- * Livraison de contrat (log)
- */
-model ContractDelivery {
-  id                String   @id @default(uuid())
-  contractId        String
-  quantityDelivered Int
-  totalPaid         BigInt
-  deliveredAt       DateTime @default(now())
-  success           Boolean  @default(true)
-  failureReason     String?
-
-  // Relations
-  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-
-  @@map("contract_deliveries")
-}
-
-// ============================================
-// MODÈLES SYSTÈME SOCIAL
-// ============================================
-
-enum AllianceType {
-  SYNDICATE
-  COOPERATIVE
-}
-
-enum AllianceRole {
-  FOUNDER
-  ADMIN
-  MEMBER
-}
-
-/**
- * Conversation privée entre deux utilisateurs
- */
-model Conversation {
-  id             String   @id @default(uuid())
-  participantAId String
-  participantBId String
-  lastMessageAt  DateTime @default(now())
-  createdAt      DateTime @default(now())
-
-  // Relations
-  participantA User     @relation("ParticipantA", fields: [participantAId], references: [id], onDelete: Cascade)
-  participantB User     @relation("ParticipantB", fields: [participantBId], references: [id], onDelete: Cascade)
-  messages     Message[]
-
-  @@unique([participantAId, participantBId])
-  @@index([lastMessageAt])
-  @@map("conversations")
-}
-
-/**
- * Message privé
- */
-model Message {
-  id             String   @id @default(uuid())
-  conversationId String
-  senderId       String
-  receiverId     String
-  content        String   @db.VarChar(2000)
-  read           Boolean  @default(false)
-  createdAt      DateTime @default(now())
-
-  // Relations
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver     User         @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId, createdAt])
-  @@map("messages")
-}
-
-/**
- * Message public dans une ville (chat de ville)
- */
-model CityChat {
-  id          String   @id @default(uuid())
-  locationId  String
-  authorId    String
-  content     String   @db.VarChar(500)
-  createdAt   DateTime @default(now())
-
-  // Relations
-  location MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  author   User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  @@index([locationId, createdAt])
-  @@map("city_chats")
-}
-
-/**
- * Annonce épinglée dans une ville
- */
-model CityAnnouncement {
-  id          String    @id @default(uuid())
-  locationId  String
-  authorId    String
-  title       String    @db.VarChar(100)
-  content     String    @db.VarChar(1000)
-  pinned      Boolean   @default(false)
-  expiresAt   DateTime?
-  createdAt   DateTime  @default(now())
-
-  // Relations
-  location MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  author   User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  @@index([locationId, pinned])
-  @@map("city_announcements")
-}
-
-/**
- * Alliance (syndicat / coopérative)
- */
-model Alliance {
-  id          String       @id @default(uuid())
-  name        String       @unique
-  description String       @db.VarChar(500)
-  type        AllianceType
-  founderId   String
-  createdAt   DateTime     @default(now())
-
-  // Relations
-  founder  User              @relation("AllianceFounder", fields: [founderId], references: [id], onDelete: Cascade)
-  members  AllianceMember[]
-  treasury AllianceTreasury?
-
-  @@map("alliances")
-}
-
-/**
- * Membre d'une alliance
- */
-model AllianceMember {
-  id         String        @id @default(uuid())
-  allianceId String
-  userId     String
-  role       AllianceRole  @default(MEMBER)
-  joinedAt   DateTime      @default(now())
-
-  // Relations
-  alliance Alliance @relation(fields: [allianceId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([allianceId, userId])
-  @@map("alliance_members")
-}
-
-/**
- * Trésorerie d'alliance
- */
-model AllianceTreasury {
-  id         String   @id @default(uuid())
-  allianceId String   @unique
-  balance    BigInt   @default(0)
-  updatedAt  DateTime @updatedAt
-
-  // Relations
-  alliance Alliance @relation(fields: [allianceId], references: [id], onDelete: Cascade)
-
-  @@map("alliance_treasuries")
-}
-
-// ============================================
-// MODÈLES GOUVERNANCE
-// ============================================
-
-enum ElectionStatus {
-  OPEN
-  CLOSED
-  CANCELLED
-}
-
-enum LawStatus {
-  PROPOSED
-  VOTING
-  ACTIVE
+enum SuggestionStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
   REJECTED
+  IMPLEMENTED
 }
 
-/**
- * Élection pour représentant de ville
- */
-model Election {
-  id          String       @id @default(uuid())
-  locationId  String
-  status      ElectionStatus @default(OPEN)
-  startedAt   DateTime     @default(now())
-  endsAt      DateTime
-  winnerId    String?
-
-  // Relations
-  location   MapLocation         @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  winner     User?               @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
-  candidates ElectionCandidate[]
-  votes      ElectionVote[]
-
-  @@index([locationId, status])
-  @@map("elections")
-}
-
-/**
- * Candidat à une élection
- */
-model ElectionCandidate {
-  id          String   @id @default(uuid())
-  electionId  String
-  userId      String
-  manifesto   String   @db.VarChar(1000)
-  votes       Int      @default(0)
-
-  // Relations
-  election Election     @relation(fields: [electionId], references: [id], onDelete: Cascade)
-  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  electionVotes ElectionVote[]
-
-  @@unique([electionId, userId])
-  @@map("election_candidates")
-}
-
-/**
- * Vote dans une élection
- */
-model ElectionVote {
-  id          String   @id @default(uuid())
-  electionId  String
-  voterId     String
-  candidateId String
-  createdAt   DateTime @default(now())
-
-  // Relations
-  election  Election          @relation(fields: [electionId], references: [id], onDelete: Cascade)
-  voter     User              @relation("Voter", fields: [voterId], references: [id], onDelete: Cascade)
-  candidate ElectionCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-
-  @@unique([electionId, voterId])
-  @@map("election_votes")
-}
-
-/**
- * Représentant actuel d'une ville
- */
-model CityRepresentative {
-  id           String   @id @default(uuid())
-  locationId   String   @unique
-  userId       String
-  electedAt    DateTime @default(now())
-  mandateEndsAt DateTime
-
-  // Relations
-  location MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("city_representatives")
-}
-
-/**
- * Configuration des taxes d'une ville
- */
-model TaxConfig {
-  id                  String   @id @default(uuid())
-  locationId          String   @unique
-  transactionTaxRate  Float    @default(0.0) // 0.0 à 0.15 (0% à 15%)
-  productionTaxRate   Float    @default(0.0) // 0.0 à 0.15 (0% à 15%)
-  lastUpdatedBy       String
-  updatedAt           DateTime @updatedAt
-
-  // Relations
-  location    MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  updatedBy   User        @relation("UpdatedBy", fields: [lastUpdatedBy], references: [id], onDelete: Cascade)
-
-  @@map("tax_configs")
-}
-
-/**
- * Loi communautaire proposée
- */
-model CommunityLaw {
-  id            String    @id @default(uuid())
-  locationId    String
-  proposedBy    String
-  title         String    @db.VarChar(100)
-  description   String    @db.VarChar(2000)
-  status        LawStatus  @default(PROPOSED)
-  votesFor      Int       @default(0)
-  votesAgainst  Int       @default(0)
-  votingEndsAt  DateTime
-  createdAt     DateTime  @default(now())
-
-  // Relations
-  location MapLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  proposer User       @relation("Proposer", fields: [proposedBy], references: [id], onDelete: Cascade)
-
-  @@index([locationId, status])
-  @@map("community_laws")
-}
-
-// ============================================
-// MODÈLES EXPANSION (ROUTES COMMERCIALES)
-// ============================================
-
-/**
- * Route commerciale entre deux villes
- */
-model TradeRoute {
-  id              String   @id @default(uuid())
-  fromLocationId  String
-  toLocationId    String
-  distance        Int      @default(100) // unités fictives
-  transitTimeMins Int      @default(60)  // délai de livraison
-  active          Boolean  @default(true)
-  createdAt       DateTime @default(now())
-
-  // Relations
-  fromLocation MapLocation @relation("FromLocation", fields: [fromLocationId], references: [id], onDelete: Cascade)
-  toLocation   MapLocation @relation("ToLocation", fields: [toLocationId], references: [id], onDelete: Cascade)
-  usages       TradeRouteUsage[]
-
-  @@unique([fromLocationId, toLocationId])
-  @@map("trade_routes")
-}
-
-/**
- * Usage d'une route commerciale (log des livraisons)
- */
-model TradeRouteUsage {
-  id          String    @id @default(uuid())
-  routeId     String
-  contractId  String
-  departedAt  DateTime  @default(now())
-  arrivedAt   DateTime?
-
-  // Relations
-  route    TradeRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  contract Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
-
-  @@map("trade_route_usages")
-}
-
-// ============================================
-// MODÈLES QUÊTES & RÉALISATIONS
-// ============================================
-
-enum QuestType {
-  DAILY
-  WEEKLY
-  PERMANENT
-}
-
-enum QuestCategory {
-  ECONOMY
-  SOCIAL
-  PRODUCTION
-  EXPLORATION
-}
-
-enum UserQuestStatus {
-  ACTIVE
-  COMPLETED
-  EXPIRED
-}
-
-enum AchievementCategory {
-  ECONOMY
-  SOCIAL
-  EXPLORER
-  LEGEND
-}
-
-enum AchievementRarity {
-  COMMON
-  RARE
-  EPIC
-  LEGENDARY
-}
-
-/**
- * Template de quête (défini en seed)
- */
-model QuestTemplate {
-  id            String       @id @default(uuid())
-  title         String       @unique
-  description   String       @db.VarChar(500)
-  type          QuestType
-  category      QuestCategory
-  requirement   Json         // condition de complétion
-  rewardOrbes   BigInt       @default(0)
-  rewardXp      Json?        // { skillCategory: string, amount: int }[]
-  repeatable    Boolean      @default(false)
-  active        Boolean      @default(true)
-  createdAt     DateTime     @default(now())
-
-  // Relations
-  userQuests UserQuest[]
-
-  @@map("quest_templates")
-}
-
-/**
- * Quête assignée à un utilisateur
- */
-model UserQuest {
-  id              String        @id @default(uuid())
-  userId          String
-  questTemplateId String
-  progress        Json          // état actuel de la progression
-  status          UserQuestStatus @default(ACTIVE)
-  startedAt       DateTime      @default(now())
-  completedAt     DateTime?
-  expiresAt       DateTime?
-
-  // Relations
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  questTemplate QuestTemplate @relation(fields: [questTemplateId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, questTemplateId])
-  @@index([userId, status])
-  @@map("user_quests")
-}
-
-/**
- * Réalisation / Badge (défini en seed)
- */
-model Achievement {
-  id          String              @id @default(uuid())
-  title       String              @unique
-  description String              @db.VarChar(500)
-  icon        String              @default("🏆")
-  category    AchievementCategory
-  rarity      AchievementRarity   @default(COMMON)
-  condition   Json                // condition de déblocage
-  createdAt   DateTime            @default(now())
-
-  // Relations
-  userAchievements UserAchievement[]
-
-  @@map("achievements")
-}
-
-/**
- * Réalisation débloquée par un utilisateur
- */
-model UserAchievement {
-  id            String   @id @default(uuid())
-  userId        String
-  achievementId String
-  unlockedAt    DateTime @default(now())
-
-  // Relations
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, achievementId])
-  @@map("user_achievements")
+enum TradeType {
+  BUY
+  SELL
 }

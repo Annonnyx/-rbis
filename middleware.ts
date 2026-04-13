@@ -1,76 +1,37 @@
-// ============================================
-// middleware.ts
-// Protection des routes et redirections auth
-// ============================================
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { i18n } from './i18n.config'
 
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { match as matchLocale } from '@formatjs/intl-localematcher'
+import Negotiator from 'negotiator'
 
-export async function middleware(request: NextRequest) {
-  // Créer une réponse mutable
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+function getLocale(request: NextRequest): string | undefined {
+  const negotiatorHeaders: Record<string, string> = {}
+  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          // Mettre à jour les cookies dans la requête pour les prochains middlewares
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-          })
-          
-          // Mettre à jour les cookies dans la réponse pour le navigateur
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
+  const locales: string[] = i18n.locales as unknown as string[]
+  const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
+
+  const locale = matchLocale(languages, locales, i18n.defaultLocale)
+  return locale
+}
+
+export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  const pathnameIsMissingLocale = i18n.locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   )
 
-  // Cette ligne rafraîchit la session si nécessaire
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  
-  const pathname = request.nextUrl.pathname
-  
-  console.log('[Middleware]', pathname, { 
-    hasUser: !!user, 
-    userId: user?.id,
-    error: userError?.message,
-    cookies: request.cookies.getAll().map(c => c.name)
-  })
-  
-  // Routes protégées (requièrent auth)
-  const protectedRoutes = ['/dashboard', '/map', '/bank', '/company', '/profile', '/suggestions', '/market', '/jobs', '/alliances']
-  const isProtected = protectedRoutes.some(route => pathname.startsWith(route))
-  
-  // Non connecté sur route protégée → login
-  if (isProtected && !user) {
-    console.log('[Middleware] Redirecting to login (protected route, no user)')
-    return NextResponse.redirect(new URL('/auth/login', request.url))
-  }
-  
-  // Connecté sur page de login/register → dashboard
-  const isAuthPage = pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')
-  if (isAuthPage && user) {
-    console.log('[Middleware] Redirecting to dashboard (auth page, user logged in)')
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
+  if (pathnameIsMissingLocale) {
+    const locale = getLocale(request) || i18n.defaultLocale
 
-  return response
+    return NextResponse.redirect(
+      new URL(`/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url)
+    )
+  }
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

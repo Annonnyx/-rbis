@@ -1,203 +1,121 @@
 # Ørbis
 
-> Une simulation socio-économique multijoueur où les utilisateurs créent des entreprises, gèrent un compte bancaire fictif, et font évoluer le monde via des suggestions.
+Un monde virtuel qui grandit avec vos suggestions. Une simulation économique collaborative où vous créez votre entreprise, gérez vos finances, et façonnez l'économie.
 
-## Stack Technique
+## Fonctionnalités
 
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-- **Langage**: TypeScript (strict mode)
-- **Base de données**: PostgreSQL via [Supabase](https://supabase.com/)
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Auth**: Supabase Auth
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Déploiement**: [Vercel](https://vercel.com/)
+- **Authentification** : Connexion avec Google
+- **Monnaie Ørbe** : 1000 Ø offerts à l'inscription
+- **Carte interactive** : Choisissez votre emplacement, débloquez de nouvelles villes
+- **Création d'entreprise** : Lancez votre business (300 Ø minimum)
+- **Système bancaire** : Gérez plusieurs comptes
+- **Bourse** : Investissez dans les entreprises d'autres joueurs
+- **Suggestions** : Proposez des idées pour faire évoluer le jeu
 
----
+## Stack technique
 
-## Prérequis
-
-- Node.js 18+
-- npm ou pnpm
-- Un projet Supabase actif
-- Un compte Vercel (pour le déploiement)
-
----
+- Next.js 14 + React 18
+- TypeScript
+- Tailwind CSS
+- Prisma ORM
+- PostgreSQL (Supabase)
+- NextAuth.js v5
+- next-themes (dark/light mode)
 
 ## Installation
 
-### 1. Cloner et installer les dépendances
-
 ```bash
-git clone <repo-url>
-cd orbis
 npm install
 ```
 
-### 2. Configuration des variables d'environnement
+## Configuration
 
-```bash
-cp .env.example .env
+Créez un fichier `.env.local` avec :
+
+```env
+# Supabase
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+
+# NextAuth
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+
+# App
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret"
 ```
 
-Remplissez les variables dans `.env` :
+## Base de données
 
-- `NEXT_PUBLIC_SUPABASE_URL` : URL de votre projet Supabase
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` : Clé publique (anon)
-- `SUPABASE_SERVICE_ROLE_KEY` : Clé privée (service_role) - **ne jamais exposer**
-- `DATABASE_URL` : Connection pooling URL (avec `pgbouncer=true`)
-- `DIRECT_URL` : URL directe pour les migrations
-
-### 3. Configuration de la base de données
+### Initialisation
 
 ```bash
+# Pousser le schéma vers Supabase
+npx prisma db push
+
 # Générer le client Prisma
 npx prisma generate
-
-# Créer et appliquer les migrations
-npx prisma migrate dev --name init
-
-# (Optionnel) Remplir avec les données initiales
-npx prisma db seed
 ```
 
-### 4. Lancer en développement
+### Créer les villes initiales
+
+```bash
+# Appeler l'API d'initialisation
+curl -X POST http://localhost:3000/api/init-city
+```
+
+## Développement
 
 ```bash
 npm run dev
 ```
 
-L'application est disponible sur `http://localhost:3000`
+## Build
 
----
+```bash
+npm run build
+```
 
 ## Structure du projet
 
 ```
-orbis/
-├── app/                    # App Router Next.js
-│   ├── actions/           # Server Actions (mutations métier)
-│   ├── auth/              # Routes auth (login, register, callback)
-│   ├── dashboard/         # Dashboard utilisateur
-│   └── ...                # Autres routes
-├── components/            # Composants React
-│   ├── ui/               # Composants génériques (buttons, cards...)
-│   ├── bank/             # Composants spécifiques banque
-│   ├── map/              # Composants carte
-│   └── company/          # Composants entreprise
-├── lib/                   # Utilitaires partagés
-│   ├── prisma.ts        # Client Prisma (singleton)
-│   ├── supabase.ts      # Clients Supabase (server/browser)
-│   └── currency.ts      # Formatage monétaire
-├── types/                 # Types TypeScript globaux
-├── prisma/
-│   ├── schema.prisma    # Schéma de données
-│   └── seed.ts          # Données initiales
-├── public/               # Assets statiques
-└── ...config files
+app/
+├── api/          # API routes
+├── bank/         # Page banque
+├── business/     # Page entreprise
+├── dashboard/    # Dashboard
+├── map/          # Carte
+├── market/       # Bourse
+├── profile/      # Profil
+├── suggestions/  # Suggestions
+├── globals.css   # Styles globaux
+├── layout.tsx    # Layout principal
+└── page.tsx      # Page d'accueil
+
+components/
+├── navigation.tsx # Navigation
+└── ui/           # Composants UI
+
+lib/
+├── auth.ts       # Configuration auth
+├── db.ts         # Client Prisma
+└── utils.ts      # Utilitaires
+
+prisma/
+└── schema.prisma # Schéma de base de données
+
+types/
+└── next-auth.d.ts # Types NextAuth
 ```
 
-### Conventions
+## Fonctionnement
 
-- **App Router**: Toutes les pages sont dans `app/`, organisées par domaine
-- **Server Actions**: Toutes les mutations serveur sont dans `app/actions/`
-- **Types**: Aucun `any`, tous les types sont dans `types/` ou générés par Prisma
-- **Commentaires**: Chaque fichier exporté a un commentaire JSDoc expliquant son rôle
+1. **Inscription** : Les nouveaux utilisateurs reçoivent 1000 Ø et sont placés dans la ville déverrouillée par défaut (Neo Paris)
+2. **Entreprise** : Création possible avec 300 Ø minimum, génère automatiquement des actions en bourse
+3. **Suggestions** : Les utilisateurs votent pour les idées, l'administrateur les implémente
+4. **Carte** : De nouvelles villes se déverrouillent à mesure que le nombre d'utilisateurs augmente
 
----
-
-## Routes de l'Application
-
-### Public
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page avec compteur realtime |
-
-### Authentification
-| Route | Description |
-|-------|-------------|
-| `/auth/login` | Connexion email/password |
-| `/auth/register` | Inscription en 3 étapes (identifiants → profil → résidence) |
-
-### Application (authentification requise)
-| Route | Description |
-|-------|-------------|
-| `/dashboard` | Vue d'ensemble (solde, entreprises, transactions, suggestions) |
-| `/bank` | Gestion des comptes et virements |
-| `/map` | Carte interactive des villes et entreprises |
-| `/company/new` | Création d'une entreprise |
-| `/company/[id]` | Détail d'une entreprise |
-| `/profile` | Profil utilisateur et paramètres |
-| `/suggestions` | Liste des suggestions avec filtres et tri |
-| `/suggestions/new` | Créer une nouvelle suggestion |
-
-### Administration (admin requis)
-| Route | Description |
-|-------|-------------|
-| `/admin/suggestions` | Gestion des suggestions (accept/reject/implement) |
-
----
-
-## Server Actions
-
-Toutes les mutations serveur sont dans `app/actions/` :
-
-- `auth.ts` — login, register, updateProfile, selectResidence
-- `bank.ts` — getUserAccounts, getTransactionHistory, transferFunds
-- `company.ts` — createCompany, getCompanyById, updateCompany
-- `suggestions.ts` — createSuggestion, voteSuggestion, getSuggestions
-- `profile.ts` — updateDisplayName, getUserStats
-
----
-
-## Modèle de données
-
-### Utilisateur
-- `username` unique et immuable (identifiant public)
-- `displayName` modifiable (une seule fois)
-- Auth gérée par Supabase, profil dans Prisma
-
-### Économie
-- **BankAccount**: PERSONAL ou COMPANY, balance en centimes (BigInt)
-- **Transaction**: transferts entre comptes avec label optionnel
-- **Company**: entreprise avec compte capital dédié
-
-### Monde
-- **MapLocation**: zones géographiques, certaines débloquées par nombre d'utilisateurs
-- **Suggestion**: propositions d'amélioration votées par la communauté
-
----
-
-## Commandes utiles
-
-```bash
-# Développement
-npm run dev              # Lancer le serveur de dev
-
-# Base de données
-npx prisma studio        # GUI Prisma
-npx prisma migrate dev   # Nouvelle migration
-npx prisma db seed       # Réinitialiser les données initiales
-
-# Build
-npm run build            # Build production
-npm run start            # Lancer en production
-```
-
----
-
-## Déploiement
-
-1. Connecter le repo à Vercel
-2. Configurer les variables d'environnement dans l'interface Vercel
-3. Déployer
-
-Pour les migrations de base de données en production :
-```bash
-npx prisma migrate deploy
-```
-
----
-
-## License
+## Licence
 
 MIT

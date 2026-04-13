@@ -1,0 +1,270 @@
+{
+  "app": {
+    "name": "Ørbis",
+    "tagline": "A virtual world that grows with your suggestions",
+    "description": "A collaborative economic simulation where you create your business, manage your finances, and shape the economy."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "business": "My Business",
+    "market": "Stock Market",
+    "bank": "My Bank",
+    "map": "Map",
+    "suggestions": "Suggestions",
+    "profile": "Profile",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero": {
+      "title": "Ørbis",
+      "subtitle": "A virtual world that grows with your suggestions.",
+      "description": "Create your business, manage your finances, shape the economy.",
+      "cta": {
+        "start": "Start the adventure",
+        "learn": "Learn more"
+      }
+    },
+    "features": {
+      "title": "A complete virtual economy",
+      "business": {
+        "title": "Create your business",
+        "description": "Launch your business with 300 Ø. Define your product or service and make it thrive."
+      },
+      "bank": {
+        "title": "Manage your finances",
+        "description": "Multiple bank accounts, secure transactions, and total control over your money."
+      },
+      "market": {
+        "title": "Real-time stock market",
+        "description": "Invest in other players' businesses. The market evolves with the economy."
+      },
+      "map": {
+        "title": "Interactive map",
+        "description": "Choose your location on the map. Discover where other businesses are located."
+      },
+      "suggestions": {
+        "title": "Suggestions",
+        "description": "Propose new features, rules, or events. The game evolves with your ideas."
+      },
+      "currency": {
+        "title": "The Ørbe currency",
+        "description": "Use the Ørbe (Ø), a fictional currency with its own unique symbol."
+      }
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1": {
+        "title": "Sign up",
+        "description": "Log in with Google. Receive 1000 Ø and choose your location."
+      },
+      "step2": {
+        "title": "Create",
+        "description": "Launch your business, define your strategy, and start earning."
+      },
+      "step3": {
+        "title": "Influence",
+        "description": "Make suggestions to shape the economy. Vote for the best ideas."
+      }
+    },
+    "footer": "Ørbis - The collaborative economic simulation"
+  },
+  "login": {
+    "title": "Welcome to Ørbis",
+    "subtitle": "Log in to access your account",
+    "error": "An error occurred during login. Please try again.",
+    "google": "Continue with Google",
+    "rewards": {
+      "title": "By logging in, you will receive:",
+      "orbe": "1000 Ørbe (Ø) starting balance",
+      "location": "A location on the map",
+      "account": "A personal bank account"
+    }
+  },
+  "dashboard": {
+    "title": "Hello, {name}",
+    "subtitle": "Here's your Ørbis dashboard",
+    "balance": "Main balance",
+    "stats": {
+      "users": "Users",
+      "businesses": "Businesses",
+      "suggestions": "Suggestions",
+      "marketCap": "Market Cap"
+    },
+    "cards": {
+      "business": "My Business",
+      "noBusiness": "No business",
+      "createBusiness": "Create a business →",
+      "capital": "Capital",
+      "bank": "My Bank",
+      "accounts": "account(s)",
+      "location": "My Location",
+      "noLocation": "Not set"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "suggest": "Propose an idea",
+      "market": "View stock market",
+      "transfer": "Make a transfer"
+    }
+  },
+  "business": {
+    "title": "My Business",
+    "create": {
+      "title": "Create my business",
+      "capitalRequired": "Minimum capital required",
+      "name": "Business name",
+      "description": "Description",
+      "objective": "Objective",
+      "objectivePlaceholder": "Ex: Become the leader in eco-friendly soap",
+      "product": "Product",
+      "productPlaceholder": "Ex: Handmade soap",
+      "service": "Service",
+      "servicePlaceholder": "Ex: Home delivery",
+      "cancel": "Cancel",
+      "submit": "Create ({amount})",
+      "noBusiness": "No business",
+      "descriptionText": "You haven't created a business yet. Launch your business for only 300 Ø.",
+      "button": "Create my business"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "stats": {
+      "capital": "Capital",
+      "stockPrice": "Stock price",
+      "availableShares": "Available shares",
+      "of": "of"
+    },
+    "details": {
+      "description": "Description",
+      "objective": "Objective",
+      "product": "Product",
+      "service": "Service"
+    },
+    "edit": "Edit"
+  },
+  "bank": {
+    "title": "My Bank",
+    "transfer": "Transfer",
+    "totalBalance": "Total balance",
+    "accounts": "account(s)",
+    "main": "Main",
+    "createAccount": "Create new account",
+    "transactions": {
+      "title": "Recent transactions",
+      "empty": "No transactions yet",
+      "deposit": "Deposit",
+      "withdrawal": "Withdrawal",
+      "transfer": "Transfer",
+      "payment": "Payment"
+    }
+  },
+  "market": {
+    "title": "Ørbis Stock Market",
+    "subtitle": "Invest in Ørbis world businesses",
+    "myBusiness": "My business",
+    "overview": {
+      "listed": "Listed companies",
+      "volume": "Total volume",
+      "marketCap": "Market Cap"
+    },
+    "stocks": {
+      "title": "Available stocks",
+      "empty": "No listed companies yet",
+      "available": "shares available"
+    },
+    "trade": {
+      "buy": "Buy",
+      "sell": "Sell",
+      "quantity": "Quantity",
+      "total": "Total",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
+  },
+  "suggestions": {
+    "title": "Suggestions",
+    "subtitle": "Propose ideas to evolve Ørbis",
+    "new": "New suggestion",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Ex: Add a hygiene gauge",
+      "type": "Type",
+      "types": {
+        "feature": "New feature",
+        "rule": "Game rule",
+        "event": "Event",
+        "economy": "Economy"
+      },
+      "description": "Detailed description",
+      "descriptionPlaceholder": "Describe your idea in detail...",
+      "cancel": "Cancel",
+      "submit": "Propose"
+    },
+    "empty": "No suggestions yet. Be the first to propose an idea!",
+    "vote": "vote",
+    "votes": "votes",
+    "status": {
+      "pending": "Pending",
+      "underReview": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "implemented": "Implemented"
+    }
+  },
+  "map": {
+    "title": "Map",
+    "close": "Close",
+    "businesses": "business(es)",
+    "residents": "resident(s)",
+    "noBusinesses": "No businesses in this city yet",
+    "locked": {
+      "title": "Zones to unlock",
+      "unlockAt": "Unlocks at {count} users"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "identity": {
+      "title": "Identity",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "stats": {
+      "accounts": "Bank accounts",
+      "location": "Location",
+      "noLocation": "Not set",
+      "business": "Business",
+      "noBusiness": "None"
+    },
+    "memberSince": "Member since {date}",
+    "edit": "Edit",
+    "nameChangeLimit": "You can only change your name once per month"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "all": "All",
+    "none": "None",
+    "or": "or",
+    "and": "and",
+    "currency": "Ø"
+  }
+}

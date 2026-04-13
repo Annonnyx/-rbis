@@ -1,0 +1,270 @@
+{
+  "app": {
+    "name": "Ørbis",
+    "tagline": "Un monde virtuel qui grandit avec vos suggestions",
+    "description": "Une simulation économique collaborative où vous créez votre entreprise, gérez vos finances, et façonnez l'économie."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "business": "Mon Entreprise",
+    "market": "Bourse",
+    "bank": "Ma Banque",
+    "map": "Carte",
+    "suggestions": "Suggestions",
+    "profile": "Profil",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "home": {
+    "hero": {
+      "title": "Ørbis",
+      "subtitle": "Un monde virtuel qui grandit avec vos suggestions.",
+      "description": "Créez votre entreprise, gérez vos finances, façonnez l'économie.",
+      "cta": {
+        "start": "Commencer l'aventure",
+        "learn": "En savoir plus"
+      }
+    },
+    "features": {
+      "title": "Une économie virtuelle complète",
+      "business": {
+        "title": "Créez votre entreprise",
+        "description": "Lancez votre business avec 300 Ø. Définissez votre produit ou service et faites-le prospérer."
+      },
+      "bank": {
+        "title": "Gérez vos finances",
+        "description": "Plusieurs comptes bancaires, transactions sécurisées, et un contrôle total sur votre argent."
+      },
+      "market": {
+        "title": "Bourse en temps réel",
+        "description": "Investissez dans les entreprises d'autres joueurs. La bourse évolue avec l'économie."
+      },
+      "map": {
+        "title": "Carte interactive",
+        "description": "Choisissez votre emplacement sur la carte. Découvrez où se trouvent les autres entreprises."
+      },
+      "suggestions": {
+        "title": "Suggestions",
+        "description": "Proposez de nouvelles fonctionnalités, règles, ou événements. Le jeu évolue avec vos idées."
+      },
+      "currency": {
+        "title": "La monnaie Ørbe",
+        "description": "Utilisez la Ørbe (Ø), une monnaie fictive avec son propre symbole unique."
+      }
+    },
+    "howItWorks": {
+      "title": "Comment ça marche ?",
+      "step1": {
+        "title": "Inscription",
+        "description": "Connectez-vous avec Google. Recevez 1000 Ø et choisissez votre emplacement."
+      },
+      "step2": {
+        "title": "Créez",
+        "description": "Lancez votre entreprise, définissez votre stratégie, et commencez à gagner."
+      },
+      "step3": {
+        "title": "Influencez",
+        "description": "Faites des suggestions pour façonner l'économie. Votez pour les meilleures idées."
+      }
+    },
+    "footer": "Ørbis - La simulation économique collaborative"
+  },
+  "login": {
+    "title": "Bienvenue sur Ørbis",
+    "subtitle": "Connectez-vous pour accéder à votre compte",
+    "error": "Une erreur est survenue lors de la connexion. Veuillez réessayer.",
+    "google": "Continuer avec Google",
+    "rewards": {
+      "title": "En vous connectant, vous recevrez :",
+      "orbe": "1000 Ørbe (Ø) de départ",
+      "location": "Un emplacement sur la carte",
+      "account": "Un compte bancaire personnel"
+    }
+  },
+  "dashboard": {
+    "title": "Bonjour, {name}",
+    "subtitle": "Voici votre tableau de bord Ørbis",
+    "balance": "Solde principal",
+    "stats": {
+      "users": "Utilisateurs",
+      "businesses": "Entreprises",
+      "suggestions": "Suggestions",
+      "marketCap": "Cap. Boursière"
+    },
+    "cards": {
+      "business": "Mon Entreprise",
+      "noBusiness": "Aucune entreprise",
+      "createBusiness": "Créer une entreprise →",
+      "capital": "Capital",
+      "bank": "Ma Banque",
+      "accounts": "compte(s)",
+      "location": "Ma Position",
+      "noLocation": "Non définie"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "suggest": "Proposer une idée",
+      "market": "Voir la bourse",
+      "transfer": "Faire un virement"
+    }
+  },
+  "business": {
+    "title": "Mon Entreprise",
+    "create": {
+      "title": "Créer mon entreprise",
+      "capitalRequired": "Capital minimum requis",
+      "name": "Nom de l'entreprise",
+      "description": "Description",
+      "objective": "Objectif",
+      "objectivePlaceholder": "Ex: Devenir le leader du savon écologique",
+      "product": "Produit",
+      "productPlaceholder": "Ex: Savon artisanal",
+      "service": "Service",
+      "servicePlaceholder": "Ex: Livraison à domicile",
+      "cancel": "Annuler",
+      "submit": "Créer ({amount})",
+      "noBusiness": "Aucune entreprise",
+      "descriptionText": "Vous n'avez pas encore créé d'entreprise. Lancez votre business pour seulement 300 Ø.",
+      "button": "Créer mon entreprise"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "stats": {
+      "capital": "Capital",
+      "stockPrice": "Prix de l'action",
+      "availableShares": "Actions disponibles",
+      "of": "sur"
+    },
+    "details": {
+      "description": "Description",
+      "objective": "Objectif",
+      "product": "Produit",
+      "service": "Service"
+    },
+    "edit": "Modifier"
+  },
+  "bank": {
+    "title": "Ma Banque",
+    "transfer": "Transférer",
+    "totalBalance": "Solde total",
+    "accounts": "compte(s)",
+    "main": "Principal",
+    "createAccount": "Créer un nouveau compte",
+    "transactions": {
+      "title": "Transactions récentes",
+      "empty": "Aucune transaction pour le moment",
+      "deposit": "Dépôt",
+      "withdrawal": "Retrait",
+      "transfer": "Transfert",
+      "payment": "Paiement"
+    }
+  },
+  "market": {
+    "title": "Bourse Ørbis",
+    "subtitle": "Investissez dans les entreprises du monde Ørbis",
+    "myBusiness": "Mon entreprise",
+    "overview": {
+      "listed": "Entreprises cotées",
+      "volume": "Volume total",
+      "marketCap": "Capitalisation"
+    },
+    "stocks": {
+      "title": "Actions disponibles",
+      "empty": "Aucune entreprise cotée pour le moment",
+      "available": "actions disponibles"
+    },
+    "trade": {
+      "buy": "Acheter",
+      "sell": "Vendre",
+      "quantity": "Quantité",
+      "total": "Total",
+      "cancel": "Annuler",
+      "confirm": "Confirmer"
+    }
+  },
+  "suggestions": {
+    "title": "Suggestions",
+    "subtitle": "Proposez des idées pour faire évoluer Ørbis",
+    "new": "Nouvelle suggestion",
+    "form": {
+      "title": "Titre",
+      "titlePlaceholder": "Ex: Ajouter une jauge d'hygiène",
+      "type": "Type",
+      "types": {
+        "feature": "Nouvelle fonctionnalité",
+        "rule": "Règle du jeu",
+        "event": "Événement",
+        "economy": "Économie"
+      },
+      "description": "Description détaillée",
+      "descriptionPlaceholder": "Décrivez votre idée en détail...",
+      "cancel": "Annuler",
+      "submit": "Proposer"
+    },
+    "empty": "Aucune suggestion pour le moment. Soyez le premier à proposer une idée !",
+    "vote": "vote",
+    "votes": "votes",
+    "status": {
+      "pending": "En attente",
+      "underReview": "En révision",
+      "approved": "Approuvée",
+      "rejected": "Rejetée",
+      "implemented": "Implémentée"
+    }
+  },
+  "map": {
+    "title": "Carte",
+    "close": "Fermer",
+    "businesses": "entreprise(s)",
+    "residents": "résident(s)",
+    "noBusinesses": "Aucune entreprise dans cette ville pour le moment",
+    "locked": {
+      "title": "Zones à débloquer",
+      "unlockAt": "Débloque à {count} utilisateurs"
+    }
+  },
+  "profile": {
+    "title": "Mon Profil",
+    "identity": {
+      "title": "Identité",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "cancel": "Annuler",
+      "save": "Sauvegarder"
+    },
+    "stats": {
+      "accounts": "Comptes bancaires",
+      "location": "Localisation",
+      "noLocation": "Non définie",
+      "business": "Entreprise",
+      "noBusiness": "Aucune"
+    },
+    "memberSince": "Membre depuis le {date}",
+    "edit": "Modifier",
+    "nameChangeLimit": "Vous ne pouvez changer votre nom qu'une fois par mois"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "all": "Tous",
+    "none": "Aucun",
+    "or": "ou",
+    "and": "et",
+    "currency": "Ø"
+  }
+}
