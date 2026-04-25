@@ -2,11 +2,24 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await auth()
+  const { searchParams } = new URL(req.url)
+  const type = searchParams.get("type")
+  const sort = searchParams.get("sort") || "POPULAR"
   
   try {
+    const where: any = {}
+    if (type && type !== "ALL") {
+      where.type = type
+    }
+
+    const orderBy = sort === "NEWEST" 
+      ? { createdAt: "desc" as const }
+      : [{ votes: "desc" as const }, { createdAt: "desc" as const }]
+
     const suggestions = await db.suggestion.findMany({
+      where,
       include: {
         user: {
           select: {
@@ -19,21 +32,28 @@ export async function GET() {
             userId: true,
           },
         },
+        _count: {
+          select: {
+            votesList: true,
+          },
+        },
       },
-      orderBy: [
-        { votes: "desc" },
-        { createdAt: "desc" },
-      ],
+      orderBy,
     })
 
     const userId = session?.user?.id
 
-    const formattedSuggestions = suggestions.map((suggestion: any) => ({
-      ...suggestion,
-      hasVoted: userId 
-        ? suggestion.votesList.some((v: any) => v.userId === userId)
-        : false,
-    }))
+    const formattedSuggestions = suggestions.map((suggestion: any) => {
+      const userVote = userId 
+        ? suggestion.votesList.find((v: any) => v.userId === userId)
+        : null
+      
+      return {
+        ...suggestion,
+        userVote: userVote ? "UP" : null,
+        commentsCount: 0, // TODO: Add comments model
+      }
+    })
 
     return NextResponse.json(formattedSuggestions)
   } catch (error) {

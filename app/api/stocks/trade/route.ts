@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     const totalPrice = Number(stock.currentPrice) * quantity
 
-    if (type === "buy") {
+    if (type === "BUY") {
       if (stock.availableShares < quantity) {
         return new NextResponse("Not enough shares available", { status: 400 })
       }
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
             quantity,
             price: stock.currentPrice,
             total: totalPrice,
-            type: "BUY",
+            type: "BUY"
           },
         }),
         db.transaction.create({
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
           },
         }),
       ])
-    } else {
+    } else if (type === "SELL") {
       await db.$transaction([
         db.bankAccount.update({
           where: { id: mainAccount.id },
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
             quantity,
             price: stock.currentPrice,
             total: totalPrice,
-            type: "SELL",
+            type: "SELL"
           },
         }),
         db.transaction.create({
