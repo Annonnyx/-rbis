@@ -84,8 +84,8 @@ export function ProfileClient() {
     }
   }
 
-  const totalBalance = profile?.bankAccounts.reduce((acc, accnt) => acc + Number(accnt.balance), 0) || 0
-  const portfolioValue = profile?.portfolio.reduce((acc, item) => acc + (item.shares * Number(item.stock.currentPrice)), 0) || 0
+  const totalBalance = (profile?.bankAccounts || []).reduce((acc, accnt) => acc + Number(accnt?.balance || 0), 0)
+  const portfolioValue = (profile?.portfolio || []).reduce((acc, item) => acc + ((item?.shares || 0) * Number(item?.stock?.currentPrice || 0)), 0)
 
   if (status === "loading" || loading) {
     return (

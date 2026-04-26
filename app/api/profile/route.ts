@@ -15,16 +15,14 @@ export async function GET() {
     const user = await db.user.findUnique({
       where: { id: userId },
       include: {
-        bankAccounts: {
-          select: { id: true, name: true },
-        },
+        bankAccounts: true,
         location: {
           include: {
             city: true,
           },
         },
         business: {
-          select: { name: true },
+          select: { name: true, capital: true },
         },
       },
     })
@@ -33,7 +31,24 @@ export async function GET() {
       return new NextResponse("User not found", { status: 404 })
     }
 
-    return NextResponse.json(user)
+    // Get user's stock portfolio
+    const stockTrades = await db.stockTrade.findMany({
+      where: { buyerId: userId },
+      include: { stock: true }
+    })
+
+    const portfolio = stockTrades.map((trade: any) => ({
+      stock: {
+        symbol: trade.stock.symbol,
+        currentPrice: Number(trade.stock.currentPrice)
+      },
+      shares: trade.shares
+    }))
+
+    return NextResponse.json({
+      ...user,
+      portfolio
+    })
   } catch (error) {
     console.error("Error fetching profile:", error)
     return new NextResponse("Internal error", { status: 500 })
