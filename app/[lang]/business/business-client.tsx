@@ -479,49 +479,58 @@ export function BusinessClient() {
         {createStep === 3 && (
           <div>
             <h2 className="text-xl font-bold mb-4">Choisissez l&apos;emplacement</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {locations.map((location) => (
-                <GlassCard
-                  key={location.id}
-                  className={`p-4 cursor-pointer transition-all ${
-                    selectedLocation === location.id ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
-                  }`}
-                  onClick={() => setSelectedLocation(location.id)}
-                >
-                  <div className="flex items-start gap-3 mb-2">
-                    <MapPin className="w-5 h-5 text-[#00ffff] mt-1" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{location.name}</h3>
-                      <p className="text-xs text-muted-foreground">{location.address}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs mt-3">
-                    <div>
-                      <p className="text-muted-foreground">Type</p>
-                      <p className="font-medium">{location.type}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Trafic</p>
-                      <p className="font-medium">{location.footTraffic}/100</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Loyer/m²</p>
-                      <p className="font-medium">{formatCurrency(location.rentPerSqm)}</p>
-                    </div>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-            <div className="mt-6 flex justify-between">
-              <GlassButton variant="ghost" onClick={() => setCreateStep(2)}>
-                Retour
-              </GlassButton>
-              {selectedLocation && (
-                <GlassButton onClick={() => setCreateStep(4)}>
-                  Suivant <ChevronRight className="w-4 h-4 ml-2" />
-                </GlassButton>
-              )}
-            </div>
+            {locations.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-12 h-12 border-2 border-[#00ffff] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-muted-foreground">Chargement des emplacements...</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {locations.map((location) => (
+                    <GlassCard
+                      key={location.id}
+                      className={`p-4 cursor-pointer transition-all hover:border-[#00ffff]/50 ${
+                        selectedLocation === location.id ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                      }`}
+                      onClick={() => setSelectedLocation(location.id)}
+                    >
+                      <div className="flex items-start gap-3 mb-2">
+                        <MapPin className="w-5 h-5 text-[#00ffff] mt-1" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold">{location.name}</h3>
+                          <p className="text-xs text-muted-foreground">{location.address}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs mt-3">
+                        <div>
+                          <p className="text-muted-foreground">Type</p>
+                          <p className="font-medium">{location.type}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Trafic</p>
+                          <p className="font-medium">{location.footTraffic}/100</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Loyer/m²</p>
+                          <p className="font-medium">{formatCurrency(location.rentPerSqm)}</p>
+                        </div>
+                      </div>
+                    </GlassCard>
+                  ))}
+                </div>
+                <div className="mt-6 flex justify-between">
+                  <GlassButton variant="ghost" onClick={() => setCreateStep(2)}>
+                    Retour
+                  </GlassButton>
+                  {selectedLocation && (
+                    <GlassButton onClick={() => setCreateStep(4)}>
+                      Suivant <ChevronRight className="w-4 h-4 ml-2" />
+                    </GlassButton>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         )}
 
