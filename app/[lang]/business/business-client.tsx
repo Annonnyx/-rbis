@@ -75,6 +75,7 @@ export function BusinessClient() {
   const [showCreate, setShowCreate] = useState(false)
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [showRecordSale, setShowRecordSale] = useState(false)
+  const [showEditBusiness, setShowEditBusiness] = useState(false)
   
   const [formData, setFormData] = useState({
     name: "",
@@ -82,6 +83,11 @@ export function BusinessClient() {
     objective: "",
     product: "",
     service: "",
+  })
+
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    description: "",
   })
   
   const [productForm, setProductForm] = useState({
@@ -187,6 +193,33 @@ export function BusinessClient() {
       }
     } catch (error) {
       console.error("Error recording sale:", error)
+    }
+  }
+
+  const openEditModal = () => {
+    if (business) {
+      setEditFormData({
+        name: business.name,
+        description: business.description || "",
+      })
+      setShowEditBusiness(true)
+    }
+  }
+
+  const handleEditBusiness = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const res = await fetch("/api/business", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editFormData),
+      })
+      if (res.ok) {
+        fetchBusinessData()
+        setShowEditBusiness(false)
+      }
+    } catch (error) {
+      console.error("Error updating business:", error)
     }
   }
 
@@ -397,6 +430,45 @@ export function BusinessClient() {
     )
   }
 
+  if (showEditBusiness) {
+    return (
+      <div className="max-w-xl mx-auto animate-fade-in">
+        <h1 className="text-2xl font-bold mb-2 gradient-text">Modifier l&apos;entreprise</h1>
+        <p className="text-muted-foreground mb-6">Mettez à jour les informations de votre entreprise</p>
+        
+        <form onSubmit={handleEditBusiness} className="space-y-6">
+          <GlassCard className="p-6 space-y-4">
+            <GlassInput
+              label="Nom de l&apos;entreprise"
+              required
+              value={editFormData.name}
+              onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+              placeholder="Nom de votre entreprise"
+            />
+            <div>
+              <label className="text-sm font-medium text-foreground/80 mb-2 block">Description</label>
+              <textarea
+                value={editFormData.description}
+                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                placeholder="Décrivez votre entreprise..."
+                className="w-full px-4 py-3 glass-input rounded-xl min-h-[100px]"
+              />
+            </div>
+          </GlassCard>
+          
+          <div className="flex gap-4">
+            <GlassButton type="button" variant="ghost" onClick={() => setShowEditBusiness(false)} className="flex-1">
+              Annuler
+            </GlassButton>
+            <GlassButton type="submit" variant="primary" className="flex-1">
+              Enregistrer les modifications
+            </GlassButton>
+          </div>
+        </form>
+      </div>
+    )
+  }
+
   if (!business) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
@@ -434,7 +506,7 @@ export function BusinessClient() {
           <p className="text-muted-foreground">{business.description}</p>
         </div>
         <div className="flex gap-2">
-          <GlassButton variant="secondary">
+          <GlassButton variant="secondary" onClick={openEditModal}>
             <Edit className="w-4 h-4 mr-2" />
             Modifier
           </GlassButton>

@@ -113,3 +113,38 @@ export async function POST(req: Request) {
     return new NextResponse("Internal error", { status: 500 })
   }
 }
+
+export async function PATCH(req: Request) {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 })
+  }
+
+  const userId = session.user.id
+
+  try {
+    const { name, description } = await req.json()
+
+    const business = await db.business.findFirst({
+      where: { userId },
+    })
+
+    if (!business) {
+      return new NextResponse("Business not found", { status: 404 })
+    }
+
+    const updatedBusiness = await db.business.update({
+      where: { id: business.id },
+      data: {
+        name: name || business.name,
+        description: description !== undefined ? description : business.description,
+      },
+    })
+
+    return NextResponse.json(updatedBusiness)
+  } catch (error) {
+    console.error("Error updating business:", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}
