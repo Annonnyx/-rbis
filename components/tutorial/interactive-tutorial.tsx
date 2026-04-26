@@ -182,7 +182,8 @@ export function InteractiveTutorialProvider({ children }: { children: ReactNode 
   const [currentPath, setCurrentPath] = useState("")
 
   useEffect(() => {
-    // Check if tutorial was already completed
+    // Check if tutorial was already completed (client-side only)
+    if (typeof window === 'undefined') return
     const completed = localStorage.getItem("tutorial-completed")
     if (!completed) {
       // Small delay to let the page load
@@ -192,6 +193,7 @@ export function InteractiveTutorialProvider({ children }: { children: ReactNode 
   }, [])
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
     const handleRouteChange = () => {
       setCurrentPath(window.location.pathname)
     }
@@ -200,7 +202,7 @@ export function InteractiveTutorialProvider({ children }: { children: ReactNode 
   }, [])
 
   useEffect(() => {
-    if (!isActive) return
+    if (!isActive || typeof window === 'undefined' || typeof document === 'undefined') return
 
     const step = TUTORIAL_STEPS[currentStep]
     if (!step) return
