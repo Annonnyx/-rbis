@@ -56,6 +56,11 @@ export function ProfileClient() {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState(false)
+  const [showEditProfile, setShowEditProfile] = useState(false)
+  const [editFormData, setEditFormData] = useState({
+    firstName: "",
+    lastName: "",
+  })
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -84,6 +89,23 @@ export function ProfileClient() {
     }
   }
 
+  const handleEditProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editFormData),
+      })
+      if (res.ok) {
+        fetchProfile()
+        setShowEditProfile(false)
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error)
+    }
+  }
+
   const totalBalance = (profile?.bankAccounts || []).reduce((acc, accnt) => acc + Number(accnt?.balance || 0), 0)
   const portfolioValue = (profile?.portfolio || []).reduce((acc, item) => acc + ((item?.shares || 0) * Number(item?.stock?.currentPrice || 0)), 0)
 
@@ -100,6 +122,51 @@ export function ProfileClient() {
 
   if (status === "unauthenticated") {
     redirect("/login")
+  }
+
+  if (showEditProfile) {
+    return (
+      <div className="max-w-xl mx-auto animate-fade-in">
+        <h1 className="text-2xl font-bold mb-2 gradient-text">Modifier le profil</h1>
+        <p className="text-muted-foreground mb-6">Mettez à jour vos informations personnelles</p>
+        
+        <form onSubmit={handleEditProfile} className="space-y-6">
+          <GlassCard className="p-6 space-y-4">
+            <div>
+              <label className="text-sm font-medium text-foreground/80 mb-2 block">Prénom</label>
+              <input
+                type="text"
+                required
+                value={editFormData.firstName}
+                onChange={(e) => setEditFormData({ ...editFormData, firstName: e.target.value })}
+                placeholder="Votre prénom"
+                className="w-full px-4 py-3 glass-input rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground/80 mb-2 block">Nom</label>
+              <input
+                type="text"
+                required
+                value={editFormData.lastName}
+                onChange={(e) => setEditFormData({ ...editFormData, lastName: e.target.value })}
+                placeholder="Votre nom"
+                className="w-full px-4 py-3 glass-input rounded-xl"
+              />
+            </div>
+          </GlassCard>
+          
+          <div className="flex gap-4">
+            <GlassButton type="button" variant="ghost" onClick={() => setShowEditProfile(false)} className="flex-1">
+              Annuler
+            </GlassButton>
+            <GlassButton type="submit" variant="primary" className="flex-1">
+              Enregistrer
+            </GlassButton>
+          </div>
+        </form>
+      </div>
+    )
   }
 
   return (
@@ -157,7 +224,7 @@ export function ProfileClient() {
             </div>
           </div>
           
-          <GlassButton variant="secondary">
+          <GlassButton variant="secondary" onClick={() => setShowEditProfile(true)}>
             <Edit2 className="w-4 h-4 mr-2" />
             Modifier
           </GlassButton>
