@@ -141,8 +141,8 @@ export function TechnologyPanel() {
                 <p className="font-semibold">{patent.name}</p>
                 <p className="text-sm text-muted-foreground">{patent.industry}</p>
                 <div className="flex justify-between mt-2 text-sm">
-                  <span>Valeur: {patent.marketValue.toLocaleString()}\u00D8</span>
-                  <span>Licences: {patent.licensingRevenue.toLocaleString()}\u00D8/an</span>
+                  <span>Valeur: {patent.marketValue.toLocaleString()}Ø</span>
+                  <span>Licences: {patent.licensingRevenue.toLocaleString()}Ø/an</span>
                 </div>
               </div>
             ))}
@@ -244,7 +244,7 @@ export function TechnologyPanel() {
                   </div>
                   {!isResearching && !isCompleted && (
                     <GlassButton size="sm" onClick={() => startResearch(selectedCategory, index)}>
-                      {tech.baseCost.toLocaleString()}\u00D8
+                      {tech.baseCost.toLocaleString()}Ø
                     </GlassButton>
                   )}
                   {isResearching && (

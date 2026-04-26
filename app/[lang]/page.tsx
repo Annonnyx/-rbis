@@ -12,7 +12,7 @@ export default function HomePage() {
           <Orbit className="w-24 h-24 text-orbe" />
         </div>
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-orbe to-orbe-light bg-clip-text text-transparent">
-          \u00D8rbis
+          Ørbis
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mb-8">
           Un monde virtuel qui grandit avec vos suggestions.
@@ -46,7 +46,7 @@ export default function HomePage() {
             <FeatureCard
               icon={Building2}
               title="Créez votre entreprise"
-              description="Lancez votre business avec 300 \u00D8. Définissez votre produit ou service et faites-le prospérer."
+              description="Lancez votre business avec 300 Ø. Définissez votre produit ou service et faites-le prospérer."
             />
             <FeatureCard
               icon={Landmark}
@@ -70,8 +70,8 @@ export default function HomePage() {
             />
             <FeatureCard
               icon={Orbit}
-              title="La monnaie \u00D8rbe"
-              description="Utilisez la \u00D8rbe (\u00D8), une monnaie fictive avec son propre symbole unique."
+              title="La monnaie Ørbe"
+              description="Utilisez la Ørbe (Ø), une monnaie fictive avec son propre symbole unique."
             />
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function HomePage() {
             <StepCard
               number={1}
               title="Inscription"
-              description="Connectez-vous avec Google. Recevez 1000 \u00D8 et choisissez votre emplacement."
+              description="Connectez-vous avec Google. Recevez 1000 Ø et choisissez votre emplacement."
             />
             <StepCard
               number={2}
@@ -105,7 +105,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="py-8 px-4 text-center text-muted-foreground">
-        <p>\u00D8rbis - La simulation économique collaborative</p>
+        <p>Ørbis - La simulation économique collaborative</p>
       </footer>
     </div>
   )

@@ -213,7 +213,7 @@ export function BusinessClient() {
     return (
       <div className="max-w-2xl mx-auto animate-fade-in">
         <h1 className="text-3xl font-bold mb-2 gradient-text">Créer mon entreprise</h1>
-        <p className="text-muted-foreground mb-8">Lancez votre business dans l&apos;économie \u00D8rbis</p>
+        <p className="text-muted-foreground mb-8">Lancez votre business dans l&apos;économie Ørbis</p>
         
         <GlassCard liquid className="p-8 mb-6">
           <div className="flex items-center gap-4 mb-4">
@@ -234,7 +234,7 @@ export function BusinessClient() {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ex: \u00D8rbis Technologies"
+              placeholder="Ex: Ørbis Technologies"
             />
             <div>
               <label className="text-sm font-medium text-foreground/80 mb-2 block">Description</label>
@@ -315,7 +315,7 @@ export function BusinessClient() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <GlassInput
-                label="Prix (\u00D8)"
+                label="Prix (Ø)"
                 type="number"
                 required
                 value={productForm.price}
@@ -406,7 +406,7 @@ export function BusinessClient() {
         </div>
         <h1 className="text-3xl font-bold mb-4">Aucune entreprise</h1>
         <p className="text-muted-foreground mb-8 text-center max-w-md">
-          Vous n&apos;avez pas encore créé d&apos;entreprise. Lancez votre business pour seulement 300 \u00D8.
+          Vous n&apos;avez pas encore créé d&apos;entreprise. Lancez votre business pour seulement 300 Ø.
         </p>
         <GlassButton onClick={() => setShowCreate(true)} variant="primary" size="lg" data-tutorial="create-business">
           <Plus className="w-5 h-5 mr-2" />

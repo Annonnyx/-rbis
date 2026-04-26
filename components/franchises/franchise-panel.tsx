@@ -118,7 +118,7 @@ export function FranchisePanel() {
         </div>
         <GlassCard className="px-4 py-2">
           <p className="text-sm text-muted-foreground">Royalties totales</p>
-          <p className="text-xl font-bold">{totalRoyaltyRevenue.toLocaleString()}\u00D8</p>
+          <p className="text-xl font-bold">{totalRoyaltyRevenue.toLocaleString()}Ø</p>
         </GlassCard>
       </div>
 
@@ -149,7 +149,7 @@ export function FranchisePanel() {
                   </div>
                   <div>
                     <p className="text-muted-foreground">Revenu mensuel</p>
-                    <p className="font-medium">{Number(franchise.monthlyRevenue).toLocaleString()}\u00D8</p>
+                    <p className="font-medium">{Number(franchise.monthlyRevenue).toLocaleString()}Ø</p>
                   </div>
                 </div>
 
@@ -184,12 +184,12 @@ export function FranchisePanel() {
                 <div className="my-3 space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Droit d'entrée:</span>
-                    <span className="font-medium">{location.entryFee.toLocaleString()}\u00D8</span>
+                    <span className="font-medium">{location.entryFee.toLocaleString()}Ø</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Revenu estimé:</span>
                     <span className="font-medium text-green-500">
-                      {location.expectedMonthlyRevenue.toLocaleString()}\u00D8/mois
+                      {location.expectedMonthlyRevenue.toLocaleString()}Ø/mois
                     </span>
                   </div>
                 </div>

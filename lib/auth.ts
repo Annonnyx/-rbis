@@ -38,7 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           type: "PERSONAL",
           name: "Compte Principal",
           balance: 1000,
-          currency: "\u00D8",
+          currency: "Ø",
           isMain: true,
         },
       })

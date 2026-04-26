@@ -139,7 +139,7 @@ export function AchievementsPanel() {
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Fortune</p>
-              <p className="text-xl font-bold">{stats.currentFortune.toLocaleString()}\u00D8</p>
+              <p className="text-xl font-bold">{stats.currentFortune.toLocaleString()}Ø</p>
             </div>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Rang Forbes</p>
@@ -186,7 +186,7 @@ export function AchievementsPanel() {
                       <>
                         {getRewardIcon(achievement.rewardType)}
                         <span className="text-xs text-muted-foreground">
-                          {achievement.rewardType === "BONUS" ? `+${achievement.rewardValue}\u00D8` : achievement.rewardValue}
+                          {achievement.rewardType === "BONUS" ? `+${achievement.rewardValue}Ø` : achievement.rewardValue}
                         </span>
                       </>
                     )}

@@ -76,7 +76,7 @@ export function MarketClient() {
   })
 
   const [userBalance, setUserBalance] = useState<number>(0)
-  const CRYPTO_UNLOCK_THRESHOLD = 10000 // 10k \u00D8
+  const CRYPTO_UNLOCK_THRESHOLD = 10000 // 10k Ø
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -589,13 +589,13 @@ export function MarketClient() {
               <Bitcoin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Crypto Verrouillé</h3>
               <p className="text-muted-foreground mb-4">
-                Le trading crypto se débloque à {CRYPTO_UNLOCK_THRESHOLD.toLocaleString()}\u00D8 de capital
+                Le trading crypto se débloque à {CRYPTO_UNLOCK_THRESHOLD.toLocaleString()}Ø de capital
               </p>
               <div className="p-4 rounded-lg bg-primary/10 inline-block">
                 <p className="text-sm text-muted-foreground">Votre capital actuel</p>
-                <p className="text-2xl font-bold">{userBalance.toLocaleString()}\u00D8</p>
+                <p className="text-2xl font-bold">{userBalance.toLocaleString()}Ø</p>
                 <p className="text-sm text-muted-foreground">
-                  Il vous manque {(CRYPTO_UNLOCK_THRESHOLD - userBalance).toLocaleString()}\u00D8
+                  Il vous manque {(CRYPTO_UNLOCK_THRESHOLD - userBalance).toLocaleString()}Ø
                 </p>
               </div>
             </GlassCard>

@@ -96,7 +96,7 @@ export async function POST(req: Request) {
     if (playerStats.miniGamesCapReached || playerStats.miniGamesEarnings >= MINI_GAMES_CAP) {
       return NextResponse.json({
         success: false,
-        message: "Vous avez atteint le plafond de gains via mini-jeux (2000\u00D8). Créez une entreprise pour générer des revenus passifs !",
+        message: "Vous avez atteint le plafond de gains via mini-jeux (2000Ø). Créez une entreprise pour générer des revenus passifs !",
         capReached: true
       }, { status: 403 })
     }
@@ -219,7 +219,7 @@ export async function POST(req: Request) {
       },
       message: capReached 
         ? "Plafond atteint ! Passez aux entreprises pour des revenus illimités."
-        : `+${actualEarnings}\u00D8 gagnés !`
+        : `+${actualEarnings}Ø gagnés !`
     })
 
   } catch (error) {

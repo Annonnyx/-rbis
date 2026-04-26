@@ -114,7 +114,7 @@ export function MiniGamesPanel() {
     if (stats?.miniGames.capReached) {
       setMessage({
         type: "error",
-        text: "Vous avez atteint le maximum de 2000\u00D8 via mini-jeux. Créez une entreprise pour continuer !"
+        text: "Vous avez atteint le maximum de 2000Ø via mini-jeux. Créez une entreprise pour continuer !"
       })
       setTimeout(() => setMessage(null), 5000)
       return
@@ -156,7 +156,7 @@ export function MiniGamesPanel() {
       if (data.success) {
         setMessage({
           type: "success",
-          text: `+${data.earnings}\u00D8 gagnés ! ${data.capReached ? "Plafond atteint !" : ""}`
+          text: `+${data.earnings}Ø gagnés ! ${data.capReached ? "Plafond atteint !" : ""}`
         })
         fetchStats()
         setTimeout(() => setMessage(null), 3000)
@@ -216,7 +216,7 @@ export function MiniGamesPanel() {
 
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium">💰 Gains Mini-Jeux</span>
-          <span className="text-sm">{stats.miniGames.earnings} / {stats.miniGames.cap} \u00D8</span>
+          <span className="text-sm">{stats.miniGames.earnings} / {stats.miniGames.cap} Ø</span>
         </div>
         <div className="w-full bg-gray-700 rounded-full h-2">
           <div 
@@ -228,12 +228,12 @@ export function MiniGamesPanel() {
         </div>
         {stats.miniGames.capReached && (
           <p className="text-xs text-red-400 mt-2 text-center">
-            🚫 Plafond atteint ! Passez aux entreprises pour des revenus illimités \u00D8/h
+            🚫 Plafond atteint ! Passez aux entreprises pour des revenus illimités Ø/h
           </p>
         )}
         {!stats.miniGames.capReached && (
           <p className="text-xs text-gray-400 mt-2 text-center">
-            Encore {stats.miniGames.remaining}\u00D8 disponibles via mini-jeux
+            Encore {stats.miniGames.remaining}Ø disponibles via mini-jeux
           </p>
         )}
       </GlassCard>
@@ -269,7 +269,7 @@ export function MiniGamesPanel() {
                 <div className="text-3xl mb-2">{game.icon}</div>
                 <h3 className="text-sm font-semibold mb-1">{game.name}</h3>
                 <p className="text-xs text-gray-400 mb-2">
-                  {game.minEarnings}-{game.maxEarnings} \u00D8
+                  {game.minEarnings}-{game.maxEarnings} Ø
                 </p>
                 <div className="flex items-center justify-center gap-2 text-xs mb-3">
                   <span className="text-red-400">-{game.energyCost} ⚡</span>

@@ -38,7 +38,7 @@ export async function POST(req: Request) {
         name,
         type,
         balance: 0,
-        currency: "\u00D8",
+        currency: "Ø",
         isMain: false,
       },
     })

@@ -54,10 +54,10 @@ export function ForbesRanking() {
   }, [])
 
   const formatFortune = (value: number) => {
-    if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}B\u00D8`
-    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M\u00D8`
-    if (value >= 1000) return `${(value / 1000).toFixed(1)}k\u00D8`
-    return `${value}\u00D8`
+    if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}BØ`
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}MØ`
+    if (value >= 1000) return `${(value / 1000).toFixed(1)}kØ`
+    return `${value}Ø`
   }
 
   const getRankIcon = (rank: number) => {
@@ -140,7 +140,7 @@ export function ForbesRanking() {
       <GlassCard className="p-6">
         <h3 className="font-semibold mb-4 flex items-center gap-2">
           <Trophy className="w-5 h-5 text-yellow-500" />
-          Top 20 Forbes \u00D8rbis
+          Top 20 Forbes Ørbis
         </h3>
         <div className="space-y-2">
           {fullRanking.map((character) => (

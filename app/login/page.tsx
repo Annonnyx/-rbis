@@ -15,7 +15,7 @@ function LoginContent() {
       <div className="w-full max-w-md glass rounded-2xl p-8">
         <div className="text-center mb-8">
           <Orbit className="w-16 h-16 text-orbe mx-auto mb-4 orbe-float" />
-          <h1 className="text-3xl font-bold mb-2">Bienvenue sur \u00D8rbis</h1>
+          <h1 className="text-3xl font-bold mb-2">Bienvenue sur Ørbis</h1>
           <p className="text-muted-foreground">
             Connectez-vous pour accéder à votre compte
           </p>
@@ -38,7 +38,7 @@ function LoginContent() {
         <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>En vous connectant, vous recevrez :</p>
           <ul className="mt-2 space-y-1">
-            <li>• 1000 \u00D8rbe (\u00D8) de départ</li>
+            <li>• 1000 Ørbe (Ø) de départ</li>
             <li>• Un emplacement sur la carte</li>
             <li>• Un compte bancaire personnel</li>
           </ul>

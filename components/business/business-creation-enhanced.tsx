@@ -182,11 +182,11 @@ export function BusinessCreationEnhanced() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <p className="text-muted-foreground">Coût création</p>
-                    <p className="font-semibold">{subtype.cost.toLocaleString()}\u00D8</p>
+                    <p className="font-semibold">{subtype.cost.toLocaleString()}Ø</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Revenu/h</p>
-                    <p className="font-semibold text-green-500">{subtype.revenue}\u00D8/h</p>
+                    <p className="font-semibold text-green-500">{subtype.revenue}Ø/h</p>
                   </div>
                 </div>
               </GlassCard>
@@ -236,7 +236,7 @@ export function BusinessCreationEnhanced() {
                   </div>
                   <div>
                     <p className="text-muted-foreground">Loyer/m²</p>
-                    <p className="font-medium">{location.rentPerSqm}\u00D8</p>
+                    <p className="font-medium">{location.rentPerSqm}Ø</p>
                   </div>
                 </div>
               </GlassCard>
@@ -347,11 +347,11 @@ export function BusinessCreationEnhanced() {
               </div>
               <div className="flex justify-between font-semibold">
                 <span>Coût total:</span>
-                <span>{totalCost.toLocaleString()}\u00D8</span>
+                <span>{totalCost.toLocaleString()}Ø</span>
               </div>
               <div className="flex justify-between font-semibold text-green-500">
                 <span>Revenu estimé:</span>
-                <span>{estimatedRevenue}\u00D8/h</span>
+                <span>{estimatedRevenue}Ø/h</span>
               </div>
             </div>
           </GlassCard>

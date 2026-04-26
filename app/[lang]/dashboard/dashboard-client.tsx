@@ -102,7 +102,7 @@ export function DashboardClient() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-5 h-5 text-primary" />
-            <span className="text-sm text-muted-foreground">Bienvenue sur \u00D8rbis</span>
+            <span className="text-sm text-muted-foreground">Bienvenue sur Ørbis</span>
           </div>
           <h1 className="text-3xl font-bold">Bonjour, {data?.user.name}</h1>
           <p className="text-muted-foreground">Voici votre tableau de bord</p>
@@ -137,7 +137,7 @@ export function DashboardClient() {
         />
         <StatCard 
           icon={Globe} 
-          label="Utilisateurs \u00D8rbis" 
+          label="Utilisateurs Ørbis" 
           value={data?.stats.totalUsers || 0}
           color="orange"
         />
@@ -193,7 +193,7 @@ export function DashboardClient() {
                 </div>
               ) : (
                 <div className="mt-4 pt-4 border-t border-border/50">
-                  <p className="text-sm text-primary">Créez votre entreprise pour 300 \u00D8 →</p>
+                  <p className="text-sm text-primary">Créez votre entreprise pour 300 Ø →</p>
                 </div>
               )}
             </GlassCard>
@@ -234,7 +234,7 @@ export function DashboardClient() {
           <GlassCard className="p-6">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <Globe className="w-4 h-4 text-primary" />
-              Statistiques \u00D8rbis
+              Statistiques Ørbis
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-3 rounded-xl bg-background/50">
@@ -269,7 +269,7 @@ export function DashboardClient() {
                 <h3 className="font-semibold">🎮 Mini-Jeux</h3>
               </div>
               <p className="text-sm text-muted-foreground">
-                Gagnez jusqu'à 2000\u00D8 pour démarrer votre empire
+                Gagnez jusqu'à 2000Ø pour démarrer votre empire
               </p>
               <p className="text-xs text-primary mt-2">Jouer maintenant →</p>
             </GlassCard>

@@ -288,7 +288,7 @@ export function BankClient() {
             </div>
             
             <GlassInput
-              label="Montant (\u00D8)"
+              label="Montant (Ø)"
               type="number"
               required
               min="0.01"

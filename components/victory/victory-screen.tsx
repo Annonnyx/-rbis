@@ -55,10 +55,10 @@ export function VictoryScreen() {
   }, [])
 
   const formatFortune = (value: number) => {
-    if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}B\u00D8`
-    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M\u00D8`
-    if (value >= 1000) return `${(value / 1000).toFixed(1)}k\u00D8`
-    return `${value}\u00D8`
+    if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}BØ`
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}MØ`
+    if (value >= 1000) return `${(value / 1000).toFixed(1)}kØ`
+    return `${value}Ø`
   }
 
   if (loading) {
@@ -174,7 +174,7 @@ export function VictoryScreen() {
             Progression vers la Victoire
           </h2>
           <p className="text-muted-foreground mb-6">
-            Atteignez 1B\u00D8 de fortune et devenez Top 1 Forbes pour gagner !
+            Atteignez 1BØ de fortune et devenez Top 1 Forbes pour gagner !
           </p>
 
           <div className="space-y-6">
@@ -219,7 +219,7 @@ export function VictoryScreen() {
           <ul className="space-y-2 text-sm">
             <li className="flex items-center gap-2">
               <Wallet className="w-4 h-4 text-green-500" />
-              Atteindre 1 milliard d'\u00D8 de fortune totale
+              Atteindre 1 milliard d'Ø de fortune totale
             </li>
             <li className="flex items-center gap-2">
               <Star className="w-4 h-4 text-purple-500" />
@@ -227,7 +227,7 @@ export function VictoryScreen() {
             </li>
           </ul>
           <p className="text-xs text-muted-foreground mt-4">
-            Récompense: 1.000.000\u00D8 + Titre "Magnat Suprême"
+            Récompense: 1.000.000Ø + Titre "Magnat Suprême"
           </p>
         </GlassCard>
       </div>

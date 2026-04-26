@@ -174,7 +174,7 @@ export function EmployeePanel() {
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div className="p-2 rounded bg-background/50">
                   <p className="text-xs text-muted-foreground">Salaire</p>
-                  <p className="font-semibold">{employee.salary.toLocaleString()}\u00D8/mois</p>
+                  <p className="font-semibold">{employee.salary.toLocaleString()}Ø/mois</p>
                 </div>
                 <div className="p-2 rounded bg-background/50">
                   <p className="text-xs text-muted-foreground">Compétence</p>
