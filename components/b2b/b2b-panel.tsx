@@ -109,7 +109,7 @@ export function B2BPanel() {
         </div>
         <GlassCard className="px-4 py-2">
           <p className="text-sm text-muted-foreground">Revenus B2B totaux</p>
-          <p className="text-xl font-bold">{totalB2BRevenue.toLocaleString()}Ø</p>
+          <p className="text-xl font-bold">{totalB2BRevenue.toLocaleString()}\u00D8</p>
         </GlassCard>
       </div>
 
@@ -141,7 +141,7 @@ export function B2BPanel() {
                   </div>
                   <div>
                     <p className="text-muted-foreground">Prix unitaire</p>
-                    <p className="font-medium">{client.unitPrice}Ø</p>
+                    <p className="font-medium">{client.unitPrice}\u00D8</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-3">
@@ -177,9 +177,9 @@ export function B2BPanel() {
                 </div>
                 <div className="text-sm space-y-1 mb-3">
                   <p><span className="text-muted-foreground">Volume:</span> {prospect.volume.toLocaleString()}/mois</p>
-                  <p><span className="text-muted-foreground">Prix:</span> {prospect.price}Ø/unité</p>
+                  <p><span className="text-muted-foreground">Prix:</span> {prospect.price}\u00D8/unité</p>
                   <p className="text-green-500">
-                    <span className="text-muted-foreground">Potentiel:</span> {prospect.potentialRevenue.toLocaleString()}Ø/an
+                    <span className="text-muted-foreground">Potentiel:</span> {prospect.potentialRevenue.toLocaleString()}\u00D8/an
                   </p>
                 </div>
                 <GlassButton size="sm" onClick={() => signClient(prospect)}>
@@ -214,7 +214,7 @@ export function B2BPanel() {
                 <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
                   <div>
                     <p className="text-muted-foreground">Prix base</p>
-                    <p className="font-medium">{supplier.basePrice}Ø</p>
+                    <p className="font-medium">{supplier.basePrice}\u00D8</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Qualité</p>

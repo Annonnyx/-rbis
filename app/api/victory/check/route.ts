@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 
-const VICTORY_FORTUNE_THRESHOLD = 1000000000 // 1BØ
+const VICTORY_FORTUNE_THRESHOLD = 1000000000 // 1B\u00D8
 const VICTORY_RANK_THRESHOLD = 1 // Top 1 Forbes
 
 // GET /api/victory/check - Check if user has achieved victory
@@ -69,7 +69,7 @@ export async function GET() {
           businessesOwned: businessesCount,
           totalTransactions: transactionsCount,
           title: "Magnat Suprême",
-          bonusReward: 1000000 // 1MØ bonus
+          bonusReward: 1000000 // 1M\u00D8 bonus
         }
       })
 
@@ -97,7 +97,7 @@ export async function GET() {
       return NextResponse.json({
         hasVictory: true,
         victory,
-        message: "🎉 FÉLICITATIONS ! Vous êtes devenu le Magnat Suprême de Ørbis !"
+        message: "🎉 FÉLICITATIONS ! Vous êtes devenu le Magnat Suprême de \u00D8rbis !"
       })
     }
 
@@ -120,7 +120,7 @@ export async function GET() {
         }
       },
       message: fortuneCondition ? "Fortune atteinte ! Il faut être Top 1 Forbes" : 
-                rankCondition ? "Top 1 atteint ! Il faut atteindre 1BØ" :
+                rankCondition ? "Top 1 atteint ! Il faut atteindre 1B\u00D8" :
                 "Continuez à progresser vers la victoire"
     })
 

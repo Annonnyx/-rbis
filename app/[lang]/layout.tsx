@@ -9,7 +9,7 @@ import { i18n } from "@/i18n.config"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Ørbis - La simulation économique collaborative",
+  title: "\u00D8rbis - La simulation économique collaborative",
   description: "Un monde virtuel qui grandit avec vos suggestions. Créez votre entreprise, gérez vos finances, et façonnez l'économie.",
 }
 

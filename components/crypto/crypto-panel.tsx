@@ -106,7 +106,7 @@ export function CryptoPanel() {
   }
 
   const cryptoList = [
-    { id: "ORB", name: "ØRB", icon: "🪙", color: "text-yellow-500" },
+    { id: "ORB", name: "\u00D8RB", icon: "🪙", color: "text-yellow-500" },
     { id: "BITGOLD", name: "BitGold", icon: "🥇", color: "text-orange-500" },
     { id: "ETHEREUM_PLUS", name: "Ethereum++", icon: "💎", color: "text-purple-500" },
     { id: "SPEEDCOIN", name: "SpeedCoin", icon: "⚡", color: "text-blue-500" },
@@ -123,7 +123,7 @@ export function CryptoPanel() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">Valeur totale du portefeuille</p>
-            <p className="text-3xl font-bold">{wallet?.totalValue ? `${wallet.totalValue.toFixed(2)}Ø` : "0.00Ø"}</p>
+            <p className="text-3xl font-bold">{wallet?.totalValue ? `${wallet.totalValue.toFixed(2)}\u00D8` : "0.00\u00D8"}</p>
           </div>
           <Activity className="w-8 h-8 text-primary" />
         </div>
@@ -144,7 +144,7 @@ export function CryptoPanel() {
             <div className="text-2xl mb-1">{crypto.icon}</div>
             <div className={`text-xs font-medium ${crypto.color}`}>{crypto.name}</div>
             <div className="text-xs text-muted-foreground">
-              {prices?.[crypto.id as keyof CryptoPrices]?.toFixed(2)}Ø
+              {prices?.[crypto.id as keyof CryptoPrices]?.toFixed(2)}\u00D8
             </div>
           </button>
         ))}
@@ -161,7 +161,7 @@ export function CryptoPanel() {
               {cryptoList.find(c => c.id === selectedCrypto)?.name}
             </h3>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">{currentPrice.toFixed(2)}Ø</span>
+              <span className="text-2xl font-bold">{currentPrice.toFixed(2)}\u00D8</span>
               <span className="text-sm text-green-500 flex items-center">
                 <TrendingUp className="w-4 h-4 mr-1" />
                 +{(Math.random() * 5).toFixed(2)}%
@@ -180,11 +180,11 @@ export function CryptoPanel() {
             </p>
           </div>
           <div className="p-3 rounded-lg bg-background/50">
-            <p className="text-xs text-muted-foreground">Valeur en Ø</p>
+            <p className="text-xs text-muted-foreground">Valeur en \u00D8</p>
             <p className="text-lg font-semibold">
               {wallet?.[`${selectedCrypto.toLowerCase()}Balance` as keyof CryptoWallet]
                 ? (Number(wallet[`${selectedCrypto.toLowerCase()}Balance` as keyof CryptoWallet]) * currentPrice).toFixed(2)
-                : "0.00"}Ø
+                : "0.00"}\u00D8
             </p>
           </div>
         </div>
@@ -207,7 +207,7 @@ export function CryptoPanel() {
             <div className="p-3 rounded-lg bg-primary/10">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total:</span>
-                <span className="font-semibold">{totalCost.toFixed(2)}Ø</span>
+                <span className="font-semibold">{totalCost.toFixed(2)}\u00D8</span>
               </div>
             </div>
           )}

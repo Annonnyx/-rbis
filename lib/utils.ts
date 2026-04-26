@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number, currency: string = "Ø"): string {
+export function formatCurrency(amount: number, currency: string = "\u00D8"): string {
   // Use non-breaking space and explicit UTF-8 encoding to prevent display issues
   const formatted = amount.toLocaleString("fr-FR")
   return `${formatted}\u00A0${currency}`

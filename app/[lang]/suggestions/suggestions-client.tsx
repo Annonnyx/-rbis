@@ -176,7 +176,7 @@ export function SuggestionsClient() {
           </div>
           <div>
             <h1 className="text-2xl font-bold gradient-text">Nouvelle suggestion</h1>
-            <p className="text-muted-foreground">Partagez votre idée pour améliorer Ørbis</p>
+            <p className="text-muted-foreground">Partagez votre idée pour améliorer \u00D8rbis</p>
           </div>
         </div>
         

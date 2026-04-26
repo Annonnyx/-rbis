@@ -7,15 +7,15 @@ import { AchievementCategory } from "@prisma/client"
 const ACHIEVEMENT_DEFINITIONS = [
   // Fortune Progression
   { number: 1, name: "Premier Pas", description: "Gagner 100\u00D8 via mini-jeux", category: "FORTUNE", conditionType: "fortune", conditionValue: "100", rewardType: "BONUS", rewardValue: "50" },
-  { number: 2, name: "Centenaire", description: "Atteindre 100Ø de fortune", category: "FORTUNE", conditionType: "fortune", conditionValue: "100", rewardType: "BADGE", rewardValue: "bronze" },
-  { number: 3, name: "Millénium", description: "Atteindre 1.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "1000", rewardType: "BONUS", rewardValue: "100" },
-  { number: 4, name: "Décamillénium", description: "Atteindre 10.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "10000", rewardType: "BADGE", rewardValue: "argent" },
-  { number: 5, name: "Centenaire²", description: "Atteindre 100.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "100000", rewardType: "BONUS", rewardValue: "1000" },
-  { number: 6, name: "Millionnaire", description: "Atteindre 1.000.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "1000000", rewardType: "BADGE", rewardValue: "or" },
-  { number: 7, name: "Dix-Millionnaire", description: "Atteindre 10.000.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "10000000", rewardType: "BONUS", rewardValue: "10000" },
-  { number: 8, name: "Cent-Millionnaire", description: "Atteindre 100.000.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "100000000", rewardType: "BADGE", rewardValue: "platine" },
-  { number: 9, name: "Milliardaire", description: "Atteindre 1.000.000.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "1000000000", rewardType: "BONUS", rewardValue: "100000" },
-  { number: 10, name: "Multi-Milliardaire", description: "Atteindre 10.000.000.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "10000000000", rewardType: "BADGE", rewardValue: "diamant" },
+  { number: 2, name: "Centenaire", description: "Atteindre 100\u00D8 de fortune", category: "FORTUNE", conditionType: "fortune", conditionValue: "100", rewardType: "BADGE", rewardValue: "bronze" },
+  { number: 3, name: "Millénium", description: "Atteindre 1.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "1000", rewardType: "BONUS", rewardValue: "100" },
+  { number: 4, name: "Décamillénium", description: "Atteindre 10.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "10000", rewardType: "BADGE", rewardValue: "argent" },
+  { number: 5, name: "Centenaire²", description: "Atteindre 100.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "100000", rewardType: "BONUS", rewardValue: "1000" },
+  { number: 6, name: "Millionnaire", description: "Atteindre 1.000.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "1000000", rewardType: "BADGE", rewardValue: "or" },
+  { number: 7, name: "Dix-Millionnaire", description: "Atteindre 10.000.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "10000000", rewardType: "BONUS", rewardValue: "10000" },
+  { number: 8, name: "Cent-Millionnaire", description: "Atteindre 100.000.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "100000000", rewardType: "BADGE", rewardValue: "platine" },
+  { number: 9, name: "Milliardaire", description: "Atteindre 1.000.000.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "1000000000", rewardType: "BONUS", rewardValue: "100000" },
+  { number: 10, name: "Multi-Milliardaire", description: "Atteindre 10.000.000.000\u00D8", category: "FORTUNE", conditionType: "fortune", conditionValue: "10000000000", rewardType: "BADGE", rewardValue: "diamant" },
   
   // Forbes Ranking
   { number: 13, name: "Top 10.000", description: "Entrer dans le classement Forbes", category: "FORBES", conditionType: "forbes_rank", conditionValue: "10000", rewardType: "BADGE", rewardValue: "Débutant" },
@@ -48,16 +48,16 @@ const ACHIEVEMENT_DEFINITIONS = [
   
   // Tech & Software
   { number: 52, name: "Coder", description: "Créer un SaaS", category: "TECH", conditionType: "business_subtype", conditionValue: "SAAS", rewardType: "BADGE", rewardValue: "Dev" },
-  { number: 53, name: "Unicorn Hunter", description: "Avoir un SaaS valorisé 1MØ", category: "TECH", conditionType: "business_valuation", conditionValue: "1000000", rewardType: "BONUS", rewardValue: "10000" },
+  { number: 53, name: "Unicorn Hunter", description: "Avoir un SaaS valorisé 1M\u00D8", category: "TECH", conditionType: "business_valuation", conditionValue: "1000000", rewardType: "BONUS", rewardValue: "10000" },
   { number: 54, name: "Hardware Hero", description: "Créer une entreprise hardware", category: "TECH", conditionType: "business_subtype", conditionValue: "HARDWARE", rewardType: "SKIN", rewardValue: "hardware" },
   { number: 56, name: "Game Dev", description: "Créer un studio de jeux", category: "TECH", conditionType: "business_subtype", conditionValue: "GAME_STUDIO", rewardType: "BADGE", rewardValue: "Gamer" },
-  { number: 57, name: "Hit Maker", description: "Avoir un jeu viral (+10.000Ø/h)", category: "TECH", conditionType: "hourly_revenue", conditionValue: "10000", rewardType: "BONUS", rewardValue: "20000" },
+  { number: 57, name: "Hit Maker", description: "Avoir un jeu viral (+10.000\u00D8/h)", category: "TECH", conditionType: "hourly_revenue", conditionValue: "10000", rewardType: "BONUS", rewardValue: "20000" },
   
   // Trading & Crypto
   { number: 113, name: "Day Trader", description: "Faire 100 trades", category: "CRYPTO", conditionType: "trade_count", conditionValue: "100", rewardType: "BONUS", rewardValue: "500" },
-  { number: 114, name: "Swing Master", description: "Gain 100kØ sur un swing", category: "CRYPTO", conditionType: "single_trade_profit", conditionValue: "100000", rewardType: "BONUS", rewardValue: "1000" },
+  { number: 114, name: "Swing Master", description: "Gain 100k\u00D8 sur un swing", category: "CRYPTO", conditionType: "single_trade_profit", conditionValue: "100000", rewardType: "BONUS", rewardValue: "1000" },
   { number: 116, name: "HODLer", description: "Garder une crypto 1 an", category: "CRYPTO", conditionType: "hold_duration_days", conditionValue: "365", rewardType: "BADGE", rewardValue: "Patient" },
-  { number: 117, name: "Bitcoin Millionaire", description: "Fortune 1MØ en crypto", category: "CRYPTO", conditionType: "crypto_value", conditionValue: "1000000", rewardType: "BONUS", rewardValue: "10000" },
+  { number: 117, name: "Bitcoin Millionaire", description: "Fortune 1M\u00D8 en crypto", category: "CRYPTO", conditionType: "crypto_value", conditionValue: "1000000", rewardType: "BONUS", rewardValue: "10000" },
   { number: 120, name: "Altcoin Hunter", description: "Posséder 10 cryptos différentes", category: "CRYPTO", conditionType: "crypto_types_owned", conditionValue: "10", rewardType: "BADGE", rewardValue: "Diversifié" },
   
   // R&D & Patents
@@ -69,7 +69,7 @@ const ACHIEVEMENT_DEFINITIONS = [
   // B2B & Supply Chain
   { number: 65, name: "Fournisseur", description: "Signer premier contrat B2B", category: "BUSINESS", conditionType: "b2b_contracts", conditionValue: "1", rewardType: "BONUS", rewardValue: "300" },
   { number: 66, name: "Partenaire Majeur", description: "Avoir 10 clients B2B", category: "BUSINESS", conditionType: "b2b_clients", conditionValue: "10", rewardType: "BADGE", rewardValue: "Fournisseur" },
-  { number: 67, name: "Volume d'Or", description: "1MØ de revenus B2B", category: "BUSINESS", conditionType: "b2b_revenue", conditionValue: "1000000", rewardType: "BONUS", rewardValue: "5000" },
+  { number: 67, name: "Volume d'Or", description: "1M\u00D8 de revenus B2B", category: "BUSINESS", conditionType: "b2b_revenue", conditionValue: "1000000", rewardType: "BONUS", rewardValue: "5000" },
   
   // Franchises
   { number: 99, name: "Franchisor", description: "Créer première franchise", category: "BUSINESS", conditionType: "franchise_count", conditionValue: "1", rewardType: "BONUS", rewardValue: "500" },

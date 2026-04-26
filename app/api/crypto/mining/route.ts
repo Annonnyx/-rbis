@@ -12,9 +12,9 @@ const MINING_CONFIG: Partial<Record<CryptoType, {
 }>> = {
   [CryptoType.ORB]: {
     baseHashrate: 100, // MH/s
-    powerCost: 10, // Ø/h
+    powerCost: 10, // \u00D8/h
     rewardPerHour: 0.1, // coins per hour
-    upgradeCost: 1000 // Ø to upgrade
+    upgradeCost: 1000 // \u00D8 to upgrade
   },
   [CryptoType.ETHEREUM_PLUS]: {
     baseHashrate: 10,

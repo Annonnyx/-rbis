@@ -4,20 +4,20 @@ import { NextResponse } from "next/server"
 import { TutorialStep } from "@prisma/client"
 
 const TUTORIAL_STEPS = [
-  { step: TutorialStep.WELCOME, title: "Bienvenue à Ørbis", description: "Commencez votre aventure entrepreneuriale avec 500Ø" },
+  { step: TutorialStep.WELCOME, title: "Bienvenue à \u00D8rbis", description: "Commencez votre aventure entrepreneuriale avec 500\u00D8" },
   { step: TutorialStep.MAP_DISCOVERY, title: "Découvrez la carte", description: "Explorez les zones économiques de la ville" },
   { step: TutorialStep.FIRST_MINIGAME, title: "Premiers revenus", description: "Gagnez de l'argent avec les mini-jeux" },
   { step: TutorialStep.ENERGY_SYSTEM, title: "Système d'énergie", description: "Gérez votre énergie pour maximiser vos gains" },
-  { step: TutorialStep.FIRST_BUSINESS, title: "Créez votre entreprise", description: "Investissez 300Ø pour lancer votre affaire" },
+  { step: TutorialStep.FIRST_BUSINESS, title: "Créez votre entreprise", description: "Investissez 300\u00D8 pour lancer votre affaire" },
   { step: TutorialStep.BUSINESS_TYPES, title: "Types d'entreprises", description: "Choisissez parmi 7 secteurs différents" },
   { step: TutorialStep.LOCATION_CHOICE, title: "Emplacement", description: "Le placement affecte vos revenus" },
   { step: TutorialStep.DA_POSITIONING, title: "Direction Artistique", description: "Positionnez votre marque sur le marché" },
   { step: TutorialStep.HIRING_EMPLOYEE, title: "Recrutement", description: "Embauchez votre premier employé" },
   { step: TutorialStep.STOCK_MARKET, title: "Bourse", description: "Investissez en bourse pour diversifier" },
   { step: TutorialStep.CRYPTO_UNLOCKED, title: "Crypto débloquée", description: "Tradez des cryptomonnaies" },
-  { step: TutorialStep.HOLDING_UNLOCKED, title: "Holding", description: "Créez une holding à 100kØ" },
-  { step: TutorialStep.VICTORY_CONDITIONS, title: "Objectif final", description: "Atteignez 1BØ et devenez Top 1 Forbes" },
-  { step: TutorialStep.COMPLETED, title: "Tutoriel terminé", description: "Vous maîtrisez les bases d'Ørbis" }
+  { step: TutorialStep.HOLDING_UNLOCKED, title: "Holding", description: "Créez une holding à 100k\u00D8" },
+  { step: TutorialStep.VICTORY_CONDITIONS, title: "Objectif final", description: "Atteignez 1B\u00D8 et devenez Top 1 Forbes" },
+  { step: TutorialStep.COMPLETED, title: "Tutoriel terminé", description: "Vous maîtrisez les bases d'\u00D8rbis" }
 ]
 
 // GET /api/tutorial - Get user's tutorial progress

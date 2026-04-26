@@ -22,7 +22,7 @@ interface TutorialStep {
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: "welcome",
-    title: "👋 Bienvenue à Ørbis !",
+    title: "👋 Bienvenue à \u00D8rbis !",
     description: "Commençons votre aventure entrepreneuriale. Je vais vous guider à travers les fonctionnalités essentielles.",
     target: "body",
     tooltipPosition: "center",
@@ -44,7 +44,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: "fortune-card",
     title: "💰 Votre Fortune",
-    description: "Cette carte montre votre solde total. Vous commencez avec 500Ø. Objectif : atteindre 1 milliard !",
+    description: "Cette carte montre votre solde total. Vous commencez avec 500\u00D8. Objectif : atteindre 1 milliard !",
     target: "[data-tutorial='fortune']",
     targetPage: "/dashboard",
     tooltipPosition: "right",
@@ -74,7 +74,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: "play-minigame",
     title: "🕹️ Jouez pour Gagner",
-    description: "Sélectionnez un mini-jeu et jouez pour gagner des Ørbis. Chaque jeu coûte de l'énergie mais rapporte de l'argent !",
+    description: "Sélectionnez un mini-jeu et jouez pour gagner des \u00D8rbis. Chaque jeu coûte de l'énergie mais rapporte de l'argent !",
     target: "[data-tutorial='minigame-list']",
     targetPage: "/start",
     tooltipPosition: "center",
@@ -83,7 +83,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: "business-nav",
     title: "🏢 Créer votre Entreprise",
-    description: "Une fois que vous avez 3000Ø, créez votre entreprise. Cliquez sur 'Entreprises' dans le menu.",
+    description: "Une fois que vous avez 3000\u00D8, créez votre entreprise. Cliquez sur 'Entreprises' dans le menu.",
     target: "a[href*='business']",
     targetPage: "/start",
     action: "click",
@@ -149,7 +149,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: "complete",
     title: "🎉 Vous êtes prêt !",
-    description: "Vous connaissez maintenant les bases. Votre objectif : devenir le N°1 du classement Forbes avec 1 milliard d'Ø ! Bonne chance !",
+    description: "Vous connaissez maintenant les bases. Votre objectif : devenir le N°1 du classement Forbes avec 1 milliard d'\u00D8 ! Bonne chance !",
     target: "body",
     tooltipPosition: "center",
     nextButton: true,

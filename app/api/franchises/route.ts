@@ -193,7 +193,7 @@ export async function PUT(req: Request) {
     return NextResponse.json({
       success: true,
       royalty: monthlyRoyalty,
-      message: `Collected ${monthlyRoyalty.toFixed(0)}Ø in royalties`
+      message: `Collected ${monthlyRoyalty.toFixed(0)}\u00D8 in royalties`
     })
 
   } catch (error) {

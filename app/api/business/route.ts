@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     })
 
     if (!mainAccount || Number(mainAccount.balance) < 300) {
-      return new NextResponse("Insufficient funds (300 Ø required)", { status: 400 })
+      return new NextResponse("Insufficient funds (300 \u00D8 required)", { status: 400 })
     }
 
     const userLocation = await db.userLocation.findUnique({
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
           type: "BUSINESS",
           name: `Compte ${name}`,
           balance: 300,
-          currency: "Ø",
+          currency: "\u00D8",
           isMain: false,
         },
       }),

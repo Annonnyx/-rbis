@@ -97,7 +97,7 @@ export function MapClient() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold mb-1">Carte du monde</h1>
-          <p className="text-muted-foreground">Explorez les villes d&apos;Ørbis</p>
+          <p className="text-muted-foreground">Explorez les villes d&apos;\u00D8rbis</p>
         </div>
         {userLocation && (
           <GlassCard liquid className="px-4 py-2 flex items-center gap-2">

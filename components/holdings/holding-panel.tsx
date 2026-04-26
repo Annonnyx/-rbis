@@ -34,7 +34,7 @@ export function HoldingPanel() {
   const [selectedStructure, setSelectedStructure] = useState<string>("SARL")
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const [userBalance, setUserBalance] = useState<number>(0)
-  const HOLDING_UNLOCK_THRESHOLD = 100000 // 100k Ø
+  const HOLDING_UNLOCK_THRESHOLD = 100000 // 100k \u00D8
 
   const fetchHolding = async () => {
     try {
@@ -143,13 +143,13 @@ export function HoldingPanel() {
         <Briefcase className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-xl font-semibold mb-2">Holding Verrouillé</h3>
         <p className="text-muted-foreground mb-4">
-          La création de holding se débloque à {HOLDING_UNLOCK_THRESHOLD.toLocaleString()}Ø de capital
+          La création de holding se débloque à {HOLDING_UNLOCK_THRESHOLD.toLocaleString()}\u00D8 de capital
         </p>
         <div className="p-4 rounded-lg bg-primary/10 inline-block">
           <p className="text-sm text-muted-foreground">Votre capital actuel</p>
-          <p className="text-2xl font-bold">{userBalance.toLocaleString()}Ø</p>
+          <p className="text-2xl font-bold">{userBalance.toLocaleString()}\u00D8</p>
           <p className="text-sm text-muted-foreground">
-            Il vous manque {(HOLDING_UNLOCK_THRESHOLD - userBalance).toLocaleString()}Ø
+            Il vous manque {(HOLDING_UNLOCK_THRESHOLD - userBalance).toLocaleString()}\u00D8
           </p>
         </div>
       </GlassCard>
@@ -197,7 +197,7 @@ export function HoldingPanel() {
                       }`}
                     >
                       <p className="font-semibold">{structure.name}</p>
-                      <p className="text-sm text-muted-foreground">{structure.cost.toLocaleString()}Ø</p>
+                      <p className="text-sm text-muted-foreground">{structure.cost.toLocaleString()}\u00D8</p>
                       <p className="text-xs text-green-500">×{structure.multiplier} revenus</p>
                     </button>
                   ))}
@@ -206,7 +206,7 @@ export function HoldingPanel() {
 
               <div className="flex gap-3">
                 <GlassButton onClick={handleCreate}>
-                  Créer ({legalStructures.find(s => s.value === selectedStructure)?.cost.toLocaleString()}Ø)
+                  Créer ({legalStructures.find(s => s.value === selectedStructure)?.cost.toLocaleString()}\u00D8)
                 </GlassButton>
                 <GlassButton variant="secondary" onClick={() => setShowCreateForm(false)}>
                   Annuler
@@ -259,7 +259,7 @@ export function HoldingPanel() {
             <Building2 className="w-4 h-4 text-primary" />
             <span className="text-sm text-muted-foreground">Capital</span>
           </div>
-          <p className="text-2xl font-bold">{Number(holding.capital).toLocaleString()}Ø</p>
+          <p className="text-2xl font-bold">{Number(holding.capital).toLocaleString()}\u00D8</p>
         </GlassCard>
 
         <GlassCard className="p-4">
@@ -267,7 +267,7 @@ export function HoldingPanel() {
             <AlertTriangle className="w-4 h-4 text-orange-500" />
             <span className="text-sm text-muted-foreground">Coût annuel</span>
           </div>
-          <p className="text-2xl font-bold">{Number(holding.annualCost).toLocaleString()}Ø</p>
+          <p className="text-2xl font-bold">{Number(holding.annualCost).toLocaleString()}\u00D8</p>
         </GlassCard>
       </div>
 
@@ -298,7 +298,7 @@ export function HoldingPanel() {
                     <span className="text-sm text-green-500 font-medium">Actif</span>
                   ) : isUnlocked ? (
                     <GlassButton onClick={() => handleUpgrade(level.value)} size="sm">
-                      Upgrade ({level.cost.toLocaleString()}Ø)
+                      Upgrade ({level.cost.toLocaleString()}\u00D8)
                     </GlassButton>
                   ) : (
                     <span className="text-sm text-muted-foreground">Verrouillé</span>
