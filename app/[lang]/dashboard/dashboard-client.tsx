@@ -115,12 +115,14 @@ export function DashboardClient() {
 
       {/* Main Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard 
-          icon={Wallet} 
-          label="En banque" 
-          value={formatCurrency(totalBankBalance)}
-          color="blue"
-        />
+        <div data-tutorial="fortune">
+          <StatCard 
+            icon={Wallet} 
+            label="En banque" 
+            value={formatCurrency(totalBankBalance)}
+            color="blue"
+          />
+        </div>
         <StatCard 
           icon={TrendingUp} 
           label="En bourse" 
@@ -258,7 +260,7 @@ export function DashboardClient() {
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
           {/* Mini-Games Card - Phase 1 */}
-          <Link href="/start">
+          <Link href="/start" data-tutorial="minigames">
             <GlassCard className="p-5 group cursor-pointer border-yellow-500/30">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-yellow-500/10 rounded-lg">
@@ -274,7 +276,7 @@ export function DashboardClient() {
           </Link>
 
           {/* Forbes Ranking Card - Phase 4 */}
-          <GlassCard className="p-5 border-purple-500/30">
+          <GlassCard className="p-5 border-purple-500/30" data-tutorial="forbes">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-purple-500/10 rounded-lg">
                 <Trophy className="w-5 h-5 text-purple-500" />

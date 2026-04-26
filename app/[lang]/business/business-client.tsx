@@ -408,7 +408,7 @@ export function BusinessClient() {
         <p className="text-muted-foreground mb-8 text-center max-w-md">
           Vous n&apos;avez pas encore créé d&apos;entreprise. Lancez votre business pour seulement 300 Ø.
         </p>
-        <GlassButton onClick={() => setShowCreate(true)} variant="primary" size="lg">
+        <GlassButton onClick={() => setShowCreate(true)} variant="primary" size="lg" data-tutorial="create-business">
           <Plus className="w-5 h-5 mr-2" />
           Créer mon entreprise
         </GlassButton>
@@ -442,7 +442,7 @@ export function BusinessClient() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2" data-tutorial="business-tabs">
         {[
           { id: "overview", label: "Vue d'ensemble", icon: BarChart3 },
           { id: "sales", label: "Ventes", icon: ShoppingCart },

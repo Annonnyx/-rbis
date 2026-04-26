@@ -3,7 +3,7 @@ import { Inter } from "next/font/google"
 import "../globals.css"
 import { Providers } from "../providers"
 import { Navigation } from "@/components/navigation"
-import { TutorialOverlay } from "@/components/tutorial/tutorial-overlay"
+import { InteractiveTutorialProvider } from "@/components/tutorial/interactive-tutorial"
 import { i18n } from "@/i18n.config"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -31,13 +31,14 @@ export default async function RootLayout({
     <html lang={lang} suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <div className="min-h-screen bg-background">
-            <Navigation />
-            <TutorialOverlay />
-            <main className="container mx-auto px-4 py-8 pt-24">
-              {children}
-            </main>
-          </div>
+          <InteractiveTutorialProvider>
+            <div className="min-h-screen bg-background">
+              <Navigation />
+              <main className="container mx-auto px-4 py-8 pt-24">
+                {children}
+              </main>
+            </div>
+          </InteractiveTutorialProvider>
         </Providers>
       </body>
     </html>

@@ -29,7 +29,7 @@ export default function StartPage() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left column - Mini games */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2" data-tutorial="minigame-list">
           <GlassCard className="p-6">
             <h2 className="text-xl font-semibold mb-4">🎮 Mini-Jeux</h2>
             <MiniGamesPanel />
