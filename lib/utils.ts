@@ -6,7 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, currency: string = "Ø"): string {
-  return `${amount.toLocaleString("fr-FR")} ${currency}`
+  // Use non-breaking space and explicit UTF-8 encoding to prevent display issues
+  const formatted = amount.toLocaleString("fr-FR")
+  return `${formatted}\u00A0${currency}`
 }
 
 export function formatDate(date: Date | string): string {

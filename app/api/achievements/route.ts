@@ -6,7 +6,7 @@ import { AchievementCategory } from "@prisma/client"
 // Achievement definitions from the document
 const ACHIEVEMENT_DEFINITIONS = [
   // Fortune Progression
-  { number: 1, name: "Premier Pas", description: "Gagner 100Ø via mini-jeux", category: "FORTUNE", conditionType: "fortune", conditionValue: "100", rewardType: "BONUS", rewardValue: "50" },
+  { number: 1, name: "Premier Pas", description: "Gagner 100\u00D8 via mini-jeux", category: "FORTUNE", conditionType: "fortune", conditionValue: "100", rewardType: "BONUS", rewardValue: "50" },
   { number: 2, name: "Centenaire", description: "Atteindre 100Ø de fortune", category: "FORTUNE", conditionType: "fortune", conditionValue: "100", rewardType: "BADGE", rewardValue: "bronze" },
   { number: 3, name: "Millénium", description: "Atteindre 1.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "1000", rewardType: "BONUS", rewardValue: "100" },
   { number: 4, name: "Décamillénium", description: "Atteindre 10.000Ø", category: "FORTUNE", conditionType: "fortune", conditionValue: "10000", rewardType: "BADGE", rewardValue: "argent" },
