@@ -148,6 +148,8 @@ export function BusinessClient() {
 
   // Fetch business types and locations for creation
   useEffect(() => {
+    if (status !== "authenticated") return
+
     // Fetch business types
     fetch("/api/business/types")
       .then(res => res.json())
@@ -165,9 +167,12 @@ export function BusinessClient() {
     // Fetch locations
     fetch("/api/locations")
       .then(res => res.json())
-      .then(data => setLocations(data.locations || []))
+      .then(data => {
+        console.log("Locations fetched:", data)
+        setLocations(data.locations || [])
+      })
       .catch(err => console.error("Error fetching locations:", err))
-  }, [])
+  }, [status])
 
   const fetchBusinessData = async () => {
     try {
