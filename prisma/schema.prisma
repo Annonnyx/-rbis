@@ -37,6 +37,13 @@ model Session {
   @@map("sessions")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+  BANNED
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -47,6 +54,7 @@ model User {
   identifier    String    @unique @default(cuid())
   nameChangedAt DateTime? @map("name_changed_at")
   image         String?
+  role          UserRole  @default(USER)
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   

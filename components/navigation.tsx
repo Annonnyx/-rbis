@@ -17,6 +17,7 @@ import {
   Menu,
   Orbit,
   TrendingUp,
+  Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -35,9 +36,15 @@ export function Navigation() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    // Check admin status
+    fetch("/api/admin")
+      .then(res => res.json())
+      .then(data => setIsAdmin(data.isAdmin))
+      .catch(() => setIsAdmin(false))
   }, [])
 
   if (!session) {
@@ -92,6 +99,18 @@ export function Navigation() {
               <span className="hidden lg:inline">{item.label}</span>
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+                "hover:bg-red-500/10 hover:text-red-500 text-sm font-medium"
+              )}
+            >
+              <Shield className="w-4 h-4" />
+              <span className="hidden lg:inline">Admin</span>
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
