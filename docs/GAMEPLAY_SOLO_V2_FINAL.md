@@ -308,7 +308,6 @@ Options de sourcing :
 - **Contrefaçon** : Copies apparues, perte de valeur marque
 - **Tendance surprise** : Couleur/motif inattendu qui explose
 
----
 
 ### ⚡ 2. VENTE DE BOISSONS ÉNERGISANTES
 

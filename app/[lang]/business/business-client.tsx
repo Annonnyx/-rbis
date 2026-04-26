@@ -7,7 +7,8 @@ import {
   Building2, TrendingUp, DollarSign, Plus, Edit, Package, 
   ShoppingCart, Users, BarChart3, ArrowUpRight, ArrowDownRight,
   Store, Sparkles, ChevronRight, Briefcase, Zap, UserCircle,
-  FlaskConical, Handshake, Store as StoreIcon, Trash2, AlertTriangle
+  FlaskConical, Handshake, Store as StoreIcon, Trash2, AlertTriangle,
+  MapPin, Leaf, Lightbulb
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
@@ -19,6 +20,26 @@ import { EmployeePanel } from "@/components/employees/employee-panel"
 import { TechnologyPanel } from "@/components/technologies/technology-panel"
 import { B2BPanel } from "@/components/b2b/b2b-panel"
 import { FranchisePanel } from "@/components/franchises/franchise-panel"
+
+// Business types for enhanced creation
+interface BusinessTypeOption {
+  value: string
+  name: string
+  icon: string
+  subtypes: { value: string; name: string; cost: number; revenue: number; difficulty: number }[]
+}
+
+interface GameLocationOption {
+  id: string
+  name: string
+  address: string
+  type: string
+  district: string
+  rentPerSqm: number
+  footTraffic: number
+  visibility: number
+  accessibility: number
+}
 
 interface Business {
   id: string
@@ -78,6 +99,20 @@ export function BusinessClient() {
   const [showRecordSale, setShowRecordSale] = useState(false)
   const [showEditBusiness, setShowEditBusiness] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  
+  // Enhanced creation form state
+  const [createStep, setCreateStep] = useState(1)
+  const [businessTypes, setBusinessTypes] = useState<BusinessTypeOption[]>([])
+  const [locations, setLocations] = useState<GameLocationOption[]>([])
+  const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [selectedSubtype, setSelectedSubtype] = useState<string | null>(null)
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null)
+  const [businessName, setBusinessName] = useState("")
+  const [pricePositioning, setPricePositioning] = useState<string>("accessible")
+  const [ethicsPositioning, setEthicsPositioning] = useState<string>("standard")
+  const [innovationPositioning, setInnovationPositioning] = useState<string>("hybrid")
+  const [createLoading, setCreateLoading] = useState(false)
+  const [createMessage, setCreateMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   
   const [formData, setFormData] = useState({
     name: "",
@@ -150,6 +185,58 @@ export function BusinessClient() {
       }
     } catch (error) {
       console.error("Error creating business:", error)
+    }
+  }
+
+  // Enhanced creation handlers
+  const selectedTypeData = businessTypes.find(t => t.value === selectedType)
+  const selectedSubtypeData = selectedTypeData?.subtypes.find((s: {value: string}) => s.value === selectedSubtype)
+  const selectedLocationData = locations.find(l => l.id === selectedLocation)
+  const totalCost = selectedSubtypeData?.cost || 0
+  const estimatedRevenue = selectedSubtypeData?.revenue || 0
+
+  const handleEnhancedCreate = async () => {
+    if (!businessName || !selectedType || !selectedSubtype || !selectedLocation) {
+      setCreateMessage({ type: "error", text: "Veuillez remplir tous les champs" })
+      return
+    }
+
+    setCreateLoading(true)
+    try {
+      const res = await fetch("/api/business", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: businessName,
+          type: selectedType,
+          subType: selectedSubtype,
+          locationId: selectedLocation,
+          pricePositioning,
+          ethicsPositioning,
+          innovationPositioning
+        })
+      })
+
+      if (res.ok) {
+        setCreateMessage({ type: "success", text: "Entreprise créée avec succès !" })
+        fetchBusinessData()
+        setTimeout(() => {
+          setShowCreate(false)
+          setCreateStep(1)
+          setBusinessName("")
+          setSelectedType(null)
+          setSelectedSubtype(null)
+          setSelectedLocation(null)
+          setCreateMessage(null)
+        }, 1500)
+      } else {
+        const data = await res.json()
+        setCreateMessage({ type: "error", text: data.message || "Erreur lors de la création" })
+      }
+    } catch (error) {
+      setCreateMessage({ type: "error", text: "Erreur réseau" })
+    } finally {
+      setCreateLoading(false)
     }
   }
 
@@ -261,81 +348,275 @@ export function BusinessClient() {
 
   if (showCreate) {
     return (
-      <div className="max-w-2xl mx-auto animate-fade-in">
-        <h1 className="text-3xl font-bold mb-2 gradient-text">Créer mon entreprise</h1>
-        <p className="text-muted-foreground mb-8">Lancez votre business dans l&apos;économie Ørbis</p>
-        
-        <GlassCard liquid className="p-8 mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-primary/10 rounded-xl">
-              <Sparkles className="w-6 h-6 text-primary" />
+      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+        {/* Progress Steps */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-bold gradient-text">Créer mon entreprise</h1>
+          <div className="flex items-center">
+            {[1, 2, 3, 4].map((s) => (
+              <div key={s} className="flex items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                  createStep >= s ? "bg-[#00ffff] text-black" : "bg-muted text-muted-foreground"
+                }`}>
+                  {s}
+                </div>
+                {s < 4 && <div className={`w-16 h-1 mx-2 ${createStep > s ? "bg-[#00ffff]" : "bg-muted"}`} />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Step 1: Business Type */}
+        {createStep === 1 && (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Choisissez le type d&apos;entreprise</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {businessTypes.map((type) => (
+                <GlassCard
+                  key={type.value}
+                  className={`p-4 cursor-pointer transition-all ${
+                    selectedType === type.value ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedType(type.value)
+                    setSelectedSubtype(null)
+                  }}
+                >
+                  <div className="text-3xl mb-2">{type.icon}</div>
+                  <h3 className="font-semibold">{type.name}</h3>
+                  <p className="text-xs text-muted-foreground">{type.subtypes.length} sous-types</p>
+                </GlassCard>
+              ))}
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Capital minimum requis</p>
-              <p className="text-3xl font-bold gradient-text">{formatCurrency(300)}</p>
+            {selectedType && (
+              <div className="mt-6 flex justify-end">
+                <GlassButton onClick={() => setCreateStep(2)}>
+                  Suivant <ChevronRight className="w-4 h-4 ml-2" />
+                </GlassButton>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Step 2: Subtype */}
+        {createStep === 2 && selectedTypeData && (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Choisissez la spécialisation</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {selectedTypeData.subtypes.map((subtype) => (
+                <GlassCard
+                  key={subtype.value}
+                  className={`p-4 cursor-pointer transition-all ${
+                    selectedSubtype === subtype.value ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                  }`}
+                  onClick={() => setSelectedSubtype(subtype.value)}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold">{subtype.name}</h3>
+                    <span className="text-xs px-2 py-1 rounded bg-[#00ffff]/20 text-[#00ffff]">
+                      {"★".repeat(subtype.difficulty)}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Coût création</p>
+                      <p className="font-semibold">{formatCurrency(subtype.cost)}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Revenu/h</p>
+                      <p className="font-semibold text-[#00ff00]">{formatCurrency(subtype.revenue)}/h</p>
+                    </div>
+                  </div>
+                </GlassCard>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-between">
+              <GlassButton variant="ghost" onClick={() => setCreateStep(1)}>
+                Retour
+              </GlassButton>
+              {selectedSubtype && (
+                <GlassButton onClick={() => setCreateStep(3)}>
+                  Suivant <ChevronRight className="w-4 h-4 ml-2" />
+                </GlassButton>
+              )}
             </div>
           </div>
-        </GlassCard>
-        
-        <form onSubmit={handleCreate} className="space-y-6">
-          <GlassCard className="p-6 space-y-6">
-            <GlassInput
-              label="Nom de l'entreprise"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ex: Ørbis Technologies"
-            />
-            <div>
-              <label className="text-sm font-medium text-foreground/80 mb-2 block">Description</label>
-              <textarea 
-                rows={3} 
-                value={formData.description} 
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
-                placeholder="Décrivez votre entreprise..."
-                className="w-full px-4 py-3 glass-input rounded-xl resize-none"
-              />
+        )}
+
+        {/* Step 3: Location */}
+        {createStep === 3 && (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Choisissez l&apos;emplacement</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {locations.map((location) => (
+                <GlassCard
+                  key={location.id}
+                  className={`p-4 cursor-pointer transition-all ${
+                    selectedLocation === location.id ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                  }`}
+                  onClick={() => setSelectedLocation(location.id)}
+                >
+                  <div className="flex items-start gap-3 mb-2">
+                    <MapPin className="w-5 h-5 text-[#00ffff] mt-1" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{location.name}</h3>
+                      <p className="text-xs text-muted-foreground">{location.address}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-xs mt-3">
+                    <div>
+                      <p className="text-muted-foreground">Type</p>
+                      <p className="font-medium">{location.type}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Trafic</p>
+                      <p className="font-medium">{location.footTraffic}/100</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Loyer/m²</p>
+                      <p className="font-medium">{formatCurrency(location.rentPerSqm)}</p>
+                    </div>
+                  </div>
+                </GlassCard>
+              ))}
             </div>
-            <GlassInput
-              label="Objectif"
-              value={formData.objective}
-              onChange={(e) => setFormData({ ...formData, objective: e.target.value })}
-              placeholder="Ex: Devenir le leader du savon écologique"
-            />
-            <div className="grid md:grid-cols-2 gap-4">
-              <GlassInput
-                label="Produit principal"
-                value={formData.product}
-                onChange={(e) => setFormData({ ...formData, product: e.target.value })}
-                placeholder="Ex: Savon artisanal"
-              />
-              <GlassInput
-                label="Service proposé"
-                value={formData.service}
-                onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                placeholder="Ex: Livraison à domicile"
-              />
+            <div className="mt-6 flex justify-between">
+              <GlassButton variant="ghost" onClick={() => setCreateStep(2)}>
+                Retour
+              </GlassButton>
+              {selectedLocation && (
+                <GlassButton onClick={() => setCreateStep(4)}>
+                  Suivant <ChevronRight className="w-4 h-4 ml-2" />
+                </GlassButton>
+              )}
             </div>
-          </GlassCard>
-          
-          <div className="flex gap-4">
-            <GlassButton
-              type="button"
-              variant="ghost"
-              onClick={() => setShowCreate(false)}
-              className="flex-1"
-            >
-              Annuler
-            </GlassButton>
-            <GlassButton
-              type="submit"
-              variant="primary"
-              className="flex-1"
-            >
-              Créer pour {formatCurrency(300)}
-            </GlassButton>
           </div>
-        </form>
+        )}
+
+        {/* Step 4: Details & Positioning */}
+        {createStep === 4 && (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Détails et Direction Artistique</h2>
+            
+            <GlassCard className="p-6 mb-6">
+              <h3 className="font-semibold mb-4">Nom de l&apos;entreprise</h3>
+              <GlassInput
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                placeholder="Ex: Ma Super Entreprise"
+              />
+            </GlassCard>
+
+            <GlassCard className="p-6 mb-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Positionnement Prix
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {["discount", "accessible", "premium", "luxe"].map((pos) => (
+                  <button
+                    key={pos}
+                    onClick={() => setPricePositioning(pos)}
+                    className={`p-3 rounded-lg border transition-all ${
+                      pricePositioning === pos ? "border-[#00ffff] bg-[#00ffff]/10" : ""
+                    }`}
+                  >
+                    <p className="font-medium capitalize">{pos}</p>
+                  </button>
+                ))}
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-6 mb-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Leaf className="w-5 h-5" />
+                Positionnement Éthique
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {["standard", "eco_friendly", "fair_trade", "local"].map((pos) => (
+                  <button
+                    key={pos}
+                    onClick={() => setEthicsPositioning(pos)}
+                    className={`p-3 rounded-lg border transition-all ${
+                      ethicsPositioning === pos ? "border-[#00ffff] bg-[#00ffff]/10" : ""
+                    }`}
+                  >
+                    <p className="font-medium capitalize">{pos.replace("_", " ")}</p>
+                  </button>
+                ))}
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-6 mb-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Lightbulb className="w-5 h-5" />
+                Positionnement Innovation
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                {["traditional", "hybrid", "innovative"].map((pos) => (
+                  <button
+                    key={pos}
+                    onClick={() => setInnovationPositioning(pos)}
+                    className={`p-3 rounded-lg border transition-all ${
+                      innovationPositioning === pos ? "border-[#00ffff] bg-[#00ffff]/10" : ""
+                    }`}
+                  >
+                    <p className="font-medium capitalize">{pos}</p>
+                  </button>
+                ))}
+              </div>
+            </GlassCard>
+
+            {/* Summary */}
+            <GlassCard className="p-6 mb-6 bg-[#00ffff]/5 border-[#00ffff]/30">
+              <h3 className="font-semibold mb-4 text-[#00ffff]">Récapitulatif</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Type:</span>
+                  <span>{selectedTypeData?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Spécialisation:</span>
+                  <span>{selectedSubtypeData?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Emplacement:</span>
+                  <span>{selectedLocationData?.name}</span>
+                </div>
+                <div className="flex justify-between font-semibold">
+                  <span>Coût total:</span>
+                  <span className="text-[#00ffff]">{formatCurrency(totalCost)}</span>
+                </div>
+                <div className="flex justify-between font-semibold text-[#00ff00]">
+                  <span>Revenu estimé:</span>
+                  <span>{formatCurrency(estimatedRevenue)}/h</span>
+                </div>
+              </div>
+            </GlassCard>
+
+            {createMessage && (
+              <div className={`p-4 rounded-lg mb-4 ${
+                createMessage.type === "success" ? "bg-green-500/10 text-green-500 border border-green-500/30" : "bg-red-500/10 text-red-500 border border-red-500/30"
+              }`}>
+                {createMessage.text}
+              </div>
+            )}
+
+            <div className="flex justify-between">
+              <GlassButton variant="ghost" onClick={() => setCreateStep(3)}>
+                Retour
+              </GlassButton>
+              <GlassButton 
+                onClick={handleEnhancedCreate} 
+                disabled={createLoading || !businessName}
+                className="neon-pulse"
+              >
+                <Building2 className="w-4 h-4 mr-2" />
+                {createLoading ? "Création..." : `Créer pour ${formatCurrency(totalCost)}`}
+              </GlassButton>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
