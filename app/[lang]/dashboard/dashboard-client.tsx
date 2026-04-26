@@ -90,9 +90,9 @@ export function DashboardClient() {
     redirect("/login")
   }
 
-  const mainBalance = data?.user.bankAccounts[0]?.balance || 0
-  const totalBankBalance = data?.user.bankAccounts.reduce((acc, accnt) => acc + Number(accnt.balance), 0) || 0
-  const portfolioValue = data?.user.portfolio.reduce((acc, item) => acc + (item.shares * Number(item.stock.currentPrice)), 0) || 0
+  const mainBalance = data?.user?.bankAccounts?.[0]?.balance || 0
+  const totalBankBalance = (data?.user?.bankAccounts || []).reduce((acc, accnt) => acc + Number(accnt.balance || 0), 0)
+  const portfolioValue = (data?.user?.portfolio || []).reduce((acc, item) => acc + ((item?.shares || 0) * Number(item?.stock?.currentPrice || 0)), 0)
   const totalWealth = totalBankBalance + portfolioValue
 
   return (
