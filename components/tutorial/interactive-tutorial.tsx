@@ -180,15 +180,32 @@ export function InteractiveTutorialProvider({ children }: { children: ReactNode 
   const [isActive, setIsActive] = useState(false)
   const [targetElement, setTargetElement] = useState<DOMRect | null>(null)
   const [currentPath, setCurrentPath] = useState("")
+  const [tutorialChecked, setTutorialChecked] = useState(false)
 
   useEffect(() => {
-    // Check if tutorial was already completed (client-side only)
+    // Check tutorial status from API (user-specific, not localStorage)
     if (typeof window === 'undefined') return
-    const completed = localStorage.getItem("tutorial-completed")
-    if (!completed) {
-      // Small delay to let the page load
-      setTimeout(() => setIsActive(true), 1000)
+    
+    const checkTutorialStatus = async () => {
+      try {
+        const res = await fetch("/api/tutorial")
+        if (res.ok) {
+          const data = await res.json()
+          // Only show tutorial if not completed and not skipped
+          if (data.tutorial && 
+              data.tutorial.currentStep !== "COMPLETED" && 
+              !data.tutorial.skipped) {
+            setTimeout(() => setIsActive(true), 1000)
+          }
+        }
+      } catch (error) {
+        console.error("Error checking tutorial status:", error)
+      } finally {
+        setTutorialChecked(true)
+      }
     }
+    
+    checkTutorialStatus()
     setCurrentPath(window.location.pathname)
   }, [])
 
@@ -223,24 +240,44 @@ export function InteractiveTutorialProvider({ children }: { children: ReactNode 
     return () => clearTimeout(timer)
   }, [currentStep, isActive, currentPath])
 
-  const startTutorial = useCallback(() => {
+  const startTutorial = useCallback(async () => {
     setCurrentStep(0)
     setIsActive(true)
-    localStorage.removeItem("tutorial-completed")
+    // Reset tutorial status via API
+    try {
+      await fetch("/api/tutorial", { method: "PATCH" })
+    } catch (error) {
+      console.error("Error resetting tutorial:", error)
+    }
   }, [])
 
-  const skipTutorial = useCallback(() => {
+  const skipTutorial = useCallback(async () => {
     setIsActive(false)
-    localStorage.setItem("tutorial-completed", "true")
-    localStorage.setItem("tutorial-skipped", "true")
+    // Mark tutorial as skipped via API
+    try {
+      await fetch("/api/tutorial", { method: "PUT" })
+    } catch (error) {
+      console.error("Error skipping tutorial:", error)
+    }
   }, [])
 
-  const nextStep = useCallback(() => {
+  const nextStep = useCallback(async () => {
     if (currentStep < TUTORIAL_STEPS.length - 1) {
       setCurrentStep(prev => prev + 1)
+      // Advance tutorial step via API
+      try {
+        await fetch("/api/tutorial", { method: "POST" })
+      } catch (error) {
+        console.error("Error advancing tutorial:", error)
+      }
     } else {
       setIsActive(false)
-      localStorage.setItem("tutorial-completed", "true")
+      // Complete tutorial via API
+      try {
+        await fetch("/api/tutorial", { method: "POST" })
+      } catch (error) {
+        console.error("Error completing tutorial:", error)
+      }
     }
   }, [currentStep])
 

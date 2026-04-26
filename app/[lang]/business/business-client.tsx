@@ -7,7 +7,7 @@ import {
   Building2, TrendingUp, DollarSign, Plus, Edit, Package, 
   ShoppingCart, Users, BarChart3, ArrowUpRight, ArrowDownRight,
   Store, Sparkles, ChevronRight, Briefcase, Zap, UserCircle,
-  FlaskConical, Handshake, Store as StoreIcon
+  FlaskConical, Handshake, Store as StoreIcon, Trash2, AlertTriangle
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
@@ -77,6 +77,7 @@ export function BusinessClient() {
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [showRecordSale, setShowRecordSale] = useState(false)
   const [showEditBusiness, setShowEditBusiness] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   
   const [formData, setFormData] = useState({
     name: "",
@@ -221,6 +222,21 @@ export function BusinessClient() {
       }
     } catch (error) {
       console.error("Error updating business:", error)
+    }
+  }
+
+  const handleDeleteBusiness = async () => {
+    try {
+      const res = await fetch("/api/business", {
+        method: "DELETE",
+      })
+      if (res.ok) {
+        setBusiness(null)
+        setShowDeleteConfirm(false)
+        router.refresh()
+      }
+    } catch (error) {
+      console.error("Error deleting business:", error)
     }
   }
 
@@ -470,6 +486,31 @@ export function BusinessClient() {
     )
   }
 
+  if (showDeleteConfirm) {
+    return (
+      <div className="max-w-md mx-auto animate-fade-in">
+        <GlassCard className="p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
+          </div>
+          <h1 className="text-2xl font-bold mb-2 text-red-500">Supprimer l&apos;entreprise ?</h1>
+          <p className="text-muted-foreground mb-6">
+            Cette action est irréversible. Toutes les données de l&apos;entreprise, y compris les actions en bourse, seront définitivement supprimées.
+          </p>
+          <div className="flex gap-4">
+            <GlassButton type="button" variant="ghost" onClick={() => setShowDeleteConfirm(false)} className="flex-1">
+              Annuler
+            </GlassButton>
+            <GlassButton type="button" variant="primary" onClick={handleDeleteBusiness} className="flex-1 bg-red-500 hover:bg-red-600">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Supprimer
+            </GlassButton>
+          </div>
+        </GlassCard>
+      </div>
+    )
+  }
+
   if (!business) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
@@ -510,6 +551,10 @@ export function BusinessClient() {
           <GlassButton variant="secondary" onClick={openEditModal}>
             <Edit className="w-4 h-4 mr-2" />
             Modifier
+          </GlassButton>
+          <GlassButton variant="secondary" onClick={() => setShowDeleteConfirm(true)} className="text-red-500 hover:text-red-600">
+            <Trash2 className="w-4 h-4 mr-2" />
+            Supprimer
           </GlassButton>
         </div>
       </div>

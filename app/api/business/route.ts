@@ -148,3 +148,88 @@ export async function PATCH(req: Request) {
     return new NextResponse("Internal error", { status: 500 })
   }
 }
+
+export async function DELETE() {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 })
+  }
+
+  const userId = session.user.id
+
+  try {
+    const business = await db.business.findFirst({
+      where: { userId },
+      include: {
+        stock: true,
+      },
+    })
+
+    if (!business) {
+      return new NextResponse("Business not found", { status: 404 })
+    }
+
+    const mainAccount = await db.bankAccount.findFirst({
+      where: { userId, isMain: true },
+    })
+
+    const businessAccount = await db.bankAccount.findFirst({
+      where: { businessId: business.id },
+    })
+
+    // Transfer remaining balance to main account if exists
+    const businessBalance = businessAccount ? Number(businessAccount.balance) : 0
+
+    await db.$transaction(async (tx) => {
+      // Delete stock trades for this stock
+      if (business.stock) {
+        await tx.stockTrade.deleteMany({
+          where: { stockId: business.stock.id },
+        })
+        await tx.stockHistory.deleteMany({
+          where: { stockId: business.stock.id },
+        })
+        await tx.stock.delete({
+          where: { id: business.stock.id },
+        })
+      }
+
+      // Delete business account transactions
+      if (businessAccount) {
+        await tx.transaction.deleteMany({
+          where: { accountId: businessAccount.id },
+        })
+        await tx.bankAccount.delete({
+          where: { id: businessAccount.id },
+        })
+      }
+
+      // Transfer remaining balance to main account
+      if (mainAccount && businessBalance > 0) {
+        await tx.bankAccount.update({
+          where: { id: mainAccount.id },
+          data: { balance: { increment: businessBalance } },
+        })
+        await tx.transaction.create({
+          data: {
+            accountId: mainAccount.id,
+            type: "DEPOSIT",
+            amount: businessBalance,
+            description: `Liquidation entreprise: ${business.name}`,
+          },
+        })
+      }
+
+      // Delete business
+      await tx.business.delete({
+        where: { id: business.id },
+      })
+    })
+
+    return new NextResponse("Business deleted successfully", { status: 200 })
+  } catch (error) {
+    console.error("Error deleting business:", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}

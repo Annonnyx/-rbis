@@ -135,3 +135,40 @@ export async function PUT() {
     return new NextResponse("Internal error", { status: 500 })
   }
 }
+
+// PATCH /api/tutorial/reset - Reset tutorial for retaking
+export async function PATCH() {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 })
+  }
+
+  try {
+    const tutorial = await db.tutorial.upsert({
+      where: { userId: session.user.id },
+      update: {
+        currentStep: TutorialStep.WELCOME,
+        stepsCompleted: 0,
+        completedSteps: [],
+        skipped: false,
+        skippedAt: null
+      },
+      create: {
+        userId: session.user.id,
+        currentStep: TutorialStep.WELCOME,
+        totalSteps: TUTORIAL_STEPS.length,
+        stepsCompleted: 0
+      }
+    })
+
+    return NextResponse.json({
+      success: true,
+      message: "Tutorial reset",
+      tutorial
+    })
+  } catch (error) {
+    console.error("Error resetting tutorial:", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}
