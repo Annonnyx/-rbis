@@ -6,12 +6,19 @@ import { useEffect, useState } from "react"
 import { 
   Building2, TrendingUp, DollarSign, Plus, Edit, Package, 
   ShoppingCart, Users, BarChart3, ArrowUpRight, ArrowDownRight,
-  Store, Sparkles, ChevronRight
+  Store, Sparkles, ChevronRight, Briefcase, Zap, UserCircle,
+  FlaskConical, Handshake, Store as StoreIcon
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
 import { GlassButton } from "@/components/ui/glass-button"
 import { GlassInput } from "@/components/ui/glass-input"
+import { HoldingPanel } from "@/components/holdings/holding-panel"
+import { EventsPanel } from "@/components/events/events-panel"
+import { EmployeePanel } from "@/components/employees/employee-panel"
+import { TechnologyPanel } from "@/components/technologies/technology-panel"
+import { B2BPanel } from "@/components/b2b/b2b-panel"
+import { FranchisePanel } from "@/components/franchises/franchise-panel"
 
 interface Business {
   id: string
@@ -64,7 +71,7 @@ export function BusinessClient() {
   const [products, setProducts] = useState<Product[]>([])
   const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<"overview" | "sales" | "products" | "analytics">("overview")
+  const [activeTab, setActiveTab] = useState<"overview" | "sales" | "products" | "employees" | "analytics" | "technologies" | "b2b" | "franchises" | "holding" | "events">("overview")
   const [showCreate, setShowCreate] = useState(false)
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [showRecordSale, setShowRecordSale] = useState(false)
@@ -440,7 +447,13 @@ export function BusinessClient() {
           { id: "overview", label: "Vue d'ensemble", icon: BarChart3 },
           { id: "sales", label: "Ventes", icon: ShoppingCart },
           { id: "products", label: "Produits", icon: Package },
+          { id: "employees", label: "Équipe", icon: UserCircle },
           { id: "analytics", label: "Analytics", icon: TrendingUp },
+          { id: "technologies", label: "R&D", icon: FlaskConical },
+          { id: "b2b", label: "B2B", icon: Handshake },
+          { id: "franchises", label: "Franchises", icon: StoreIcon },
+          { id: "holding", label: "Holding", icon: Briefcase },
+          { id: "events", label: "Événements", icon: Zap },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -680,6 +693,48 @@ export function BusinessClient() {
               Les graphiques détaillés seront bientôt disponibles
             </p>
           </GlassCard>
+        </div>
+      )}
+
+      {/* Holding Tab */}
+      {activeTab === "holding" && (
+        <div className="space-y-6">
+          <HoldingPanel />
+        </div>
+      )}
+
+      {/* Events Tab */}
+      {activeTab === "events" && (
+        <div className="space-y-6">
+          <EventsPanel />
+        </div>
+      )}
+
+      {/* Employees Tab */}
+      {activeTab === "employees" && (
+        <div className="space-y-6">
+          <EmployeePanel />
+        </div>
+      )}
+
+      {/* Technologies Tab */}
+      {activeTab === "technologies" && (
+        <div className="space-y-6">
+          <TechnologyPanel />
+        </div>
+      )}
+
+      {/* B2B Tab */}
+      {activeTab === "b2b" && (
+        <div className="space-y-6">
+          <B2BPanel />
+        </div>
+      )}
+
+      {/* Franchises Tab */}
+      {activeTab === "franchises" && (
+        <div className="space-y-6">
+          <FranchisePanel />
         </div>
       )}
     </div>

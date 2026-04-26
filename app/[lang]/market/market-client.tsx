@@ -6,12 +6,13 @@ import { useEffect, useState } from "react"
 import { 
   TrendingUp, TrendingDown, Building2, DollarSign, 
   ShoppingCart, ArrowUpRight, ArrowDownRight, BarChart3,
-  PieChart, Activity, Clock, ChevronRight, Search
+  PieChart, Activity, Clock, ChevronRight, Search, Bitcoin
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
 import { GlassButton } from "@/components/ui/glass-button"
 import { GlassInput } from "@/components/ui/glass-input"
+import { CryptoPanel } from "@/components/crypto/crypto-panel"
 
 interface Stock {
   id: string
@@ -64,7 +65,7 @@ export function MarketClient() {
   const [portfolio, setPortfolio] = useState<Portfolio[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<"market" | "portfolio" | "history">("market")
+  const [activeTab, setActiveTab] = useState<"market" | "portfolio" | "history" | "crypto">("market")
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null)
   const [showTradeModal, setShowTradeModal] = useState(false)
   const [tradeType, setTradeType] = useState<"BUY" | "SELL">("BUY")
@@ -74,11 +75,30 @@ export function MarketClient() {
     shares: "",
   })
 
+  const [userBalance, setUserBalance] = useState<number>(0)
+  const CRYPTO_UNLOCK_THRESHOLD = 10000 // 10k Ø
+
   useEffect(() => {
     if (status === "authenticated") {
       fetchMarketData()
+      fetchUserBalance()
     }
   }, [status])
+
+  const fetchUserBalance = async () => {
+    try {
+      const res = await fetch("/api/bank/accounts")
+      if (res.ok) {
+        const accounts = await res.json()
+        const mainAccount = accounts.find((a: any) => a.isMain)
+        if (mainAccount) {
+          setUserBalance(Number(mainAccount.balance))
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user balance:", error)
+    }
+  }
 
   const fetchMarketData = async () => {
     try {
@@ -325,6 +345,7 @@ export function MarketClient() {
           { id: "market", label: "Marché", icon: BarChart3 },
           { id: "portfolio", label: "Mon portefeuille", icon: PieChart },
           { id: "history", label: "Historique", icon: Clock },
+          { id: "crypto", label: "Crypto", icon: Bitcoin },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -546,14 +567,40 @@ export function MarketClient() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`font-bold ${transaction.type === "BUY" ? "text-red-500" : "text-green-500"}`}>
-                        {transaction.type === "BUY" ? "-" : "+"}{formatCurrency(Number(transaction.totalAmount))}
+                      <p className={`font-semibold ${transaction.type === "BUY" ? "text-red-500" : "text-green-500"}`}>
+                        {transaction.type === "BUY" ? "-" : "+"}{formatCurrency(transaction.totalAmount)}
                       </p>
                     </div>
                   </div>
                 </GlassCard>
               ))}
             </div>
+          )}
+        </div>
+      )}
+
+      {/* Crypto Tab */}
+      {activeTab === "crypto" && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Trading Crypto</h2>
+          
+          {userBalance < CRYPTO_UNLOCK_THRESHOLD ? (
+            <GlassCard className="p-12 text-center">
+              <Bitcoin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Crypto Verrouillé</h3>
+              <p className="text-muted-foreground mb-4">
+                Le trading crypto se débloque à {CRYPTO_UNLOCK_THRESHOLD.toLocaleString()}Ø de capital
+              </p>
+              <div className="p-4 rounded-lg bg-primary/10 inline-block">
+                <p className="text-sm text-muted-foreground">Votre capital actuel</p>
+                <p className="text-2xl font-bold">{userBalance.toLocaleString()}Ø</p>
+                <p className="text-sm text-muted-foreground">
+                  Il vous manque {(CRYPTO_UNLOCK_THRESHOLD - userBalance).toLocaleString()}Ø
+                </p>
+              </div>
+            </GlassCard>
+          ) : (
+            <CryptoPanel />
           )}
         </div>
       )}

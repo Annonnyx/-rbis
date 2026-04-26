@@ -58,6 +58,30 @@ model User {
   suggestions   Suggestion[]
   stockTrades   StockTrade[]
   votes         Vote[]
+  
+  // Phase 1: Solo gameplay
+  playerStats   PlayerStats?
+  inventory     InventoryItem[]
+  
+  // Phase 2: Crypto
+  cryptoWallet  CryptoWallet?
+  
+  // Phase 3: Holding
+  holding       Holding?
+  
+  // Phase 4: OPA, Forbes, Events
+  opaOffers     OPAOffer[]
+  forbesRanking ForbesRanking?
+  randomEvents  RandomEvent[]
+  
+  // Phase 5: Victory
+  victory       Victory?
+  
+  // Achievements System
+  userAchievements UserAchievement[]
+  
+  // Tutorial System
+  tutorial      Tutorial?
 
   @@map("users")
 }
@@ -153,12 +177,47 @@ model Business {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  // Phase 2: Business enhancements
+  type        BusinessType?
+  subType     BusinessSubType? @map("sub_type")
+  locationId  String?  @map("location_id") // GameLocation reference
+  
+  // Direction Artistique (DA)
+  pricePositioning    PricePositioning? @map("price_positioning")
+  ethicsPositioning   EthicsPositioning? @map("ethics_positioning")
+  innovationPositioning InnovationPositioning? @map("innovation_positioning")
+  
+  // Performance metrics
+  revenuePerHour      Decimal? @default(0) @map("revenue_per_hour") @db.Decimal(15, 2)
+  monthlyRent        Decimal? @default(0) @map("monthly_rent") @db.Decimal(15, 2)
+  monthlySalaries    Decimal? @default(0) @map("monthly_salaries") @db.Decimal(15, 2)
+  operatingCosts     Decimal? @default(0) @map("operating_costs") @db.Decimal(15, 2)
+  
+  productivity       Decimal? @default(1.0) @db.Decimal(3, 2)
+  customerSatisfaction Int? @default(50) @map("customer_satisfaction")
+  reputation         Int? @default(0)
+  
+  isProfitable       Boolean? @default(false) @map("is_profitable")
+
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   city        City?    @relation(fields: [cityId], references: [id])
   accounts    BankAccount[]
   stock       Stock?
   products    Product[]
   sales       Sale[]
+  location    GameLocation? @relation(fields: [locationId], references: [id])
+  subsidiaries Subsidiary[]
+  opaOffers   OPAOffer[]
+  randomEvents RandomEvent[]
+  
+  // Enhanced systems
+  employees   Employee[]
+  technologies Technology[]
+  patents     Patent[]
+  b2bClients  B2BClient[]
+  suppliers   Supplier[]
+  constructionProjects ConstructionProject[]
+  vehicles    Vehicle[]
 
   @@map("businesses")
 }
@@ -314,3 +373,1010 @@ enum TradeType {
   BUY
   SELL
 }
+
+// ==================== PHASE 1: SOLO GAMEPLAY SYSTEM ====================
+
+model PlayerStats {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  
+  // Mini-games tracking
+  miniGamesEarnings Int      @default(0) @map("mini_games_earnings") // Total Ø earned from mini-games (capped at 2000)
+  miniGamesCapReached Boolean @default(false) @map("mini_games_cap_reached")
+  
+  // Energy system
+  energyCurrent     Int      @default(100) @map("energy_current")
+  energyMax         Int      @default(100) @map("energy_max")
+  lastEnergyUpdate  DateTime @default(now()) @map("last_energy_update")
+  
+  // Starting capital
+  startingCapital   Int      @default(500) @map("starting_capital")
+  hasUsedMiniGames  Boolean  @default(false) @map("has_used_mini_games")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  miniGameSessions  MiniGameSession[]
+  
+  @@map("player_stats")
+}
+
+model MiniGameSession {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  playerStatsId   String   @map("player_stats_id")
+  
+  type            MiniGameType
+  earnings        Int      // Ø earned this session
+  energyConsumed  Int      @map("energy_consumed")
+  duration        Int      // Duration in seconds
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  
+  playerStats     PlayerStats @relation(fields: [playerStatsId], references: [id], onDelete: Cascade)
+  
+  @@map("mini_game_sessions")
+}
+
+model InventoryItem {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  
+  type        ItemType
+  name        String
+  description String?
+  quantity    Int      @default(1)
+  
+  // Effects
+  energyRestore   Int? @map("energy_restore")
+  energyBoost     Int? @map("energy_boost") // Temporary max energy boost
+  duration        Int? // Duration in minutes for temporary effects
+  
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("inventory_items")
+}
+
+model GameLocation {
+  id          String   @id @default(cuid())
+  
+  // Google Maps data
+  name        String
+  address     String
+  lat         Float
+  lng         Float
+  
+  // Zone type
+  type        LocationType
+  district    String? // Quartier/Ville
+  
+  // Economic characteristics
+  rentPerSqm  Int      @default(50) @map("rent_per_sqm") // Ø/m²/month
+  footTraffic Int      @default(50) @map("foot_traffic") // 0-100
+  visibility  Int      @default(50) // 0-100
+  accessibility Int    @default(50) // 0-100 (transport)
+  competition Int      @default(0) // Number of similar businesses nearby
+  
+  // Infrastructure
+  hasParking       Boolean @default(false) @map("has_parking")
+  hasFiber         Boolean @default(false) @map("has_fiber")
+  hasLoadingDock   Boolean @default(false) @map("has_loading_dock")
+  hasStorage       Boolean @default(false) @map("has_storage")
+  
+  // Gentrification system
+  gentrificationLevel Int @default(0) @map("gentrification_level") // 0-300 (×3 max)
+  majorProjectsNearby Int @default(0) @map("major_projects_nearby")
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  businesses  Business[]
+
+  @@map("game_locations")
+}
+
+// Enums for Phase 1
+enum MiniGameType {
+  DELIVERY_WALKING
+  URBAN_TASKS
+  DELIVERY_BIKE
+  STREET_VENDOR
+  FREELANCE_DIGITAL
+  DRIVER_VTC
+}
+
+enum ItemType {
+  FOOD
+  DRINK
+  ENERGY_BOOST
+  STAMINA_POTION
+  SPECIAL
+}
+
+enum LocationType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+  FINANCIAL
+  PORT
+  AIRPORT
+  TOURIST
+  RURAL
+}
+
+// ==================== PHASE 2: TRADING CRYPTO ====================
+
+enum CryptoType {
+  ORB // Base coin, 1Ø
+  BITGOLD // Premium, 50.000Ø
+  ETHEREUM_PLUS // High volatility, 3.000Ø
+  SPEEDCOIN // Extreme volatility, 0.1Ø
+  GREENTOKEN // Eco-friendly, 5Ø
+}
+
+model CryptoWallet {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  
+  // Holdings
+  orbBalance        Decimal  @default(0) @map("orb_balance") @db.Decimal(20, 8)
+  bitgoldBalance    Decimal  @default(0) @map("bitgold_balance") @db.Decimal(20, 8)
+  ethereumPlusBalance Decimal @default(0) @map("ethereum_plus_balance") @db.Decimal(20, 8)
+  speedcoinBalance  Decimal  @default(0) @map("speedcoin_balance") @db.Decimal(20, 8)
+  greentokenBalance Decimal  @default(0) @map("greentoken_balance") @db.Decimal(20, 8)
+  
+  // Total value in Ø
+  totalValue        Decimal  @default(0) @map("total_value") @db.Decimal(20, 2)
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cryptoTransactions CryptoTransaction[]
+  cryptoMining      CryptoMining?
+  
+  @@map("crypto_wallets")
+}
+
+model CryptoTransaction {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  cryptoWalletId    String   @map("crypto_wallet_id")
+  
+  type              CryptoTransactionType
+  cryptoType        CryptoType
+  amount            Decimal  @db.Decimal(20, 8)
+  pricePerUnit      Decimal  @map("price_per_unit") @db.Decimal(20, 8)
+  totalValue        Decimal  @map("total_value") @db.Decimal(20, 2)
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  
+  cryptoWallet      CryptoWallet @relation(fields: [cryptoWalletId], references: [id], onDelete: Cascade)
+  
+  @@map("crypto_transactions")
+}
+
+enum CryptoTransactionType {
+  BUY
+  SELL
+  MINING_REWARD
+  STAKING_REWARD
+}
+
+model CryptoMining {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  cryptoWalletId    String   @unique @map("crypto_wallet_id")
+  
+  // Mining setup
+  hashrate          Int      @default(0) // MH/s
+  powerConsumption  Int      @default(0) // Watts
+  miningCostPerHour Int      @default(0) @map("mining_cost_per_hour") // Ø/h
+  
+  // Mining progress
+  lastMiningUpdate  DateTime @map("last_mining_update")
+  totalMined        Decimal  @default(0) @map("total_mined") @db.Decimal(20, 8)
+  
+  isActive          Boolean  @default(false) @map("is_active")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  cryptoWallet      CryptoWallet @relation(fields: [cryptoWalletId], references: [id], onDelete: Cascade)
+  
+  @@map("crypto_mining")
+}
+
+// ==================== PHASE 2: BUSINESS ENHANCEMENTS ====================
+
+enum BusinessType {
+  // Retail
+  CLOTHING
+  ENERGY_DRINKS
+  ELECTRONICS
+  FOOD_BEVERAGE
+  COSMETICS
+  FURNITURE
+  
+  // Tech
+  SAAS
+  HARDWARE
+  GAME_DEV
+  CYBERSECURITY
+  
+  // Transport
+  AIRLINE
+  LOGISTICS
+  
+  // Real Estate
+  REAL_ESTATE
+  
+  // Special
+  CASINO
+  HOTEL
+  INDUSTRIAL
+  PHARMA
+  GREEN_ENERGY
+  OIL_GAS
+  NUCLEAR
+  MEDIA
+  HEALTHCARE
+  EDUCATION
+  AGRICULTURE
+  DEFENSE
+}
+
+enum BusinessSubType {
+  // Clothing
+  FAST_FASHION
+  READY_TO_WEAR
+  LUXURY
+  SPORTSWEAR
+  ECO_FRIENDLY
+  
+  // Energy Drinks
+  ARTISANAL
+  INDUSTRIAL
+  PREMIUM_BIO
+  GAMING
+  
+  // Electronics
+  RETAIL
+  REPAIR
+  MANUFACTURING
+  
+  // Food & Beverage
+  RESTAURANT
+  FAST_FOOD
+  CAFE
+  BAKERY
+  
+  // And more subtypes for other categories...
+}
+
+enum PricePositioning {
+  DISCOUNT
+  ACCESSIBLE
+  PREMIUM
+  LUXE
+}
+
+enum EthicsPositioning {
+  STANDARD
+  ECO_FRIENDLY
+  FAIR_TRADE
+  LOCAL
+}
+
+enum InnovationPositioning {
+  TRADITIONAL
+  HYBRID
+  INNOVATIVE
+}
+
+// ==================== PHASE 3: HOLDING & TAX OPTIMIZATION ====================
+
+enum LegalStructure {
+  AUTO_ENTREPRENEUR
+  SARL
+  SAS
+  HOLDING
+  OFFSHORE
+}
+
+enum TaxOptimizationLevel {
+  STANDARD // ×1.0
+  SARL_OPTIMIZED // ×1.2
+  HOLDING_SARL // ×1.4
+  HOLDING_OFFSHORE // ×1.7
+}
+
+model Holding {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  name              String
+  
+  // Legal structure
+  legalStructure    LegalStructure @map("legal_structure")
+  taxOptimizationLevel TaxOptimizationLevel @map("tax_optimization_level")
+  
+  // Financials
+  capital           Decimal  @default(0) @db.Decimal(15, 2)
+  annualCost        Decimal  @default(0) @map("annual_cost") @db.Decimal(15, 2)
+  
+  // Tax optimization
+  taxRate           Decimal  @default(0.25) @db.Decimal(5, 4) // 0% to 25%
+  revenueMultiplier Decimal  @default(1.0) @map("revenue_multiplier") @db.Decimal(3, 2) // 1.0 to 1.7
+  
+  // Optimization strategies
+  hasDeductions     Boolean  @default(false) @map("has_deductions")
+  hasAmortizations  Boolean  @default(false) @map("has_amortizations")
+  hasProvisions     Boolean  @default(false) @map("has_provisions")
+  hasTaxCredits     Boolean  @default(false) @map("has_tax_credits")
+  hasOffshore       Boolean  @default(false) @map("has_offshore")
+  hasTransferPricing Boolean @default(false) @map("has_transfer_pricing")
+  
+  // Risk factors
+  auditRisk         Int      @default(0) @map("audit_risk") // 0-100
+  reputationRisk    Int      @default(0) @map("reputation_risk") // 0-100
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subsidiaries      Subsidiary[]
+  
+  @@map("holdings")
+}
+
+model Subsidiary {
+  id                String   @id @default(cuid())
+  holdingId         String   @map("holding_id")
+  businessId        String   @map("business_id")
+  
+  // Ownership
+  ownershipPercent  Decimal  @map("ownership_percent") @db.Decimal(5, 2)
+  
+  // Location
+  country           String
+  city              String
+  
+  // Financial contribution
+  annualContribution Decimal @map("annual_contribution") @db.Decimal(15, 2)
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  holding           Holding  @relation(fields: [holdingId], references: [id], onDelete: Cascade)
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("subsidiaries")
+}
+
+// ==================== PHASE 4: OPA & FORBES RANKING ====================
+
+enum OPAStatus {
+  PENDING
+  ACTIVE
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+model OPAOffer {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  targetBusinessId  String   @map("target_business_id")
+  
+  // Offer details
+  offerPricePerShare Decimal @map("offer_price_per_share") @db.Decimal(15, 2)
+  totalShares       Int      @map("total_shares")
+  totalValue        Decimal  @map("total_value") @db.Decimal(15, 2)
+  premiumPercent    Decimal  @map("premium_percent") @db.Decimal(5, 2) // % above market price
+  
+  status            OPAStatus
+  acceptanceRate    Decimal  @default(0) @map("acceptance_rate") @db.Decimal(5, 2) // % of shareholders accepted
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  expiresAt         DateTime @map("expires_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetBusiness    Business @relation(fields: [targetBusinessId], references: [id])
+  
+  @@map("opa_offers")
+}
+
+enum ForbesRankTier {
+  OUTSIDE // Rang 100+
+  BOTTOM_100 // Rang 51-100
+  MID_50 // Rang 26-50
+  TOP_25 // Rang 11-25
+  TOP_10 // Rang 1-10
+  NUMBER_1 // Rang 1
+}
+
+model ForbesRanking {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  
+  currentRank       Int      @default(10000) @map("current_rank")
+  previousRank      Int?     @default(10000) @map("previous_rank")
+  rankTier          ForbesRankTier @map("rank_tier")
+  
+  totalFortune      Decimal  @default(0) @map("total_fortune") @db.Decimal(20, 2)
+  
+  // Fortune breakdown
+  cash              Decimal  @default(0) @db.Decimal(20, 2)
+  stocks            Decimal  @default(0) @db.Decimal(20, 2)
+  crypto            Decimal  @default(0) @db.Decimal(20, 2)
+  businessValue     Decimal  @default(0) @map("business_value") @db.Decimal(20, 2)
+  realEstate        Decimal  @default(0) @map("real_estate") @db.Decimal(20, 2)
+  
+  // Progression
+  rankChange        Int      @default(0) @map("rank_change") // Positive = climbed
+  fortuneChange     Decimal  @default(0) @map("fortune_change") @db.Decimal(20, 2)
+  
+  lastUpdated       DateTime @default(now()) @map("last_updated")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("forbes_rankings")
+}
+
+enum EventType {
+  OPPORTUNITY
+  BREAKDOWN
+  BUZZ
+  CRISIS
+  SCANDAL
+}
+
+model RandomEvent {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  businessId        String?  @map("business_id")
+  
+  type              EventType
+  title             String
+  description       String   @db.Text
+  
+  // Impact
+  revenueImpact     Decimal? @map("revenue_impact") @db.Decimal(5, 2) // -0.5 to +2.0 multiplier
+  reputationImpact  Int?     @map("reputation_impact") // -50 to +50
+  costImpact        Decimal? @map("cost_impact") @db.Decimal(15, 2)
+  
+  // Duration (in hours of game time)
+  durationHours     Int?     @map("duration_hours")
+  isActive          Boolean  @default(true) @map("is_active")
+  
+  // Player choice
+  playerChoice      String?  @map("player_choice") // "accept", "reject", "invest", etc.
+  choiceResult      String?  @map("choice_result")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  resolvedAt        DateTime? @map("resolved_at")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business          Business? @relation(fields: [businessId], references: [id])
+  
+  @@map("random_events")
+}
+
+// ==================== PHASE 5: VICTORY & GAME COMPLETION ====================
+
+model Victory {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  
+  // Victory conditions
+  achievedAt        DateTime @map("achieved_at")
+  finalFortune      Decimal  @map("final_fortune") @db.Decimal(20, 2)
+  finalRank         Int      @map("final_rank")
+  
+  // Statistics
+  totalPlayTime     Int      @map("total_play_time") // in minutes
+  businessesOwned   Int      @default(0) @map("businesses_owned")
+  totalTransactions Int      @default(0) @map("total_transactions")
+  
+  // Achievements
+  title             String   @default("Magnat Suprême")
+  bonusReward       Decimal  @default(1000000) @map("bonus_reward") @db.Decimal(20, 2) // 1MØ bonus
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("victories")
+}
+
+// ==================== ACHIEVEMENTS SYSTEM ====================
+
+enum AchievementCategory {
+  FORTUNE
+  FORBES
+  BUSINESS
+  RETAIL
+  TECH
+  TRANSPORT
+  REAL_ESTATE
+  SPECIAL
+  FRANCHISE
+  STOCK
+  CRYPTO
+}
+
+enum AchievementRewardType {
+  BADGE
+  BONUS
+  TITLE
+  SKIN
+}
+
+model Achievement {
+  id                String   @id @default(cuid())
+  number            Int      @unique
+  
+  name              String
+  description       String   @db.Text
+  category          AchievementCategory
+  
+  // Condition
+  conditionType     String   @map("condition_type") // "fortune", "rank", "business_count", etc.
+  conditionValue    String   @map("condition_value") // JSON string for complex conditions
+  
+  // Reward
+  rewardType        AchievementRewardType @map("reward_type")
+  rewardValue       String?  @map("reward_value") // JSON string for reward details
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  
+  userAchievements  UserAchievement[]
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  achievementId     String   @map("achievement_id")
+  
+  unlockedAt        DateTime @map("unlocked_at")
+  progress          Float    @default(0) // 0 to 1 for progress-based achievements
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement       Achievement @relation(fields: [achievementId], references: [id])
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// ==================== ENHANCED EMPLOYEE SYSTEM ====================
+
+enum EmployeeRole {
+  OPERATIONS
+  SALES
+  MARKETING
+  RESEARCH
+  MANAGEMENT
+  LOGISTICS
+  CUSTOMER_SERVICE
+}
+
+enum SkillType {
+  EFFICIENCY      // Réduction coûts production
+  CREATIVITY      // Amélioration DA/produits
+  NEGOTIATION     // Meilleurs prix fournisseurs
+  LEADERSHIP      // Bonus équipe
+  TECHNICAL       // R&D speed
+  MARKETING       // Bonus ventes
+  LOGISTICS       // Optimisation transport
+}
+
+model Employee {
+  id                String   @id @default(cuid())
+  businessId        String   @map("business_id")
+  
+  // Identity
+  firstName         String   @map("first_name")
+  lastName          String   @map("last_name")
+  fullName          String   @map("full_name")
+  
+  // Role & Level
+  role              EmployeeRole
+  level             Int      @default(1) // 1-10
+  experience        Int      @default(0) // XP pour prochain niveau
+  
+  // Skills (0-100 each)
+  skillEfficiency   Int      @default(10) @map("skill_efficiency")
+  skillCreativity   Int      @default(10) @map("skill_creativity")
+  skillNegotiation  Int      @default(10) @map("skill_negotiation")
+  skillLeadership   Int      @default(10) @map("skill_leadership")
+  skillTechnical    Int      @default(10) @map("skill_technical")
+  skillMarketing    Int      @default(10) @map("skill_marketing")
+  skillLogistics    Int      @default(10) @map("skill_logistics")
+  
+  // Employment
+  salary            Decimal  @db.Decimal(10, 2)
+  hiredAt           DateTime @default(now()) @map("hired_at")
+  performance       Decimal  @default(0.7) @db.Decimal(3, 2) // 0-1, affects productivity
+  satisfaction      Decimal  @default(0.8) @db.Decimal(3, 2) // 0-1, affects retention
+  
+  // Specializations (unlocked at higher levels)
+  specializations   String[] @default([]) // JSON array of special perks
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  trainingSessions  EmployeeTraining[]
+  
+  @@map("employees")
+}
+
+model EmployeeTraining {
+  id                String   @id @default(cuid())
+  employeeId        String   @map("employee_id")
+  
+  skillType         SkillType @map("skill_type")
+  durationHours     Int      @map("duration_hours")
+  cost              Decimal  @db.Decimal(10, 2)
+  xpGain            Int      @map("xp_gain")
+  
+  startedAt         DateTime @default(now()) @map("started_at")
+  completedAt       DateTime? @map("completed_at")
+  
+  employee          Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@map("employee_trainings")
+}
+
+// ==================== TUTORIAL SYSTEM ====================
+
+enum TutorialStep {
+  WELCOME
+  MAP_DISCOVERY
+  FIRST_MINIGAME
+  ENERGY_SYSTEM
+  FIRST_BUSINESS
+  BUSINESS_TYPES
+  LOCATION_CHOICE
+  DA_POSITIONING
+  HIRING_EMPLOYEE
+  STOCK_MARKET
+  CRYPTO_UNLOCKED
+  HOLDING_UNLOCKED
+  VICTORY_CONDITIONS
+  COMPLETED
+}
+
+model Tutorial {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  
+  currentStep       TutorialStep @default(WELCOME) @map("current_step")
+  completedSteps    String[] @default([]) @map("completed_steps") // Array of completed steps
+  
+  // Progress tracking
+  totalSteps        Int      @default(14)
+  stepsCompleted    Int      @default(0) @map("steps_completed")
+  
+  // Skip option
+  skipped           Boolean  @default(false)
+  skippedAt         DateTime? @map("skipped_at")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("tutorials")
+}
+
+// ==================== R&D TECHNOLOGY SYSTEM ====================
+
+enum TechCategory {
+  PRODUCT
+  PROCESS
+  MARKETING
+  LOGISTICS
+  SUSTAINABILITY
+}
+
+model Technology {
+  id                String   @id @default(cuid())
+  businessId        String   @map("business_id")
+  
+  name              String
+  description       String   @db.Text
+  category          TechCategory
+  level             Int      @default(1) // 1-5
+  maxLevel          Int      @default(5) @map("max_level")
+  
+  // Costs
+  researchCost      Decimal  @map("research_cost") @db.Decimal(15, 2)
+  researchTime      Int      @map("research_time") // hours
+  
+  // Effects (JSON)
+  effects           String   // {"revenueMultiplier": 1.1, "costReduction": 0.15}
+  
+  // Progress
+  progress          Float    @default(0) // 0-1
+  startedAt         DateTime? @map("started_at")
+  completedAt       DateTime? @map("completed_at")
+  
+  // Prerequisites
+  prerequisites     String[] @default([]) // IDs of required technologies
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("technologies")
+}
+
+model Patent {
+  id                String   @id @default(cuid())
+  businessId        String   @map("business_id")
+  
+  name              String
+  description       String   @db.Text
+  industry          String   // tech, pharma, energy, etc.
+  
+  // Value
+  licensingRevenue  Decimal  @default(0) @map("licensing_revenue") @db.Decimal(15, 2)
+  marketValue       Decimal  @map("market_value") @db.Decimal(15, 2)
+  
+  // Duration
+  filedAt           DateTime @default(now()) @map("filed_at")
+  expiresAt         DateTime @map("expires_at") // 20 years
+  
+  isActive          Boolean  @default(true) @map("is_active")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("patents")
+}
+
+// ==================== SUPPLY CHAIN B2B ====================
+
+enum ContractStatus {
+  NEGOTIATING
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+model B2BClient {
+  id                String   @id @default(cuid())
+  businessId        String   @map("business_id")
+  
+  name              String
+  industry          String   // restaurant, gym, supermarket, etc.
+  
+  // Contract terms
+  contractStatus    ContractStatus @default(NEGOTIATING) @map("contract_status")
+  monthlyVolume     Int      @map("monthly_volume") // units per month
+  unitPrice         Decimal  @map("unit_price") @db.Decimal(10, 2)
+  
+  // Relationship
+  satisfaction      Decimal  @default(0.8) @db.Decimal(3, 2)
+  loyaltyYears      Int      @default(0) @map("loyalty_years")
+  
+  // Financials
+  totalRevenue      Decimal  @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("b2b_clients")
+}
+
+model Supplier {
+  id                String   @id @default(cuid())
+  businessId        String   @map("business_id")
+  
+  name              String
+  materialType      String   @map("material_type") // raw_materials, packaging, components
+  
+  // Terms
+  basePrice         Decimal  @map("base_price") @db.Decimal(10, 2)
+  qualityRating     Int      @default(5) @map("quality_rating") // 1-10
+  reliability       Decimal  @default(0.9) @db.Decimal(3, 2) // on-time delivery rate
+  
+  // Negotiation
+  discountRate      Decimal  @default(0) @map("discount_rate") @db.Decimal(5, 2)
+  minOrderQuantity  Int      @default(100) @map("min_order_quantity")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("suppliers")
+}
+
+// ==================== FRANCHISE SYSTEM ====================
+
+enum FranchiseStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+model Franchise {
+  id                String   @id @default(cuid())
+  franchisorId      String   @map("franchisor_id") // user who owns the brand
+  franchiseeId      String?  @map("franchisee_id") // user who operates (null if AI)
+  
+  // Brand
+  brandName         String   @map("brand_name")
+  businessType      BusinessType @map("business_type")
+  
+  // Terms
+  entryFee          Decimal  @map("entry_fee") @db.Decimal(15, 2) // 10k-100k
+  royaltyRate       Decimal  @map("royalty_rate") @db.Decimal(5, 2) // 3-8% of revenue
+  
+  // Location
+  city              String
+  country           String
+  address           String
+  
+  // Performance
+  monthlyRevenue    Decimal  @default(0) @map("monthly_revenue") @db.Decimal(15, 2)
+  totalRevenue      Decimal  @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  royaltyPaid       Decimal  @default(0) @map("royalty_paid") @db.Decimal(15, 2)
+  
+  status            FranchiseStatus @default(DRAFT)
+  openedAt          DateTime? @map("opened_at")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  @@map("franchises")
+}
+
+// ==================== REAL ESTATE CONSTRUCTION ====================
+
+enum ProjectType {
+  RESIDENTIAL
+  COMMERCIAL
+  OFFICE
+  INDUSTRIAL
+  MIXED_USE
+}
+
+enum ConstructionStatus {
+  PLANNING
+  PERMITTING
+  CONSTRUCTION
+  COMPLETED
+  SOLD_OUT
+}
+
+model ConstructionProject {
+  id                String   @id @default(cuid())
+  businessId        String   @map("business_id")
+  
+  name              String
+  projectType       ProjectType @map("project_type")
+  address           String
+  
+  // Land
+  landCost          Decimal  @map("land_cost") @db.Decimal(15, 2)
+  landSize          Int      @map("land_size") // m²
+  
+  // Building specs
+  buildableArea     Int      @map("buildable_area") // m²
+  floors            Int      @default(1)
+  totalUnits        Int      @map("total_units")
+  
+  // Costs
+  constructionCost  Decimal  @map("construction_cost") @db.Decimal(15, 2)
+  totalInvestment   Decimal  @map("total_investment") @db.Decimal(15, 2)
+  
+  // Timeline
+  status            ConstructionStatus
+  plannedStart      DateTime? @map("planned_start")
+  actualStart       DateTime? @map("actual_start")
+  expectedCompletion DateTime? @map("expected_completion")
+  actualCompletion  DateTime? @map("actual_completion")
+  
+  // Sales
+  unitsSold         Int      @default(0) @map("units_sold")
+  avgSalePrice      Decimal  @map("avg_sale_price") @db.Decimal(15, 2)
+  totalSales        Decimal  @default(0) @map("total_sales") @db.Decimal(15, 2)
+  
+  // Gentrification effect
+  gentrificationMultiplier Decimal @default(1.0) @map("gentrification_multiplier") @db.Decimal(3, 2)
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("construction_projects")
+}
+
+// ==================== FLEET MANAGEMENT ====================
+
+enum VehicleType {
+  // Air
+  AIRCRAFT_SMALL    // 50-100 passagers
+  AIRCRAFT_MEDIUM   // 150-200 passagers
+  AIRCRAFT_LARGE    // 400+ passagers (A380)
+  CARGO_PLANE       // Freight
+  
+  // Ground
+  VAN               // Light delivery
+  TRUCK_SMALL       // 3.5t
+  TRUCK_MEDIUM      // 7.5t
+  TRUCK_LARGE       // Semi-remorque
+  TRUCK_TANKER      // Liquids/gas
+}
+
+enum VehicleStatus {
+  ACTIVE
+  MAINTENANCE
+  RETIRED
+  SOLD
+}
+
+model Vehicle {
+  id                String   @id @default(cuid())
+  businessId        String   @map("business_id")
+  
+  name              String
+  model             String
+  vehicleType       VehicleType @map("vehicle_type")
+  
+  // Specs
+  capacity          Int      // passengers or kg cargo
+  range             Int      // km
+  fuelConsumption   Decimal  @map("fuel_consumption") @db.Decimal(5, 2) // L/100km or L/hour
+  
+  // Purchase
+  purchasePrice     Decimal  @map("purchase_price") @db.Decimal(15, 2)
+  purchaseDate      DateTime @default(now()) @map("purchase_date")
+  
+  // Operating
+  status            VehicleStatus @default(ACTIVE)
+  totalKm           Int      @default(0) @map("total_km")
+  hoursFlown        Int      @default(0) @map("hours_flown") // for aircraft
+  
+  // Maintenance
+  lastMaintenance   DateTime? @map("last_maintenance")
+  nextMaintenance   DateTime? @map("next_maintenance")
+  maintenanceCost   Decimal  @default(0) @map("maintenance_cost") @db.Decimal(15, 2)
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("vehicles")
+}
+
+// ==================== BUSINESS ENHANCEMENT RELATIONS ====================
+
+// Add relations to Business model (these will be added via edit)
+// employees Employee[]
+// technologies Technology[]
+// patents Patent[]
+// b2bClients B2BClient[]
+// suppliers Supplier[]
+// constructionProjects ConstructionProject[]
+// vehicles Vehicle[]

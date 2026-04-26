@@ -6,12 +6,15 @@ import { useEffect, useState } from "react"
 import { 
   Building2, Landmark, MapPin, Wallet, TrendingUp, Lightbulb, 
   Orbit, Users, ArrowUpRight, Sparkles, Zap, Globe,
-  ChevronRight, BarChart3, PiggyBank
+  ChevronRight, BarChart3, PiggyBank, Trophy, Crown, Star
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import Link from "next/link"
 import { GlassCard } from "@/components/ui/glass-card"
 import { GlassButton } from "@/components/ui/glass-button"
+import { ForbesRanking } from "@/components/forbes/forbes-ranking"
+import { VictoryScreen } from "@/components/victory/victory-screen"
+import { AchievementsPanel } from "@/components/achievements/achievements-panel"
 
 interface DashboardData {
   user: {
@@ -254,6 +257,55 @@ export function DashboardClient() {
 
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
+          {/* Mini-Games Card - Phase 1 */}
+          <Link href="/start">
+            <GlassCard className="p-5 group cursor-pointer border-yellow-500/30">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-yellow-500/10 rounded-lg">
+                  <Sparkles className="w-5 h-5 text-yellow-500" />
+                </div>
+                <h3 className="font-semibold">🎮 Mini-Jeux</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Gagnez jusqu'à 2000Ø pour démarrer votre empire
+              </p>
+              <p className="text-xs text-primary mt-2">Jouer maintenant →</p>
+            </GlassCard>
+          </Link>
+
+          {/* Forbes Ranking Card - Phase 4 */}
+          <GlassCard className="p-5 border-purple-500/30">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-purple-500/10 rounded-lg">
+                <Trophy className="w-5 h-5 text-purple-500" />
+              </div>
+              <h3 className="font-semibold">🏆 Classement Forbes</h3>
+            </div>
+            <ForbesRanking />
+          </GlassCard>
+
+          {/* Victory Progress Card - Phase 5 */}
+          <GlassCard className="p-5 border-yellow-500/30">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-yellow-500/10 rounded-lg">
+                <Crown className="w-5 h-5 text-yellow-500" />
+              </div>
+              <h3 className="font-semibold">👑 Victoire</h3>
+            </div>
+            <VictoryScreen />
+          </GlassCard>
+
+          {/* Achievements Card */}
+          <GlassCard className="p-5 border-green-500/30">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <Star className="w-5 h-5 text-green-500" />
+              </div>
+              <h3 className="font-semibold">⭐ Succès</h3>
+            </div>
+            <AchievementsPanel />
+          </GlassCard>
+
           {/* Location Card */}
           <Link href="/map">
             <GlassCard className="p-5 group cursor-pointer">
