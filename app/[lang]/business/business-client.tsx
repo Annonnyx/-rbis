@@ -1,7 +1,7 @@
 "use client"
 
 import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { 
   Building2, TrendingUp, DollarSign, Plus, Edit, Package, 
@@ -67,6 +67,7 @@ function useSafeSession() {
 
 export function BusinessClient() {
   const { data: session, status } = useSafeSession()
+  const router = useRouter()
   const [business, setBusiness] = useState<Business | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [sales, setSales] = useState<Sale[]>([])
@@ -601,7 +602,7 @@ export function BusinessClient() {
                     <p className="text-sm text-muted-foreground">{business.stock.symbol}</p>
                   </div>
                 </div>
-                <GlassButton variant="primary" size="sm">
+                <GlassButton variant="primary" size="sm" onClick={() => router.push("/market")}>
                   Voir la bourse
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </GlassButton>
