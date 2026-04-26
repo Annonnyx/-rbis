@@ -44,9 +44,17 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
         orbe: {
-          DEFAULT: "#6366f1",
-          light: "#818cf8",
-          dark: "#4f46e5",
+          DEFAULT: "#00ffff",
+          light: "#00ffff",
+          dark: "#00cccc",
+        },
+        cyber: {
+          cyan: "#00ffff",
+          magenta: "#ff00ff",
+          yellow: "#ffff00",
+          purple: "#9900ff",
+          dark: "#0a0f14",
+          panel: "#0f1923",
         },
       },
       borderRadius: {
