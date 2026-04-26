@@ -146,6 +146,29 @@ export function BusinessClient() {
     }
   }, [status])
 
+  // Fetch business types and locations for creation
+  useEffect(() => {
+    // Fetch business types
+    fetch("/api/business/types")
+      .then(res => res.json())
+      .then(data => {
+        const types = Object.entries(data).map(([key, value]: [string, any]) => ({
+          value: key,
+          name: value.name,
+          icon: value.icon,
+          subtypes: value.subtypes
+        }))
+        setBusinessTypes(types)
+      })
+      .catch(err => console.error("Error fetching business types:", err))
+
+    // Fetch locations
+    fetch("/api/locations")
+      .then(res => res.json())
+      .then(data => setLocations(data.locations || []))
+      .catch(err => console.error("Error fetching locations:", err))
+  }, [])
+
   const fetchBusinessData = async () => {
     try {
       const [businessRes, productsRes, salesRes] = await Promise.all([
@@ -370,30 +393,39 @@ export function BusinessClient() {
         {createStep === 1 && (
           <div>
             <h2 className="text-xl font-bold mb-4">Choisissez le type d&apos;entreprise</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {businessTypes.map((type) => (
-                <GlassCard
-                  key={type.value}
-                  className={`p-4 cursor-pointer transition-all ${
-                    selectedType === type.value ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedType(type.value)
-                    setSelectedSubtype(null)
-                  }}
-                >
-                  <div className="text-3xl mb-2">{type.icon}</div>
-                  <h3 className="font-semibold">{type.name}</h3>
-                  <p className="text-xs text-muted-foreground">{type.subtypes.length} sous-types</p>
-                </GlassCard>
-              ))}
-            </div>
-            {selectedType && (
-              <div className="mt-6 flex justify-end">
-                <GlassButton onClick={() => setCreateStep(2)}>
-                  Suivant <ChevronRight className="w-4 h-4 ml-2" />
-                </GlassButton>
+            {businessTypes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-12 h-12 border-2 border-[#00ffff] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-muted-foreground">Chargement des types d&apos;entreprise...</p>
               </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {businessTypes.map((type) => (
+                    <GlassCard
+                      key={type.value}
+                      className={`p-4 cursor-pointer transition-all hover:border-[#00ffff]/50 ${
+                        selectedType === type.value ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedType(type.value)
+                        setSelectedSubtype(null)
+                      }}
+                    >
+                      <div className="text-3xl mb-2">{type.icon}</div>
+                      <h3 className="font-semibold">{type.name}</h3>
+                      <p className="text-xs text-muted-foreground">{type.subtypes?.length || 0} sous-types</p>
+                    </GlassCard>
+                  ))}
+                </div>
+                {selectedType && (
+                  <div className="mt-6 flex justify-end">
+                    <GlassButton onClick={() => setCreateStep(2)}>
+                      Suivant <ChevronRight className="w-4 h-4 ml-2" />
+                    </GlassButton>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
