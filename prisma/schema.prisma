@@ -263,15 +263,18 @@ model Vote {
 
 model Stock {
   id          String   @id @default(cuid())
-  businessId  String   @unique @map("business_id")
+  businessId  String?   @unique @map("business_id")
   symbol      String   @unique
+  name        String?
   totalShares Int      @default(1000) @map("total_shares")
   availableShares Int  @default(1000) @map("available_shares")
   currentPrice Decimal @default(1.00) @db.Decimal(15, 2) @map("current_price")
+  isRealStock Boolean  @default(false) @map("is_real_stock")
+  sector      String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business    Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
   trades      StockTrade[]
   history     StockHistory[]
 

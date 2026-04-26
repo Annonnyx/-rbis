@@ -83,7 +83,7 @@ export async function POST(req: Request) {
         db.stockTrade.create({
           data: {
             stockId,
-            buyerId: stock.business.userId,
+            buyerId: stock.business?.userId || "",
             sellerId: userId,
             quantity,
             price: stock.currentPrice,
