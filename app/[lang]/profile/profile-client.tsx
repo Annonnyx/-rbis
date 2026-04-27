@@ -5,12 +5,13 @@ import { redirect } from "next/navigation"
 import { useEffect, useState } from "react"
 import { 
   User, Mail, MapPin, Building2, Wallet, TrendingUp,
-  LogOut, Edit2, Copy, CheckCircle2, Shield, Sparkles
+  LogOut, Edit2, Copy, CheckCircle2, Shield, Sparkles, Palette
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
 import { GlassButton } from "@/components/ui/glass-button"
 import { signOut } from "next-auth/react"
+import { useTheme, themeColors, type ThemeColor } from "@/components/theme-provider"
 
 const isBrowser = typeof window !== "undefined"
 
@@ -53,10 +54,12 @@ interface ProfileData {
 
 export function ProfileClient() {
   const { data: session, status } = useSafeSession()
+  const { themeColor, setThemeColor } = useTheme()
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState(false)
   const [showEditProfile, setShowEditProfile] = useState(false)
+  const [showThemeSelector, setShowThemeSelector] = useState(false)
   const [editFormData, setEditFormData] = useState({
     firstName: "",
     lastName: "",
@@ -309,6 +312,62 @@ export function ProfileClient() {
           </div>
         </GlassCard>
       </div>
+
+      {/* Theme Color Selector */}
+      <GlassCard className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Palette className="w-4 h-4 text-primary" />
+            Couleur du thème
+          </h3>
+          <span className="text-sm text-muted-foreground">{themeColors[themeColor].name}</span>
+        </div>
+        
+        {showThemeSelector ? (
+          <div className="space-y-3">
+            <div className="grid grid-cols-7 gap-2">
+              {(Object.keys(themeColors) as ThemeColor[]).map((color) => (
+                <button
+                  key={color}
+                  onClick={() => {
+                    setThemeColor(color)
+                    setShowThemeSelector(false)
+                  }}
+                  className={`w-10 h-10 rounded-full transition-all ${
+                    themeColor === color 
+                      ? "ring-2 ring-white ring-offset-2 ring-offset-background scale-110" 
+                      : "hover:scale-105"
+                  }`}
+                  style={{ backgroundColor: themeColors[color].hex }}
+                  title={themeColors[color].name}
+                />
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <GlassButton 
+                variant="ghost" 
+                onClick={() => setShowThemeSelector(false)}
+                className="flex-1"
+              >
+                Fermer
+              </GlassButton>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <div 
+              className="w-12 h-12 rounded-full ring-2 ring-primary/30"
+              style={{ backgroundColor: themeColors[themeColor].hex }}
+            />
+            <GlassButton 
+              variant="secondary" 
+              onClick={() => setShowThemeSelector(true)}
+            >
+              Changer la couleur
+            </GlassButton>
+          </div>
+        )}
+      </GlassCard>
 
       {/* Portfolio Preview */}
       {profile?.portfolio && profile.portfolio.length > 0 && (

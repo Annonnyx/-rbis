@@ -384,11 +384,11 @@ export function BusinessClient() {
             {[1, 2, 3, 4].map((s) => (
               <div key={s} className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                  createStep >= s ? "bg-[#00ffff] text-black" : "bg-muted text-muted-foreground"
+                  createStep >= s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                 }`}>
                   {s}
                 </div>
-                {s < 4 && <div className={`w-16 h-1 mx-2 ${createStep > s ? "bg-[#00ffff]" : "bg-muted"}`} />}
+                {s < 4 && <div className={`w-16 h-1 mx-2 ${createStep > s ? "bg-primary" : "bg-muted"}`} />}
               </div>
             ))}
           </div>
@@ -400,7 +400,7 @@ export function BusinessClient() {
             <h2 className="text-xl font-bold mb-4">Choisissez le type d&apos;entreprise</h2>
             {businessTypes.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-12 h-12 border-2 border-[#00ffff] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p className="text-muted-foreground">Chargement des types d&apos;entreprise...</p>
               </div>
             ) : (
@@ -409,8 +409,8 @@ export function BusinessClient() {
                   {businessTypes.map((type) => (
                     <GlassCard
                       key={type.value}
-                      className={`p-4 cursor-pointer transition-all hover:border-[#00ffff]/50 ${
-                        selectedType === type.value ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${
+                        selectedType === type.value ? "border-primary bg-primary/10 neon-pulse" : ""
                       }`}
                       onClick={() => {
                         setSelectedType(type.value)
@@ -444,13 +444,13 @@ export function BusinessClient() {
                 <GlassCard
                   key={subtype.value}
                   className={`p-4 cursor-pointer transition-all ${
-                    selectedSubtype === subtype.value ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                    selectedSubtype === subtype.value ? "border-primary bg-primary/10 neon-pulse" : ""
                   }`}
                   onClick={() => setSelectedSubtype(subtype.value)}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold">{subtype.name}</h3>
-                    <span className="text-xs px-2 py-1 rounded bg-[#00ffff]/20 text-[#00ffff]">
+                    <span className="text-xs px-2 py-1 rounded bg-primary/20 text-primary">
                       {"★".repeat(subtype.difficulty)}
                     </span>
                   </div>
@@ -461,7 +461,7 @@ export function BusinessClient() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Revenu/h</p>
-                      <p className="font-semibold text-[#00ff00]">{formatCurrency(subtype.revenue)}/h</p>
+                      <p className="font-semibold text-green-500">{formatCurrency(subtype.revenue)}/h</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -486,7 +486,7 @@ export function BusinessClient() {
             <h2 className="text-xl font-bold mb-4">Choisissez l&apos;emplacement</h2>
             {locations.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-12 h-12 border-2 border-[#00ffff] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p className="text-muted-foreground">Chargement des emplacements...</p>
               </div>
             ) : (
@@ -495,13 +495,13 @@ export function BusinessClient() {
                   {locations.map((location) => (
                     <GlassCard
                       key={location.id}
-                      className={`p-4 cursor-pointer transition-all hover:border-[#00ffff]/50 ${
-                        selectedLocation === location.id ? "border-[#00ffff] bg-[#00ffff]/10 neon-pulse" : ""
+                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${
+                        selectedLocation === location.id ? "border-primary bg-primary/10 neon-pulse" : ""
                       }`}
                       onClick={() => setSelectedLocation(location.id)}
                     >
                       <div className="flex items-start gap-3 mb-2">
-                        <MapPin className="w-5 h-5 text-[#00ffff] mt-1" />
+                        <MapPin className="w-5 h-5 text-primary mt-1" />
                         <div className="flex-1">
                           <h3 className="font-semibold">{location.name}</h3>
                           <p className="text-xs text-muted-foreground">{location.address}</p>
@@ -564,7 +564,7 @@ export function BusinessClient() {
                     key={pos}
                     onClick={() => setPricePositioning(pos)}
                     className={`p-3 rounded-lg border transition-all ${
-                      pricePositioning === pos ? "border-[#00ffff] bg-[#00ffff]/10" : ""
+                      pricePositioning === pos ? "border-primary bg-primary/10" : ""
                     }`}
                   >
                     <p className="font-medium capitalize">{pos}</p>
@@ -584,7 +584,7 @@ export function BusinessClient() {
                     key={pos}
                     onClick={() => setEthicsPositioning(pos)}
                     className={`p-3 rounded-lg border transition-all ${
-                      ethicsPositioning === pos ? "border-[#00ffff] bg-[#00ffff]/10" : ""
+                      ethicsPositioning === pos ? "border-primary bg-primary/10" : ""
                     }`}
                   >
                     <p className="font-medium capitalize">{pos.replace("_", " ")}</p>
@@ -604,7 +604,7 @@ export function BusinessClient() {
                     key={pos}
                     onClick={() => setInnovationPositioning(pos)}
                     className={`p-3 rounded-lg border transition-all ${
-                      innovationPositioning === pos ? "border-[#00ffff] bg-[#00ffff]/10" : ""
+                      innovationPositioning === pos ? "border-primary bg-primary/10" : ""
                     }`}
                   >
                     <p className="font-medium capitalize">{pos}</p>
@@ -614,8 +614,8 @@ export function BusinessClient() {
             </GlassCard>
 
             {/* Summary */}
-            <GlassCard className="p-6 mb-6 bg-[#00ffff]/5 border-[#00ffff]/30">
-              <h3 className="font-semibold mb-4 text-[#00ffff]">Récapitulatif</h3>
+            <GlassCard className="p-6 mb-6 bg-primary/5 border-primary/30">
+              <h3 className="font-semibold mb-4 text-primary">Récapitulatif</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Type:</span>
@@ -631,9 +631,9 @@ export function BusinessClient() {
                 </div>
                 <div className="flex justify-between font-semibold">
                   <span>Coût total:</span>
-                  <span className="text-[#00ffff]">{formatCurrency(totalCost)}</span>
+                  <span className="text-primary">{formatCurrency(totalCost)}</span>
                 </div>
-                <div className="flex justify-between font-semibold text-[#00ff00]">
+                <div className="flex justify-between font-semibold text-green-500">
                   <span>Revenu estimé:</span>
                   <span>{formatCurrency(estimatedRevenue)}/h</span>
                 </div>

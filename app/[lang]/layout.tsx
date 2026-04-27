@@ -5,6 +5,7 @@ import { Providers } from "../providers"
 import { Navigation } from "@/components/navigation"
 import { InteractiveTutorialProvider } from "@/components/tutorial/interactive-tutorial"
 import { i18n } from "@/i18n.config"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -31,14 +32,16 @@ export default async function RootLayout({
     <html lang={lang} suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <InteractiveTutorialProvider>
-            <div className="min-h-screen bg-background">
-              <Navigation />
-              <main className="container mx-auto px-4 py-8 pt-24">
-                {children}
-              </main>
-            </div>
-          </InteractiveTutorialProvider>
+          <ThemeProvider>
+            <InteractiveTutorialProvider>
+              <div className="min-h-screen bg-background">
+                <Navigation />
+                <main className="container mx-auto px-4 py-8 pt-24">
+                  {children}
+                </main>
+              </div>
+            </InteractiveTutorialProvider>
+          </ThemeProvider>
         </Providers>
       </body>
     </html>

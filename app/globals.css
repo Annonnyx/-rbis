@@ -38,6 +38,10 @@
     --neon-purple: 270 100% 65%;
     --cyber-dark: 220 40% 8%;
     --grid-color: rgba(0, 255, 255, 0.03);
+    
+    /* Dynamic Theme Color (defaults to cyan) */
+    --neon-primary: #00ffff;
+    --theme-hue: 180;
   }
 
   /* ============================================
