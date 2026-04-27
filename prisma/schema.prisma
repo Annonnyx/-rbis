@@ -237,8 +237,6 @@ model Business {
   city        City?    @relation(fields: [cityId], references: [id])
   accounts    BankAccount[]
   stock       Stock?
-  products    Product[]
-  sales       Sale[]
   location    GameLocation? @relation(fields: [locationId], references: [id])
   subsidiaries Subsidiary[]
   opaOffers   OPAOffer[]
