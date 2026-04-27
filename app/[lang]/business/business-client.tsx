@@ -1,19 +1,24 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { redirect, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
-  Building2, TrendingUp, DollarSign, Plus, Edit, Package, 
-  ShoppingCart, Users, BarChart3, ArrowUpRight, ArrowDownRight,
-  Store, Sparkles, ChevronRight, Briefcase, Zap, UserCircle,
+  Building2, TrendingUp, Users, MapPin, DollarSign, Package, 
+  ArrowRight, Plus, Edit2, Sparkles, Factory, Briefcase, Zap, UserCircle,
   FlaskConical, Handshake, Store as StoreIcon, Trash2, AlertTriangle,
-  MapPin, Leaf, Lightbulb
+  ChevronRight, Leaf, Lightbulb
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
 import { GlassButton } from "@/components/ui/glass-button"
 import { GlassInput } from "@/components/ui/glass-input"
+import { EconomyPanel } from "@/components/business/economy-panel"
 import { HoldingPanel } from "@/components/holdings/holding-panel"
 import { EventsPanel } from "@/components/events/events-panel"
 import { EmployeePanel } from "@/components/employees/employee-panel"
@@ -91,12 +96,10 @@ export function BusinessClient() {
   const router = useRouter()
   const [business, setBusiness] = useState<Business | null>(null)
   const [products, setProducts] = useState<Product[]>([])
-  const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"overview" | "sales" | "products" | "employees" | "analytics" | "technologies" | "b2b" | "franchises" | "holding" | "events">("overview")
   const [showCreate, setShowCreate] = useState(false)
   const [showAddProduct, setShowAddProduct] = useState(false)
-  const [showRecordSale, setShowRecordSale] = useState(false)
   const [showEditBusiness, setShowEditBusiness] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   
@@ -134,11 +137,6 @@ export function BusinessClient() {
     stock: "",
   })
   
-  const [saleForm, setSaleForm] = useState({
-    productId: "",
-    quantity: "",
-    buyerName: "",
-  })
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -176,10 +174,9 @@ export function BusinessClient() {
 
   const fetchBusinessData = async () => {
     try {
-      const [businessRes, productsRes, salesRes] = await Promise.all([
+      const [businessRes, productsRes] = await Promise.all([
         fetch("/api/business"),
         fetch("/api/business/products"),
-        fetch("/api/business/sales"),
       ])
       
       if (businessRes.ok) {
@@ -188,9 +185,6 @@ export function BusinessClient() {
       }
       if (productsRes.ok) {
         setProducts(await productsRes.json())
-      }
-      if (salesRes.ok) {
-        setSales(await salesRes.json())
       }
     } catch (error) {
       console.error("Error fetching business data:", error)
@@ -291,27 +285,6 @@ export function BusinessClient() {
     }
   }
 
-  const handleRecordSale = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const res = await fetch("/api/business/sales", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: saleForm.productId,
-          quantity: parseInt(saleForm.quantity),
-          buyerName: saleForm.buyerName,
-        }),
-      })
-      if (res.ok) {
-        fetchBusinessData()
-        setShowRecordSale(false)
-        setSaleForm({ productId: "", quantity: "", buyerName: "" })
-      }
-    } catch (error) {
-      console.error("Error recording sale:", error)
-    }
-  }
 
   const openEditModal = () => {
     if (business) {
@@ -722,58 +695,6 @@ export function BusinessClient() {
     )
   }
 
-  if (showRecordSale) {
-    return (
-      <div className="max-w-xl mx-auto animate-fade-in">
-        <h1 className="text-2xl font-bold mb-6 gradient-text">Enregistrer une vente</h1>
-        <form onSubmit={handleRecordSale} className="space-y-6">
-          <GlassCard className="p-6 space-y-4">
-            <div>
-              <label className="text-sm font-medium text-foreground/80 mb-2 block">Produit</label>
-              <select
-                value={saleForm.productId}
-                onChange={(e) => setSaleForm({ ...saleForm, productId: e.target.value })}
-                required
-                className="w-full px-4 py-3 glass-input rounded-xl"
-              >
-                <option value="">Sélectionnez un produit</option>
-                {products.filter(p => p.isActive).map(product => (
-                  <option key={product.id} value={product.id}>
-                    {product.name} - {formatCurrency(Number(product.price))} (Stock: {product.stock})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <GlassInput
-              label="Quantité"
-              type="number"
-              required
-              min="1"
-              value={saleForm.quantity}
-              onChange={(e) => setSaleForm({ ...saleForm, quantity: e.target.value })}
-              placeholder="1"
-            />
-            <GlassInput
-              label="Nom de l'acheteur"
-              required
-              value={saleForm.buyerName}
-              onChange={(e) => setSaleForm({ ...saleForm, buyerName: e.target.value })}
-              placeholder="Ex: Jean Dupont"
-            />
-          </GlassCard>
-          <div className="flex gap-4">
-            <GlassButton type="button" variant="ghost" onClick={() => setShowRecordSale(false)} className="flex-1">
-              Annuler
-            </GlassButton>
-            <GlassButton type="submit" variant="primary" className="flex-1">
-              Enregistrer la vente
-            </GlassButton>
-          </div>
-        </form>
-      </div>
-    )
-  }
-
   if (showEditBusiness) {
     return (
       <div className="max-w-xl mx-auto animate-fade-in">
@@ -1020,50 +941,13 @@ export function BusinessClient() {
         </div>
       )}
 
-      {/* Sales Tab */}
+      {/* Economy Tab - Automatic Sales System */}
       {activeTab === "sales" && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Historique des ventes</h2>
-            <GlassButton onClick={() => setShowRecordSale(true)} variant="primary">
-              <Plus className="w-4 h-4 mr-2" />
-              Nouvelle vente
-            </GlassButton>
+            <h2 className="text-xl font-semibold">Économie & Ventes Automatiques</h2>
           </div>
-          
-          {sales.length === 0 ? (
-            <GlassCard className="p-12 text-center">
-              <ShoppingCart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucune vente enregistrée</p>
-              <GlassButton onClick={() => setShowRecordSale(true)} variant="secondary" className="mt-4">
-                Enregistrer votre première vente
-              </GlassButton>
-            </GlassCard>
-          ) : (
-            <div className="space-y-3">
-              {sales.map((sale) => (
-                <GlassCard key={sale.id} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 bg-green-500/10 rounded-lg">
-                        <ArrowUpRight className="w-5 h-5 text-green-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{sale.productName}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {sale.quantity} unité(s) à {formatCurrency(Number(sale.unitPrice))}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-500">{formatCurrency(Number(sale.totalAmount))}</p>
-                      <p className="text-xs text-muted-foreground">{sale.buyerName}</p>
-                    </div>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-          )}
+          <EconomyPanel />
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
+import { BusinessEconomy } from "@/lib/business-economy"
 
 export async function GET() {
   const session = await auth()
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
   const userId = session.user.id
 
   try {
-    const { name, description, objective, product, service } = await req.json()
+    const { name, description, objective, product, service, type, subType, pricePositioning, locationId, ethicsPositioning, innovationPositioning } = await req.json()
 
     const existingBusiness = await db.business.findFirst({
       where: { userId },
@@ -64,8 +65,16 @@ export async function POST(req: Request) {
         objective,
         product,
         service,
+        type,
+        subType,
+        pricePositioning,
+        locationId,
+        ethicsPositioning,
+        innovationPositioning,
         capital: 300,
         cityId: userLocation?.cityId,
+        isActive: true,
+        isProfitable: false,
       },
     })
 
@@ -106,6 +115,9 @@ export async function POST(req: Request) {
         },
       }),
     ])
+
+    // Initialize business economy with default prices
+    await BusinessEconomy.initializeBusiness(business.id)
 
     return NextResponse.json(business)
   } catch (error) {

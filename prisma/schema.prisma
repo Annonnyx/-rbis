@@ -212,6 +212,21 @@ model Business {
   monthlySalaries    Decimal? @default(0) @map("monthly_salaries") @db.Decimal(15, 2)
   operatingCosts     Decimal? @default(0) @map("operating_costs") @db.Decimal(15, 2)
   
+  // Economic Simulation - Automatic Sales System
+  productPrice       Decimal? @default(0) @map("product_price") @db.Decimal(15, 2) // Prix de vente défini par le joueur
+  productionCost     Decimal? @default(0) @map("production_cost") @db.Decimal(15, 2) // Coût de production par unité
+  currentStock       Int? @default(0) @map("current_stock") // Stock actuel disponible
+  totalProduced      Int? @default(0) @map("total_produced") // Total produit (stats)
+  totalSold          Int? @default(0) @map("total_sold") // Total vendu (stats)
+  lastRevenueCalc    DateTime? @map("last_revenue_calc") // Dernier calcul des revenus
+  accumulatedRevenue Decimal? @default(0) @map("accumulated_revenue") @db.Decimal(15, 2) // Revenus accumulés
+  
+  // Price/Demand indicators
+  optimalPriceMin    Decimal? @map("optimal_price_min") @db.Decimal(15, 2) // Prix minimum optimal
+  optimalPriceMax    Decimal? @map("optimal_price_max") @db.Decimal(15, 2) // Prix maximum optimal
+  demandScore        Int? @default(50) @map("demand_score") // 0-100: demande actuelle
+  priceIndicator     PriceIndicator? @map("price_indicator") // too_cheap, good, too_expensive
+  
   productivity       Decimal? @default(1.0) @db.Decimal(3, 2)
   customerSatisfaction Int? @default(50) @map("customer_satisfaction")
   reputation         Int? @default(0)
@@ -680,7 +695,16 @@ enum BusinessSubType {
   CAFE
   BAKERY
   
-  // And more subtypes for other categories...
+  // SaaS
+  B2B_SAAS
+  B2C_SAAS
+  
+  // Airline
+  LOW_COST
+  PREMIUM
+  
+  // Casino
+  CASINO
 }
 
 enum PricePositioning {
@@ -688,6 +712,12 @@ enum PricePositioning {
   ACCESSIBLE
   PREMIUM
   LUXE
+}
+
+enum PriceIndicator {
+  TOO_CHEAP
+  GOOD
+  TOO_EXPENSIVE
 }
 
 enum EthicsPositioning {
