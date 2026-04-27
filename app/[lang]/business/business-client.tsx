@@ -12,7 +12,7 @@ import {
   Building2, TrendingUp, Users, MapPin, DollarSign, Package, 
   ArrowRight, Plus, Edit2, Sparkles, Factory, Briefcase, Zap, UserCircle,
   FlaskConical, Handshake, Store as StoreIcon, Trash2, AlertTriangle,
-  ChevronRight, Leaf, Lightbulb
+  ChevronRight, Leaf, Lightbulb, Boxes
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
@@ -63,24 +63,6 @@ interface Business {
   } | null
 }
 
-interface Sale {
-  id: string
-  productName: string
-  quantity: number
-  unitPrice: number
-  totalAmount: number
-  buyerName: string
-  createdAt: string
-}
-
-interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  stock: number
-  isActive: boolean
-}
 
 const isBrowser = typeof window !== "undefined"
 
@@ -95,11 +77,9 @@ export function BusinessClient() {
   const { data: session, status } = useSafeSession()
   const router = useRouter()
   const [business, setBusiness] = useState<Business | null>(null)
-  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<"overview" | "sales" | "products" | "employees" | "analytics" | "technologies" | "b2b" | "franchises" | "holding" | "events">("overview")
+  const [activeTab, setActiveTab] = useState<"overview" | "sales" | "stock" | "employees" | "analytics" | "technologies" | "b2b" | "franchises" | "holding" | "events">("overview")
   const [showCreate, setShowCreate] = useState(false)
-  const [showAddProduct, setShowAddProduct] = useState(false)
   const [showEditBusiness, setShowEditBusiness] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   
@@ -130,12 +110,6 @@ export function BusinessClient() {
     description: "",
   })
   
-  const [productForm, setProductForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-  })
   
 
   useEffect(() => {
@@ -262,30 +236,6 @@ export function BusinessClient() {
     }
   }
 
-  const handleAddProduct = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const res = await fetch("/api/business/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: productForm.name,
-          description: productForm.description,
-          price: parseFloat(productForm.price),
-          stock: parseInt(productForm.stock),
-        }),
-      })
-      if (res.ok) {
-        fetchBusinessData()
-        setShowAddProduct(false)
-        setProductForm({ name: "", description: "", price: "", stock: "" })
-      }
-    } catch (error) {
-      console.error("Error adding product:", error)
-    }
-  }
-
-
   const openEditModal = () => {
     if (business) {
       setEditFormData({
@@ -327,10 +277,6 @@ export function BusinessClient() {
       console.error("Error deleting business:", error)
     }
   }
-
-  const totalRevenue = sales.reduce((acc, sale) => acc + Number(sale.totalAmount), 0)
-  const totalProducts = products.length
-  const totalSales = sales.length
 
   if (status === "loading" || loading) {
     return (
@@ -640,61 +586,6 @@ export function BusinessClient() {
     )
   }
 
-  if (showAddProduct) {
-    return (
-      <div className="max-w-xl mx-auto animate-fade-in">
-        <h1 className="text-2xl font-bold mb-6 gradient-text">Ajouter un produit</h1>
-        <form onSubmit={handleAddProduct} className="space-y-6">
-          <GlassCard className="p-6 space-y-4">
-            <GlassInput
-              label="Nom du produit"
-              required
-              value={productForm.name}
-              onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-              placeholder="Ex: iPhone 15 Pro"
-            />
-            <div>
-              <label className="text-sm font-medium text-foreground/80 mb-2 block">Description</label>
-              <textarea 
-                rows={2} 
-                value={productForm.description} 
-                onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} 
-                placeholder="Décrivez votre produit..."
-                className="w-full px-4 py-3 glass-input rounded-xl resize-none"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <GlassInput
-                label="Prix (Ø)"
-                type="number"
-                required
-                value={productForm.price}
-                onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
-                placeholder="299"
-              />
-              <GlassInput
-                label="Stock initial"
-                type="number"
-                required
-                value={productForm.stock}
-                onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })}
-                placeholder="100"
-              />
-            </div>
-          </GlassCard>
-          <div className="flex gap-4">
-            <GlassButton type="button" variant="ghost" onClick={() => setShowAddProduct(false)} className="flex-1">
-              Annuler
-            </GlassButton>
-            <GlassButton type="submit" variant="primary" className="flex-1">
-              Ajouter le produit
-            </GlassButton>
-          </div>
-        </form>
-      </div>
-    )
-  }
-
   if (showEditBusiness) {
     return (
       <div className="max-w-xl mx-auto animate-fade-in">
@@ -812,7 +703,7 @@ export function BusinessClient() {
         {[
           { id: "overview", label: "Vue d'ensemble", icon: BarChart3 },
           { id: "sales", label: "Ventes", icon: ShoppingCart },
-          { id: "products", label: "Produits", icon: Package },
+          { id: "stock", label: "Stock & Production", icon: Boxes },
           { id: "employees", label: "Équipe", icon: UserCircle },
           { id: "analytics", label: "Analytics", icon: TrendingUp },
           { id: "technologies", label: "R&D", icon: FlaskConical },
@@ -856,19 +747,19 @@ export function BusinessClient() {
                 <div className="p-2 bg-green-500/10 rounded-lg">
                   <ArrowUpRight className="w-5 h-5 text-green-500" />
                 </div>
-                <span className="text-sm text-muted-foreground">Revenus</span>
+                <span className="text-sm text-muted-foreground">Revenus accumulés</span>
               </div>
-              <p className="text-2xl font-bold text-green-500">{formatCurrency(totalRevenue)}</p>
+              <p className="text-2xl font-bold text-green-500">{formatCurrency(Number(business?.accumulatedRevenue || 0))}</p>
             </GlassCard>
             
             <GlassCard liquid className="p-6">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <Package className="w-5 h-5 text-blue-500" />
+                  <Boxes className="w-5 h-5 text-blue-500" />
                 </div>
-                <span className="text-sm text-muted-foreground">Produits</span>
+                <span className="text-sm text-muted-foreground">Stock</span>
               </div>
-              <p className="text-2xl font-bold">{totalProducts}</p>
+              <p className="text-2xl font-bold">{business?.currentStock ?? 0}</p>
             </GlassCard>
             
             <GlassCard liquid className="p-6">
@@ -876,9 +767,9 @@ export function BusinessClient() {
                 <div className="p-2 bg-purple-500/10 rounded-lg">
                   <ShoppingCart className="w-5 h-5 text-purple-500" />
                 </div>
-                <span className="text-sm text-muted-foreground">Ventes</span>
+                <span className="text-sm text-muted-foreground">Ventes totales</span>
               </div>
-              <p className="text-2xl font-bold">{totalSales}</p>
+              <p className="text-2xl font-bold">{business?.totalSold ?? 0}</p>
             </GlassCard>
           </div>
 
@@ -951,53 +842,22 @@ export function BusinessClient() {
         </div>
       )}
 
-      {/* Products Tab */}
-      {activeTab === "products" && (
+      {/* Stock & Production Tab */}
+      {activeTab === "stock" && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Mes produits</h2>
-            <GlassButton onClick={() => setShowAddProduct(true)} variant="primary">
-              <Plus className="w-4 h-4 mr-2" />
-              Ajouter un produit
-            </GlassButton>
+            <h2 className="text-xl font-semibold">Stock & Production</h2>
           </div>
-          
-          {products.length === 0 ? (
-            <GlassCard className="p-12 text-center">
-              <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucun produit enregistré</p>
-              <GlassButton onClick={() => setShowAddProduct(true)} variant="secondary" className="mt-4">
-                Ajouter votre premier produit
-              </GlassButton>
-            </GlassCard>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {products.map((product) => (
-                <GlassCard key={product.id} className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-semibold">{product.name}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      product.isActive 
-                        ? "bg-green-500/10 text-green-500" 
-                        : "bg-red-500/10 text-red-500"
-                    }`}>
-                      {product.isActive ? "Actif" : "Inactif"}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
-                  <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                    <div>
-                      <p className="text-lg font-bold gradient-text">{formatCurrency(Number(product.price))}</p>
-                      <p className="text-xs text-muted-foreground">{product.stock} en stock</p>
-                    </div>
-                    <button className="p-2 hover:bg-accent rounded-lg transition-colors">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
-          )}
+          <GlassCard className="p-6 text-center">
+            <Factory className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-semibold mb-2">Gestion du stock déplacée</h3>
+            <p className="text-muted-foreground mb-4">
+              La gestion de la production et du stock est maintenant intégrée dans l&apos;onglet <strong>Ventes</strong>.
+            </p>
+            <GlassButton onClick={() => setActiveTab("sales")} variant="primary">
+              Aller à l&apos;onglet Ventes
+            </GlassButton>
+          </GlassCard>
         </div>
       )}
 
@@ -1007,14 +867,14 @@ export function BusinessClient() {
           <h2 className="text-xl font-semibold">Analytics</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <GlassCard liquid className="p-6">
-              <h3 className="font-semibold mb-4">Revenus totals</h3>
-              <p className="text-4xl font-bold gradient-text">{formatCurrency(totalRevenue)}</p>
+              <h3 className="font-semibold mb-4">Revenus accumulés</h3>
+              <p className="text-4xl font-bold gradient-text">{formatCurrency(Number(business?.accumulatedRevenue || 0))}</p>
               <p className="text-sm text-muted-foreground mt-2">Depuis la création</p>
             </GlassCard>
             <GlassCard liquid className="p-6">
-              <h3 className="font-semibold mb-4">Nombre de ventes</h3>
-              <p className="text-4xl font-bold">{totalSales}</p>
-              <p className="text-sm text-muted-foreground mt-2">Transactions complétées</p>
+              <h3 className="font-semibold mb-4">Total produit</h3>
+              <p className="text-4xl font-bold">{business?.totalProduced ?? 0}</p>
+              <p className="text-sm text-muted-foreground mt-2">Unités fabriquées</p>
             </GlassCard>
           </div>
           <GlassCard className="p-6">
