@@ -44,10 +44,10 @@ export async function GET() {
     // Calculate current hourly projections
     const hourlyData = BusinessEconomy.calculateRevenue(freshBusiness, 1)
 
-    // Get pricing info
+    // Get pricing info - use non-null assertion since we checked above
     const optimalPrices = BusinessEconomy.calculateOptimalPrices(
-      freshBusiness.subType,
-      freshBusiness.pricePositioning
+      freshBusiness.subType!,
+      freshBusiness.pricePositioning!
     )
 
     return NextResponse.json({

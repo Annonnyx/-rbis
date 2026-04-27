@@ -2,17 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useRouter, redirect } from "next/navigation"
 import { 
   Building2, TrendingUp, Users, MapPin, DollarSign, Package, 
   ArrowRight, Plus, Edit2, Sparkles, Factory, Briefcase, Zap, UserCircle,
   FlaskConical, Handshake, Store as StoreIcon, Trash2, AlertTriangle,
-  ChevronRight, Leaf, Lightbulb, Boxes
+  ChevronRight, Leaf, Lightbulb, Boxes, ArrowUpRight, ShoppingCart, BarChart3
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { GlassCard } from "@/components/ui/glass-card"
@@ -55,6 +50,10 @@ interface Business {
   service: string | null
   capital: number
   isActive: boolean
+  accumulatedRevenue: number | null
+  currentStock: number | null
+  totalSold: number | null
+  totalProduced: number | null
   stock: {
     symbol: string
     currentPrice: number
@@ -148,17 +147,11 @@ export function BusinessClient() {
 
   const fetchBusinessData = async () => {
     try {
-      const [businessRes, productsRes] = await Promise.all([
-        fetch("/api/business"),
-        fetch("/api/business/products"),
-      ])
+      const businessRes = await fetch("/api/business")
       
       if (businessRes.ok) {
         const businessData = await businessRes.json()
         setBusiness(businessData)
-      }
-      if (productsRes.ok) {
-        setProducts(await productsRes.json())
       }
     } catch (error) {
       console.error("Error fetching business data:", error)
@@ -688,7 +681,7 @@ export function BusinessClient() {
         </div>
         <div className="flex gap-2">
           <GlassButton variant="secondary" onClick={openEditModal}>
-            <Edit className="w-4 h-4 mr-2" />
+            <Edit2 className="w-4 h-4 mr-2" />
             Modifier
           </GlassButton>
           <GlassButton variant="secondary" onClick={() => setShowDeleteConfirm(true)} className="text-red-500 hover:text-red-600">
@@ -822,7 +815,7 @@ export function BusinessClient() {
             {business.product && (
               <GlassCard className="p-6">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Store className="w-4 h-4 text-primary" />
+                  <StoreIcon className="w-4 h-4 text-primary" />
                   Produit principal
                 </h3>
                 <p className="text-muted-foreground">{business.product}</p>

@@ -57,9 +57,13 @@ const PRICE_MULTIPLIERS: Record<PricePositioning, number> = {
 export class BusinessEconomy {
   // Calculer les prix optimaux pour une entreprise
   static calculateOptimalPrices(
-    subType: BusinessSubType,
-    pricePositioning: PricePositioning
+    subType?: BusinessSubType,
+    pricePositioning?: PricePositioning
   ): { min: number; max: number; recommended: number; productionCost: number } {
+    if (!subType || !pricePositioning) {
+      throw new Error('subType and pricePositioning are required')
+    }
+
     const economics = BUSINESS_ECONOMICS[subType]
     const multiplier = PRICE_MULTIPLIERS[pricePositioning]
     
